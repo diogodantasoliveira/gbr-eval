@@ -1,0 +1,35 @@
+# Golden Set — Matrícula de Imóvel (matricula_v1)
+# Status: VAZIO — aguardando anotação pelo CLO (Diogo)
+#
+# Cada case_NNN.json deve conter:
+#   document_hash: SHA-256 do documento original
+#   annotated_by: quem anotou
+#   annotated_at: ISO timestamp
+#   reviewed_by: segundo revisor (Claude ou especialista)
+#   fields: campos extraídos esperados
+#   citation: referência ao trecho do documento
+
+skill: matricula_v1
+document_type: matricula
+minimum_cases: 20
+current_cases: 0
+annotator: null
+status: empty
+
+critical_fields:
+  - numero_matricula
+  - proprietario_cpf
+  - proprietario_nome
+  - area_total
+  - onus
+  - alienacao_fiduciaria
+
+field_weights:
+  numero_matricula: 3   # CRITICAL
+  proprietario_cpf: 3   # CRITICAL
+  proprietario_nome: 2  # IMPORTANT
+  area_total: 2         # IMPORTANT
+  onus: 3               # CRITICAL
+  alienacao_fiduciaria: 3  # CRITICAL
+  endereco: 1           # INFORMATIVE
+  comarca: 1            # INFORMATIVE

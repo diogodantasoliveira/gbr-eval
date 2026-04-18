@@ -1,0 +1,22 @@
+skill: procuracao_v1
+document_type: procuracao
+minimum_cases: 20
+current_cases: 0
+annotator: null
+status: empty
+
+critical_fields:
+  - outorgante
+  - outorgado
+  - poderes_especificos
+  - validade
+
+field_weights:
+  outorgante: 3
+  outorgante_cpf: 3
+  outorgado: 3
+  outorgado_cpf: 2
+  poderes_especificos: 3
+  validade: 3
+  data_lavratura: 1
+  cartorio: 1

@@ -1,0 +1,22 @@
+skill: cnd_v1
+document_type: cnd
+minimum_cases: 20
+current_cases: 0
+annotator: null
+status: empty
+
+critical_fields:
+  - tipo_certidao
+  - numero
+  - orgao_emissor
+  - validade
+  - status
+
+field_weights:
+  tipo_certidao: 3
+  numero: 3
+  orgao_emissor: 2
+  validade: 3
+  status: 3
+  cpf_cnpj_consultado: 2
+  data_emissao: 1

@@ -1,0 +1,23 @@
+skill: contrato_social_v1
+document_type: contrato_social
+minimum_cases: 20
+current_cases: 0
+annotator: null
+status: empty
+
+critical_fields:
+  - cnpj
+  - razao_social
+  - socios
+  - capital_social
+  - poderes
+
+field_weights:
+  cnpj: 3
+  razao_social: 3
+  socios: 3
+  participacao_percentual: 2
+  capital_social: 2
+  poderes: 3
+  objeto_social: 1
+  data_constituicao: 1

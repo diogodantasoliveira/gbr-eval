@@ -1,0 +1,23 @@
+skill: balanco_v1
+document_type: balanco
+minimum_cases: 20
+current_cases: 0
+annotator: null
+status: empty
+
+critical_fields:
+  - ativo_total
+  - passivo_total
+  - patrimonio_liquido
+  - divida_liquida
+  - liquidez_corrente
+
+field_weights:
+  ativo_total: 3
+  passivo_total: 3
+  patrimonio_liquido: 3
+  divida_liquida: 3
+  liquidez_corrente: 3
+  receita_liquida: 2
+  resultado_exercicio: 2
+  data_referencia: 1
