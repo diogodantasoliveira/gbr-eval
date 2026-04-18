@@ -49,7 +49,7 @@ def cohens_kappa(
 
     labels = sorted(set(annotator_a) | set(annotator_b))
 
-    observed = sum(a == b for a, b in zip(annotator_a, annotator_b)) / n
+    observed = sum(a == b for a, b in zip(annotator_a, annotator_b, strict=False)) / n
 
     expected = 0.0
     for label in labels:
@@ -57,10 +57,7 @@ def cohens_kappa(
         p_b = annotator_b.count(label) / n
         expected += p_a * p_b
 
-    if expected == 1.0:
-        kappa = 1.0
-    else:
-        kappa = (observed - expected) / (1.0 - expected)
+    kappa = 1.0 if expected == 1.0 else (observed - expected) / (1.0 - expected)
 
     return AgreementResult(
         kappa=kappa,

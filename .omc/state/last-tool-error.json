@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"uv run ruff check --fix --unsafe-fixes . 2>&1\",\"description\":\"Auto-fix lint issues\"}",
+  "error": "Exit code 1\nE501 Line too long (122 > 120)\n  --> src/gbr_eval/graders/field_f1.py:79:121\n   |\n77 |                 false_positives += 1\n78 |\n79 |         precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0.0\n   |                                                                                                                         ^^\n80 |         recall = true_positives / (true_positives + false_negatives) if (true_positives + false_ne...",
+  "timestamp": "2026-04-18T13:33:03.137Z",
+  "retry_count": 3
+}

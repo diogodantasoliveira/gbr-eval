@@ -1,9 +1,8 @@
 """Tests for field F1 grader."""
 
+import gbr_eval.graders.field_f1  # noqa: F401
 from gbr_eval.graders.base import grade
 from gbr_eval.harness.models import GraderSpec
-
-import gbr_eval.graders.field_f1  # noqa: F401
 
 
 class TestFieldF1:

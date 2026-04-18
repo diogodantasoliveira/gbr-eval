@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import time
 import uuid
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
@@ -22,6 +21,9 @@ from gbr_eval.harness.models import (
     TaskResult,
     Tier,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def load_task(path: Path) -> Task:
@@ -134,7 +136,7 @@ def run_suite(
         else:
             run.tasks_failed += 1
 
-    run.finished_at = datetime.now(timezone.utc)
+    run.finished_at = datetime.now(UTC)
     if run.tasks_total > 0:
         run.overall_score = run.tasks_passed / run.tasks_total
     return run

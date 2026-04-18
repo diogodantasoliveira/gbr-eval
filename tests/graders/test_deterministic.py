@@ -1,12 +1,10 @@
 """Tests for deterministic graders."""
 
-import pytest
-
-from gbr_eval.graders.base import grade
-from gbr_eval.harness.models import GraderSpec
 
 # Ensure graders are registered
 import gbr_eval.graders.deterministic  # noqa: F401
+from gbr_eval.graders.base import grade
+from gbr_eval.harness.models import GraderSpec
 
 
 class TestExactMatch:

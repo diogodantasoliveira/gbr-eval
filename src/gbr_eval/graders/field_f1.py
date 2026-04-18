@@ -44,10 +44,7 @@ class FieldF1:
         fuzzy_ratio = float(spec.config.get("fuzzy_ratio", 0.85))
         numeric_tolerance = float(spec.config.get("numeric_tolerance", 0.01))
 
-        if scope == "critical_only" and critical_fields:
-            fields_to_check = critical_fields
-        else:
-            fields_to_check = list(expected.keys())
+        fields_to_check = critical_fields if scope == "critical_only" and critical_fields else list(expected.keys())
 
         if not fields_to_check:
             return GraderResult(
@@ -79,8 +76,10 @@ class FieldF1:
             elif exp_val is None and act_val is not None:
                 false_positives += 1
 
-        precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0.0
-        recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0.0
+        tp_fp = true_positives + false_positives
+        tp_fn = true_positives + false_negatives
+        precision = true_positives / tp_fp if tp_fp > 0 else 0.0
+        recall = true_positives / tp_fn if tp_fn > 0 else 0.0
         f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
 
         threshold = float(spec.config.get("f1_threshold", 0.90))

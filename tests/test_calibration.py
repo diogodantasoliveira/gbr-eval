@@ -17,7 +17,8 @@ class TestCohensKappa:
         a = ["pass", "pass", "pass", "pass"]
         b = ["fail", "fail", "fail", "fail"]
         result = cohens_kappa(a, b)
-        assert result.kappa < 0
+        assert result.kappa <= 0
+        assert result.observed_agreement == 0.0
         assert result.calibrated is False
 
     def test_moderate_agreement(self):

@@ -52,7 +52,7 @@ grade(input, output, reference, config) → GraderResult
 | Tipo | Pureza | Determinismo | Uso em CI |
 |------|--------|-------------|-----------|
 | **Determinístico** | Puro | 100% reproduzível | Gate (blocking) |
-| **Model-based** | Impuro (API externa) | Não-determinístico | DECISÃO PENDENTE |
+| **Model-based** | Impuro (API externa) | Não-determinístico | Informative (anota no PR, não bloqueia). Promove a blocking após 50+ runs com auto-concordância >= 0.90 |
 | **Humano** | N/A | Gold standard | Calibração offline |
 
 ### Graders determinísticos implementados
@@ -202,13 +202,17 @@ contracts/
 - **Mitigação:** Claude como segundo anotador (não vota, mas discorda gera flag para revisão).
 - **Milestone futuro:** Contratar especialista quando revenue > R$100k MRR.
 
-## Classificação de risco de PR (futuro)
+## Classificação de risco de PR
 
-| Nível | Critério | Ação |
-|-------|----------|------|
-| Low | Todos os graders determinísticos passam, nenhum arquivo em zona perigosa | Candidato a fast-track review |
-| Medium | Toca áreas de julgamento (prompts, rubrics, agent configs) | Review humano focado |
-| High | Toca auth, billing, LGPD, core logic, infra | Review humano completo |
+O CI aplica labels automaticamente. Review humano é sempre obrigatório — a label guia a profundidade, não a necessidade.
+
+| Nível | Critério | Label CI | Ação |
+|-------|----------|----------|------|
+| Low | Todos determinísticos passam, nenhum arquivo sensível | `eval:low-risk` | Review focado (5 min). 1 em cada 5 recebe review completo (amostragem) |
+| Medium | Toca áreas de julgamento (prompts, rubrics, agent configs) | `eval:medium-risk` | Review humano focado |
+| High | Toca golden sets, thresholds, calibração, contracts | `eval:high-risk` | Review humano completo por Diogo |
+
+**Regra:** label sim, auto-merge NUNCA. Em contexto vibe-coding com 100% de código AI-generated, todo PR passa por humano.
 
 ## Roadmap de Maturidade
 
@@ -231,11 +235,11 @@ contracts/
 | Eval sem calibração | Mede algo, mas não se sabe o quê | Cohen's κ >= 0.75 antes de confiar |
 | Schema sem implementação | Engenharia no vácuo | Schema wide, implement narrow — OK ter schema L2 sem tasks L2 |
 
-## Decisões pendentes
+## Decisões tomadas
 
-| # | Decisão | Trade-off | Status |
-|---|---------|-----------|--------|
-| 1 | LLM-judge no CI: blocking vs informative | Blocking: mais seguro, risco de flaky. Informative: menos atrito, risco de ignorar. | PENDENTE |
-| 2 | Runner: pytest vs CLI customizado | pytest: integra com CI. Custom: mais flexível, mais manutenção. | PENDENTE |
-| 3 | Sprint: dedicado vs diluído | Dedicado: mais rápido, compete com Gate. Diluído: menos impacto, mais lento. | PENDENTE |
-| 4 | Auto-promotion guard | Fast-track para low-risk PRs: economiza review budget. Risco: falso senso de segurança. | PENDENTE |
+| # | Decisão | Escolha | Rationale |
+|---|---------|---------|-----------|
+| 1 | LLM-judge no CI | **Informative primeiro, blocking depois.** Anota no PR sem bloquear. Após 50+ runs com auto-concordância >= 0.90, promove a blocking. | LLM é não-determinístico — flaky gate treina time a ignorar falhas. Determinísticos já pegam erros factuais. |
+| 2 | Runner | **Os dois.** pytest testa o framework. CLI (runner.py) executa suites de eval. | Papéis diferentes. pytest = "grader funciona?". CLI = "output está correto?" |
+| 3 | Sprint | **Dedicado, 3-5 dias.** Framework já construído. Falta golden sets (CLO) + task YAMLs + CI integration. | Gate Fase 1 (~10/Mai) DEPENDE do eval. Não é concorrente, é pré-requisito. |
+| 4 | Auto-promotion | **Label sim, auto-merge não.** CI aplica `eval:low-risk`. Reviewer faz review focado. 1/5 low-risk recebe review completo (amostragem). | Em vibe-coding com 100% AI code, auto-merge é arriscado. Label guia profundidade, não necessidade. |

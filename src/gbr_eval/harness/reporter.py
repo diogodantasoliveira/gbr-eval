@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from gbr_eval.harness.models import EvalRun, TaskResult
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from gbr_eval.harness.models import EvalRun
 
 
 def console_report(run: EvalRun) -> str:

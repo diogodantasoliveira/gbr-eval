@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+import gbr_eval.graders.deterministic  # noqa: F401
 from gbr_eval.harness.models import (
     Category,
     GraderSpec,
@@ -14,9 +15,6 @@ from gbr_eval.harness.models import (
     Tier,
 )
 from gbr_eval.harness.runner import load_task, run_task
-
-import gbr_eval.graders.deterministic  # noqa: F401
-
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

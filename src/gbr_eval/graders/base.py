@@ -38,8 +38,8 @@ def grade(
     expected: dict[str, Any],
     spec: GraderSpec,
 ) -> GraderResult:
-    grader = get_grader(grader_name)
     try:
+        grader = get_grader(grader_name)
         return grader.grade(output, expected, spec)
     except Exception as exc:
         return GraderResult(

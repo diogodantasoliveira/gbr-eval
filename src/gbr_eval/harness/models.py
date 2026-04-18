@@ -2,26 +2,26 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class Layer(str, Enum):
+class Layer(StrEnum):
     L0 = "L0"
     L1 = "L1"
     L2 = "L2"
 
 
-class Tier(str, Enum):
+class Tier(StrEnum):
     GATE = "gate"
     REGRESSION = "regression"
     CANARY = "canary"
 
 
-class Category(str, Enum):
+class Category(StrEnum):
     CLASSIFICATION = "classification"
     EXTRACTION = "extraction"
     DECISION = "decision"
@@ -33,7 +33,7 @@ class Category(str, Enum):
     CONVENTION = "convention"
 
 
-class ScoringMode(str, Enum):
+class ScoringMode(StrEnum):
     WEIGHTED = "weighted"
     BINARY = "binary"
     HYBRID = "hybrid"
@@ -90,7 +90,7 @@ class TaskResult(BaseModel):
 
 class EvalRun(BaseModel):
     run_id: str
-    started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     finished_at: datetime | None = None
     layer: Layer
     tier: Tier | None = None
