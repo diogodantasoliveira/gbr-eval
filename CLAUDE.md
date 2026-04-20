@@ -127,11 +127,11 @@ uv run python -m gbr_eval.harness.runner analyze --runs-dir runs/
 uv run pytest tests/graders/test_deterministic.py          # um arquivo
 uv run pytest -k "test_exact_match"                        # por nome
 
-# Frontend admin panel
-cd frontend && pnpm install                                   # setup
-cd frontend && pnpm dev                                       # dev server (port 3002)
-cd frontend && pnpm type-check                                # TypeScript check
-cd frontend && pnpm db:push                                   # apply DB schema
+# Frontend admin panel (repo irmão, não subdir — ver docs/PORTS.md)
+cd ../gbr-eval-frontend && pnpm install                       # setup
+cd ../gbr-eval-frontend && pnpm db:push                       # apply DB schema
+cd ../gbr-eval-frontend && pnpm dev                           # dev server (porta fixa 3002)
+cd ../gbr-eval-frontend && pnpm type-check                    # TypeScript check
 ```
 
 ## Arquitetura
@@ -164,8 +164,8 @@ gbr-eval/
 │   │   └── validator.py      # JSON Schema validation (standalone, sem deps externas)
 │   └── calibration/          # Concordância inter-anotador
 │       └── iaa.py            # Cohen's kappa, concordance tracking
-├── tasks/                    # 48 task YAMLs
-│   ├── product/              # classification(10), extraction(7), citation(6), cost(1), latency(1), decision(1)
+├── tasks/                    # 47 task YAMLs
+│   ├── product/              # classification(11), extraction(6), citation(5), cost(1), latency(1), decision(1)
 │   └── engineering/          # atom-back-end(5), engine-billing(4), engine-integracao(5), garantia-ia(4), notifier(4)
 ├── golden/                   # Golden sets — ground truth anotado por humano (40 cases)
 │   ├── matricula/            # 8 cases (5 standard + 2 edge + 1 confuser)
@@ -175,11 +175,6 @@ gbr-eval/
 │   ├── certidao_trabalhista/ # 8 cases (5 standard + 2 edge + 1 confuser)
 │   ├── balanco/              # 0 cases (blocked — 0 docs disponíveis)
 │   └── red_team/             # 0 cases (blocked — authenticity_flag pendente)
-├── frontend/                 # Admin panel — Next.js 16 + SQLite (40 páginas, 57 API routes)
-│   ├── src/app/              # Pages e API routes
-│   ├── src/db/               # Drizzle ORM, 23 tabelas
-│   ├── src/lib/              # PII redaction, validations, scoring
-│   └── src/components/       # UI components (shadcn/ui)
 ├── tools/                    # Scripts auxiliares
 │   ├── generate_synthetic.py # Gerador de golden sets sintéticos (4 categorias, Claude em contexto separado)
 │   ├── generate_all_synthetic.py # Batch generation com env allowlist
@@ -195,6 +190,8 @@ gbr-eval/
 ├── docs/                     # Documentação (19 documentos)
 └── runs/                     # Resultados de eval runs (JSON)
 ```
+
+> **Frontend vive em repo separado:** `../gbr-eval-frontend/` (Next.js 16 + SQLite, porta fixa 3002). Ver `docs/PORTS.md` para o registro de portas e `../gbr-eval-frontend/.env.example` para variáveis de ambiente.
 
 ### Runners e Solvers
 
@@ -362,7 +359,7 @@ Regras detalhadas em `.claude/rules/`:
 
 ## Frontend — Admin Panel de Eval
 
-O frontend é uma aplicação Next.js 16 com SQLite local que serve como painel de administração e observabilidade do eval. Não é um dashboard estático — é uma aplicação completa com 40 páginas e 57 API routes.
+O frontend é uma aplicação Next.js 16 com SQLite local que serve como painel de administração e observabilidade do eval. **Vive em repo separado:** `../gbr-eval-frontend/` (sibling, não subdir). Porta fixa **3002** em `dev` e `start` — ver `docs/PORTS.md`. Não é um dashboard estático — é uma aplicação completa com 40 páginas e 57 API routes.
 
 ### Módulos
 

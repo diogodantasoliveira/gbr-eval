@@ -110,11 +110,6 @@ gbr-eval/
 │   ├── certidao_trabalhista/       # 8 cases
 │   ├── balanco/                    # metadata only (blocked — 0 docs)
 │   └── red_team/                   # metadata only (blocked — capability pending)
-├── frontend/                       # Admin panel — Next.js 16 + SQLite
-│   ├── src/app/                    # 39 paginas, 57 API routes
-│   ├── src/db/                     # Drizzle ORM, 23 tabelas
-│   ├── src/lib/                    # PII redaction, validations, scoring
-│   └── src/components/             # UI components (shadcn/ui)
 ├── tools/                          # Scripts auxiliares
 │   ├── generate_synthetic.py       # Gerador de golden sets sinteticos (Claude)
 │   ├── generate_all_synthetic.py   # Batch generation com env allowlist
@@ -137,6 +132,8 @@ gbr-eval/
 │   └── actions/gbr-eval-gate/      # GitHub Action reutilizavel
 └── contracts/schemas/              # Schema snapshots
 ```
+
+> **Frontend vive em repo separado:** `../gbr-eval-frontend/` (Next.js 16 + SQLite, porta fixa 3002). Nao e subdir do gbr-eval. Ver `docs/PORTS.md` para o registro de portas e `../gbr-eval-frontend/.env.example` para variaveis de ambiente.
 
 ### Tres runners — papeis diferentes
 
@@ -1081,7 +1078,7 @@ Testes que dependem de `ANTHROPIC_API_KEY` usam `pytest.mark.skipif` — nunca q
 
 ## 14. Frontend — Admin Panel
 
-O frontend e uma aplicacao Next.js 16 com SQLite local que serve como painel de administracao e observabilidade do eval.
+O frontend e uma aplicacao Next.js 16 com SQLite local que serve como painel de administracao e observabilidade do eval. **Vive em repo separado:** `../gbr-eval-frontend/` (sibling, nao subdir do gbr-eval). Porta fixa **3002** em `dev` e `start`. Registro completo de portas em `docs/PORTS.md`; variaveis de ambiente em `../gbr-eval-frontend/.env.example`.
 
 ### Stack
 
@@ -1089,7 +1086,7 @@ O frontend e uma aplicacao Next.js 16 com SQLite local que serve como painel de 
 - **Runtime:** React 19
 - **DB:** SQLite via better-sqlite3 + Drizzle ORM (23 tabelas, WAL mode)
 - **UI:** shadcn/ui + Tailwind CSS
-- **Auth:** middleware com comparacao timing-safe (HMAC via Web Crypto) + fail-closed quando ADMIN_API_TOKEN nao configurado (retorna 500)
+- **Auth:** `src/proxy.ts` (renomeado de middleware — convencao do Next 16) com comparacao timing-safe (SHA-256 via Web Crypto) + fail-closed quando ADMIN_API_TOKEN nao configurado (retorna 503). Dev bypass via `DISABLE_AUTH=true` + `NODE_ENV=development`.
 
 ### Modulos (39 paginas, 57 API routes)
 
@@ -1113,10 +1110,13 @@ O frontend e uma aplicacao Next.js 16 com SQLite local que serve como painel de 
 ### Setup frontend
 
 ```bash
-cd frontend && pnpm install
-pnpm dev          # dev server (port 3000)
-pnpm type-check   # TypeScript check
-pnpm db:push      # apply DB schema
+# Repo irmao, nao subdir do gbr-eval
+cd ../gbr-eval-frontend
+cp .env.example .env.local        # inclui PORT=3002 e DISABLE_AUTH=true para dev
+pnpm install                      # native builds liberados via pnpm.onlyBuiltDependencies no package.json
+pnpm db:push                      # cria ./gbr-eval.db (SQLite) a partir do Drizzle schema
+pnpm dev                          # dev server na porta fixa 3002
+pnpm type-check                   # TypeScript check
 ```
 
 ---
@@ -1338,7 +1338,8 @@ O campo `processos` em certidao trabalhista tem dois formatos reais (agregado vs
 | Testes | `tests/` |
 | CI | `.github/workflows/ci.yml` |
 | CI Action | `.github/actions/gbr-eval-gate/action.yml` |
-| Frontend | `frontend/` |
+| Frontend | `../gbr-eval-frontend/` (repo irmao) |
+| Registro de portas | `docs/PORTS.md` |
 | Eval runs | `runs/` |
 | Docs | `docs/` |
 
@@ -1369,8 +1370,9 @@ gbr-eval run --suite tasks/engineering/atom/ --code-dir ~/repos/atom-back-end/
 gbr-eval run --suite tasks/engineering/billing/ --code-dir ~/repos/engine-billing/
 gbr-eval run --suite tasks/engineering/integracao/ --code-dir ~/repos/engine-integracao/
 
-# Frontend
-cd frontend && pnpm install && pnpm dev
+# Frontend (repo irmao)
+cd ../gbr-eval-frontend && pnpm install && pnpm db:push && pnpm dev
+# -> http://localhost:3002 (porta fixa, ver docs/PORTS.md)
 ```
 
 ### Autonomia
