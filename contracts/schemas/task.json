@@ -1,0 +1,306 @@
+{
+  "$defs": {
+    "Category": {
+      "enum": [
+        "classification",
+        "extraction",
+        "decision",
+        "citation",
+        "cost",
+        "latency",
+        "code_quality",
+        "tenant_isolation",
+        "convention"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "GraderSpec": {
+      "properties": {
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "weight": {
+          "default": 1.0,
+          "title": "Weight",
+          "type": "number"
+        },
+        "required": {
+          "default": false,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "config": {
+          "additionalProperties": true,
+          "title": "Config",
+          "type": "object"
+        },
+        "model_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Role"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "GraderSpec",
+      "type": "object"
+    },
+    "Layer": {
+      "enum": [
+        "engineering",
+        "product",
+        "operational",
+        "compliance"
+      ],
+      "title": "Layer",
+      "type": "string"
+    },
+    "ScoreReducer": {
+      "enum": [
+        "mean",
+        "at_least_one",
+        "all_pass",
+        "majority",
+        "median"
+      ],
+      "title": "ScoreReducer",
+      "type": "string"
+    },
+    "ScoringMode": {
+      "enum": [
+        "weighted",
+        "binary",
+        "hybrid"
+      ],
+      "title": "ScoringMode",
+      "type": "string"
+    },
+    "TaskInput": {
+      "properties": {
+        "endpoint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Endpoint"
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        },
+        "fixture_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fixture Path"
+        }
+      },
+      "title": "TaskInput",
+      "type": "object"
+    },
+    "Tier": {
+      "enum": [
+        "gate",
+        "regression",
+        "canary"
+      ],
+      "title": "Tier",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "category": {
+      "$ref": "#/$defs/Category"
+    },
+    "component": {
+      "title": "Component",
+      "type": "string"
+    },
+    "layer": {
+      "$ref": "#/$defs/Layer"
+    },
+    "tier": {
+      "$ref": "#/$defs/Tier",
+      "default": "gate"
+    },
+    "tenant_profile": {
+      "default": "global",
+      "title": "Tenant Profile",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+    },
+    "input": {
+      "$ref": "#/$defs/TaskInput"
+    },
+    "expected": {
+      "additionalProperties": true,
+      "title": "Expected",
+      "type": "object"
+    },
+    "graders": {
+      "items": {
+        "$ref": "#/$defs/GraderSpec"
+      },
+      "title": "Graders",
+      "type": "array"
+    },
+    "scoring_mode": {
+      "$ref": "#/$defs/ScoringMode",
+      "default": "weighted"
+    },
+    "pass_threshold": {
+      "default": 0.95,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Pass Threshold",
+      "type": "number"
+    },
+    "target_threshold": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Threshold"
+    },
+    "baseline_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline Run Id"
+    },
+    "regression_signal": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Regression Signal"
+    },
+    "eval_owner": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Eval Owner"
+    },
+    "eval_cadence": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Eval Cadence"
+    },
+    "golden_set_tags": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Golden Set Tags"
+    },
+    "epochs": {
+      "default": 1,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Epochs",
+      "type": "integer"
+    },
+    "reducers": {
+      "items": {
+        "$ref": "#/$defs/ScoreReducer"
+      },
+      "title": "Reducers",
+      "type": "array"
+    },
+    "primary_reducer": {
+      "$ref": "#/$defs/ScoreReducer",
+      "default": "mean"
+    }
+  },
+  "required": [
+    "task_id",
+    "category",
+    "component",
+    "layer",
+    "input",
+    "graders"
+  ],
+  "title": "Task",
+  "type": "object"
+}

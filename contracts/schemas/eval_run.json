@@ -1,0 +1,313 @@
+{
+  "$defs": {
+    "GateResult": {
+      "enum": [
+        "go",
+        "conditional_go",
+        "no_go",
+        "no_go_absolute"
+      ],
+      "title": "GateResult",
+      "type": "string"
+    },
+    "GraderResult": {
+      "properties": {
+        "grader_type": {
+          "title": "Grader Type",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "weight": {
+          "default": 1.0,
+          "title": "Weight",
+          "type": "number"
+        },
+        "required": {
+          "default": false,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "details": {
+          "default": "",
+          "title": "Details",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "severity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Severity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "file_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "File Path"
+        }
+      },
+      "required": [
+        "grader_type",
+        "passed",
+        "score"
+      ],
+      "title": "GraderResult",
+      "type": "object"
+    },
+    "Layer": {
+      "enum": [
+        "engineering",
+        "product",
+        "operational",
+        "compliance"
+      ],
+      "title": "Layer",
+      "type": "string"
+    },
+    "Severity": {
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "TaskResult": {
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "grader_results": {
+          "items": {
+            "$ref": "#/$defs/GraderResult"
+          },
+          "title": "Grader Results",
+          "type": "array"
+        },
+        "duration_ms": {
+          "default": 0.0,
+          "title": "Duration Ms",
+          "type": "number"
+        },
+        "pass_threshold": {
+          "default": 0.95,
+          "title": "Pass Threshold",
+          "type": "number"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "golden_set_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Golden Set Tags"
+        },
+        "reducer_scores": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Reducer Scores",
+          "type": "object"
+        },
+        "epoch_scores": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Epoch Scores",
+          "type": "array"
+        }
+      },
+      "required": [
+        "task_id",
+        "passed",
+        "score",
+        "grader_results"
+      ],
+      "title": "TaskResult",
+      "type": "object"
+    },
+    "Tier": {
+      "enum": [
+        "gate",
+        "regression",
+        "canary"
+      ],
+      "title": "Tier",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "finished_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Finished At"
+    },
+    "layer": {
+      "$ref": "#/$defs/Layer"
+    },
+    "tier": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Tier"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "tasks_total": {
+      "default": 0,
+      "title": "Tasks Total",
+      "type": "integer"
+    },
+    "tasks_passed": {
+      "default": 0,
+      "title": "Tasks Passed",
+      "type": "integer"
+    },
+    "tasks_failed": {
+      "default": 0,
+      "title": "Tasks Failed",
+      "type": "integer"
+    },
+    "task_results": {
+      "items": {
+        "$ref": "#/$defs/TaskResult"
+      },
+      "title": "Task Results",
+      "type": "array"
+    },
+    "overall_score": {
+      "default": 0.0,
+      "title": "Overall Score",
+      "type": "number"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "gate_result": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GateResult"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "baseline_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline Run Id"
+    }
+  },
+  "required": [
+    "run_id",
+    "layer"
+  ],
+  "title": "EvalRun",
+  "type": "object"
+}

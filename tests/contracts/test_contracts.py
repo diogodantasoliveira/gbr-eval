@@ -8,6 +8,9 @@ from pathlib import Path
 import pytest
 
 from gbr_eval.contracts.validator import ContractResult, validate_response
+from gbr_eval.harness.models import EvalRun, GraderResult, Task, TaskResult
+
+SCHEMAS_DIR = Path(__file__).parent.parent.parent / "contracts" / "schemas"
 
 
 @pytest.fixture()
@@ -140,3 +143,44 @@ class TestSampleSchemaOnDisk:
         schema_path = Path(__file__).parent.parent.parent / "contracts" / "schemas" / "sample_extract_response.json"
         result = validate_response({"document_type": "matricula"}, schema_path)
         assert not result.valid
+
+
+class TestHarnessModelSchemas:
+    """Catch drift between on-disk JSON Schemas and live Pydantic model definitions.
+
+    If a model field is added, removed, or renamed, the on-disk snapshot will
+    diverge and these tests will fail — signalling that `tools/export_schemas.py`
+    must be re-run before merging.
+    """
+
+    def test_eval_run_schema_matches_model(self) -> None:
+        schema_path = SCHEMAS_DIR / "eval_run.json"
+        assert schema_path.exists(), f"Schema file not found: {schema_path}. Run tools/export_schemas.py."
+        on_disk = json.loads(schema_path.read_text(encoding="utf-8"))
+        assert on_disk == EvalRun.model_json_schema(), (
+            "eval_run.json is out of sync with EvalRun. Re-run tools/export_schemas.py."
+        )
+
+    def test_task_schema_matches_model(self) -> None:
+        schema_path = SCHEMAS_DIR / "task.json"
+        assert schema_path.exists(), f"Schema file not found: {schema_path}. Run tools/export_schemas.py."
+        on_disk = json.loads(schema_path.read_text(encoding="utf-8"))
+        assert on_disk == Task.model_json_schema(), (
+            "task.json is out of sync with Task. Re-run tools/export_schemas.py."
+        )
+
+    def test_task_result_schema_matches_model(self) -> None:
+        schema_path = SCHEMAS_DIR / "task_result.json"
+        assert schema_path.exists(), f"Schema file not found: {schema_path}. Run tools/export_schemas.py."
+        on_disk = json.loads(schema_path.read_text(encoding="utf-8"))
+        assert on_disk == TaskResult.model_json_schema(), (
+            "task_result.json is out of sync with TaskResult. Re-run tools/export_schemas.py."
+        )
+
+    def test_grader_result_schema_matches_model(self) -> None:
+        schema_path = SCHEMAS_DIR / "grader_result.json"
+        assert schema_path.exists(), f"Schema file not found: {schema_path}. Run tools/export_schemas.py."
+        on_disk = json.loads(schema_path.read_text(encoding="utf-8"))
+        assert on_disk == GraderResult.model_json_schema(), (
+            "grader_result.json is out of sync with GraderResult. Re-run tools/export_schemas.py."
+        )
