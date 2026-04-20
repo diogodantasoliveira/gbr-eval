@@ -36,9 +36,4 @@ runs/
 *.jsonl
 !tasks/**/*.jsonl
 
-frontend/node_modules/
-frontend/.next/
-frontend/*.db
-frontend/*.db-shm
-frontend/*.db-wal
-frontend/uploads/
+frontend/
