@@ -3,18 +3,13 @@
 from __future__ import annotations
 
 import re
-import re as _re_mod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from gbr_eval.graders._shared import _is_catastrophic_pattern, _make_result
 from gbr_eval.graders.base import register_grader
-from gbr_eval.harness.models import GraderResult, GraderSpec
 
-_CATASTROPHIC_RE = _re_mod.compile(r"(\([^)]*[+*][^)]*\))[+*]")
-
-
-def _is_catastrophic_pattern(pattern: str) -> bool:
-    """Detect obvious catastrophic backtracking patterns like (a+)+."""
-    return bool(_CATASTROPHIC_RE.search(pattern))
+if TYPE_CHECKING:
+    from gbr_eval.harness.models import GraderResult, GraderSpec
 
 _MISSING = object()
 
@@ -33,18 +28,6 @@ def _get_field(data: dict[str, Any], path: str) -> Any:
         else:
             return _MISSING
     return current
-
-
-def _make_result(spec: GraderSpec, passed: bool, score: float, details: str) -> GraderResult:
-    return GraderResult(
-        grader_type=spec.type,
-        field=spec.field,
-        passed=passed,
-        score=score,
-        weight=spec.weight,
-        required=spec.required,
-        details=details,
-    )
 
 
 @register_grader("exact_match")

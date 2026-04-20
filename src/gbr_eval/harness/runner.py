@@ -154,7 +154,20 @@ def _run_single_epoch(
     return grader_results, score, duration_ms
 
 
-def run_task(task: Task, output: dict[str, Any], *, model_roles: dict[str, str] | None = None) -> TaskResult:
+def _compute_task_result(
+    task: Task,
+    output: dict[str, Any],
+    *,
+    model_roles: dict[str, str] | None = None,
+    extra_metadata: dict[str, Any] | None = None,
+    extra_duration_ms: float = 0.0,
+) -> TaskResult:
+    """Run epochs, reduce scores, and construct a TaskResult.
+
+    This is the shared computation core used by both the sync runner (run_task)
+    and the async solver runner (async_runner.run_task_with_solver). Solver-specific
+    concerns (invoking the solver, capturing trace metadata) stay in the caller.
+    """
     effective_epochs = 1 if (task.epochs > 1 and _all_graders_deterministic(task)) else task.epochs
 
     epoch_scores: list[float] = []
@@ -162,10 +175,14 @@ def run_task(task: Task, output: dict[str, Any], *, model_roles: dict[str, str] 
     total_duration = 0.0
 
     for _ in range(effective_epochs):
-        grader_results, score, duration_ms = _run_single_epoch(task, output, model_roles=model_roles)
+        grader_results, score, duration_ms = _run_single_epoch(
+            task, output, model_roles=model_roles, extra_metadata=extra_metadata,
+        )
         epoch_scores.append(score)
         all_grader_results.extend(grader_results)
         total_duration += duration_ms
+
+    total_duration += extra_duration_ms
 
     reducer_scores = {
         r.value: _reduce_scores(epoch_scores, r, task.pass_threshold)
@@ -185,6 +202,10 @@ def run_task(task: Task, output: dict[str, Any], *, model_roles: dict[str, str] 
         reducer_scores=reducer_scores,
         epoch_scores=epoch_scores,
     )
+
+
+def run_task(task: Task, output: dict[str, Any], *, model_roles: dict[str, str] | None = None) -> TaskResult:
+    return _compute_task_result(task, output, model_roles=model_roles)
 
 
 def _compute_score(results: list[Any], mode: ScoringMode) -> float:
