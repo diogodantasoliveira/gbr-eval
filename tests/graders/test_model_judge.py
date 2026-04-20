@@ -10,6 +10,7 @@ import os
 from typing import Any
 from unittest.mock import MagicMock, patch
 
+import anthropic
 import pytest
 
 import gbr_eval.graders.model_judge  # noqa: F401 — trigger registration
@@ -328,3 +329,103 @@ class TestLLMJudgeApiError:
         result, _ = _mock_grade(LLMJudge(), {}, {}, spec, bad_message)
         assert not result.passed
         assert result.error is not None
+
+
+def _make_rate_limit_error() -> anthropic.RateLimitError:
+    import httpx
+
+    req = httpx.Request("GET", "https://api.anthropic.com")
+    resp = httpx.Response(429, request=req)
+    return anthropic.RateLimitError("rate limited", response=resp, body=None)
+
+
+def _make_bad_request_error() -> anthropic.BadRequestError:
+    import httpx
+
+    req = httpx.Request("GET", "https://api.anthropic.com")
+    resp = httpx.Response(400, request=req)
+    return anthropic.BadRequestError("bad request", response=resp, body=None)
+
+
+class TestLLMJudgeRetry:
+    def test_retry_on_rate_limit(self):
+        """First call raises RateLimitError; second call succeeds. time.sleep is patched."""
+        spec = _make_spec()
+        success_response = _make_api_response(score=5, reasoning="OK")
+        rate_limit_exc = _make_rate_limit_error()
+
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
+            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.time.sleep") as mock_sleep,
+        ):
+            mock_client = MagicMock()
+            mock_client_cls.return_value = mock_client
+            mock_client.messages.create.side_effect = [rate_limit_exc, success_response]
+            result = LLMJudge().grade({}, {}, spec)
+
+        assert result.passed
+        assert result.score == pytest.approx(1.0)
+        assert mock_client.messages.create.call_count == 2
+        mock_sleep.assert_called_once_with(1.0)  # _BASE_DELAY * 2^0
+
+    def test_retry_exhausted(self):
+        """All calls raise RateLimitError; result carries the error."""
+        spec = _make_spec()
+        rate_limit_exc = _make_rate_limit_error()
+
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
+            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.time.sleep"),
+        ):
+            mock_client = MagicMock()
+            mock_client_cls.return_value = mock_client
+            mock_client.messages.create.side_effect = rate_limit_exc
+            result = LLMJudge().grade({}, {}, spec)
+
+        assert not result.passed
+        assert result.score == 0.0
+        assert result.error is not None
+        # Default _MAX_RETRIES=3 → 4 total attempts
+        assert mock_client.messages.create.call_count == 4
+
+    def test_no_retry_on_bad_request(self):
+        """BadRequestError is not retried — only one attempt is made."""
+        spec = _make_spec()
+        bad_req_exc = _make_bad_request_error()
+
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
+            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.time.sleep") as mock_sleep,
+        ):
+            mock_client = MagicMock()
+            mock_client_cls.return_value = mock_client
+            mock_client.messages.create.side_effect = bad_req_exc
+            result = LLMJudge().grade({}, {}, spec)
+
+        assert not result.passed
+        assert result.error is not None
+        assert mock_client.messages.create.call_count == 1
+        mock_sleep.assert_not_called()
+
+    def test_max_retries_configurable(self):
+        """spec.config['max_retries']=0 disables retry; only one attempt on rate limit."""
+        spec = _make_spec(config={"max_retries": 0})
+        rate_limit_exc = _make_rate_limit_error()
+
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
+            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.time.sleep") as mock_sleep,
+        ):
+            mock_client = MagicMock()
+            mock_client_cls.return_value = mock_client
+            mock_client.messages.create.side_effect = rate_limit_exc
+            result = LLMJudge().grade({}, {}, spec)
+
+        assert not result.passed
+        assert result.error is not None
+        assert mock_client.messages.create.call_count == 1
+        mock_sleep.assert_not_called()

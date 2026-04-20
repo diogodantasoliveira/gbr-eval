@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from typing import Any
 
 import anthropic
@@ -18,6 +19,8 @@ from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec
 
 _DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
 _API_TIMEOUT = 30.0
+_MAX_RETRIES = 3
+_BASE_DELAY = 1.0
 
 _PII_PATTERNS: list[tuple[str, str]] = [
     (r"\d{3}\.\d{3}\.\d{3}-\d{2}", "000.000.000-XX"),
@@ -74,6 +77,43 @@ def _sanitize_pii(data: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
+def _call_with_retry(
+    client: anthropic.Anthropic,
+    *,
+    model: str,
+    max_tokens: int,
+    timeout: float,
+    system: str,
+    messages: list[anthropic.types.MessageParam],
+    max_retries: int = _MAX_RETRIES,
+) -> anthropic.types.Message:
+    """Call client.messages.create with exponential backoff on transient errors.
+
+    Retries on RateLimitError, InternalServerError, and TimeoutError.
+    Does NOT retry on BadRequestError or other non-transient errors.
+    """
+    for attempt in range(max_retries + 1):
+        try:
+            return client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                timeout=timeout,
+                system=system,
+                messages=messages,
+            )
+        except (anthropic.RateLimitError, anthropic.InternalServerError):
+            if attempt == max_retries:
+                raise
+            delay = _BASE_DELAY * (2**attempt)
+            time.sleep(delay)
+        except TimeoutError:
+            if attempt == max_retries:
+                raise
+            delay = _BASE_DELAY * (2**attempt)
+            time.sleep(delay)
+    raise AssertionError("unreachable: loop always returns or raises")
+
+
 @register_grader("llm_judge", context_aware=True)
 class LLMJudge:
     def grade(
@@ -124,14 +164,21 @@ class LLMJudge:
             ]
             prompt += "\n\n## Prior Grader Results\n" + "\n".join(lines) + "\n"
 
+        max_retries = int(spec.config.get("max_retries", _MAX_RETRIES))
+
         try:
             client = anthropic.Anthropic(api_key=api_key)
-            response = client.messages.create(
+            api_messages: list[anthropic.types.MessageParam] = [
+                {"role": "user", "content": prompt}
+            ]
+            response = _call_with_retry(
+                client,
                 model=model,
                 max_tokens=512,
                 timeout=_API_TIMEOUT,
                 system=_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": prompt}],
+                messages=api_messages,
+                max_retries=max_retries,
             )
 
             from anthropic.types import TextBlock

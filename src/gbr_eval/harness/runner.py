@@ -504,6 +504,179 @@ def cli() -> None:
     """gbr-eval — eval-first quality framework for GarantiaBR."""
 
 
+def _parse_model_roles(model_role: tuple[str, ...]) -> dict[str, str] | None:
+    """Parse --model-role key=value pairs into a dict.
+
+    Returns None when no pairs are given, or the populated dict.
+    Raises click.UsageError on invalid format.
+    """
+    if not model_role:
+        return None
+    model_roles: dict[str, str] = {}
+    for pair in model_role:
+        if "=" not in pair:
+            raise click.UsageError(f"Invalid --model-role format: '{pair}' (expected role=model)")
+        role, model_id = pair.split("=", 1)
+        model_roles[role.strip()] = model_id.strip()
+    return model_roles
+
+
+def _setup_client_recorder(
+    endpoint: str | None,
+    allow_internal: bool,
+    tenant: str,
+    record_dir: Path | None,
+    replay_dir: Path | None,
+) -> tuple[Any, Any]:
+    """Create EvalClient and/or OutputRecorder based on CLI flags.
+
+    Returns (client, recorder) — either may be None when the flag was not set.
+    """
+    client = None
+    recorder = None
+    if endpoint or record_dir or replay_dir:
+        from gbr_eval.harness.client import EvalClient, OutputRecorder
+        if endpoint:
+            client = EvalClient(
+                base_url=endpoint,
+                headers={"X-Tenant-ID": tenant},
+                allow_internal=allow_internal,
+            )
+        if record_dir:
+            recorder = OutputRecorder(record_dir=record_dir)
+        elif replay_dir:
+            recorder = OutputRecorder(record_dir=replay_dir)
+    return client, recorder
+
+
+def _run_code_eval(
+    suite: Path | None,
+    task_path: Path | None,
+    code_dir: Path,
+    layer_enum: Layer | None,
+    tier_enum: Tier | None,
+) -> EvalRun:
+    """Handle --code-dir branch: engineering layer eval against a repo on disk."""
+    from gbr_eval.harness.code_loader import run_engineering_suite, run_task_against_code
+
+    if task_path:
+        task = load_task(task_path)
+        result = run_task_against_code(task, code_dir)
+        return EvalRun(
+            run_id=str(uuid.uuid4()),
+            layer=task.layer,
+            tier=task.tier,
+            tasks_total=1,
+            tasks_passed=1 if result.passed else 0,
+            tasks_failed=0 if result.passed else 1,
+            task_results=[result],
+            overall_score=result.score,
+            finished_at=datetime.now(UTC),
+        )
+    assert suite is not None
+    return run_engineering_suite(suite, code_dir, layer=layer_enum, tier=tier_enum)
+
+
+def _run_single_task_eval(
+    task_path: Path,
+    golden_dir: Path | None,
+    self_eval: bool,
+    client: Any,
+    recorder: Any,
+    model_roles: dict[str, str] | None,
+) -> EvalRun:
+    """Handle single --task branch (with or without --golden-dir)."""
+    task = load_task(task_path)
+    if model_roles:
+        _warn_unused_model_roles([task], model_roles)
+    if golden_dir:
+        doc_type = _extract_document_type(task)
+        cases = load_golden_cases(golden_dir, doc_type, tags=task.golden_set_tags) if doc_type else []
+        if cases:
+            result = run_task_against_golden_set(
+                task, cases, self_eval=self_eval, client=client, recorder=recorder,
+                model_roles=model_roles,
+            )
+        elif self_eval and task.expected:
+            result = run_task(task, dict(task.expected), model_roles=model_roles)
+        else:
+            result = run_task(task, {}, model_roles=model_roles)
+    else:
+        result = run_task(task, {}, model_roles=model_roles)
+    return EvalRun(
+        run_id=str(uuid.uuid4()),
+        layer=task.layer,
+        tier=task.tier,
+        tasks_total=1,
+        tasks_passed=1 if result.passed else 0,
+        tasks_failed=0 if result.passed else 1,
+        task_results=[result],
+        overall_score=result.score,
+        finished_at=datetime.now(UTC),
+    )
+
+
+def _run_golden_suite_eval(
+    suite: Path,
+    golden_dir: Path,
+    self_eval: bool,
+    layer_enum: Layer | None,
+    tier_enum: Tier | None,
+    client: Any,
+    recorder: Any,
+    model_roles: dict[str, str] | None,
+) -> EvalRun:
+    """Handle --suite + --golden-dir branch."""
+    if model_roles:
+        _warn_unused_model_roles(load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum), model_roles)
+    return run_suite_with_golden(
+        suite, golden_dir, self_eval=self_eval, layer=layer_enum, tier=tier_enum,
+        client=client, recorder=recorder, model_roles=model_roles,
+    )
+
+
+def _run_plain_suite_eval(
+    suite: Path,
+    layer_enum: Layer | None,
+    tier_enum: Tier | None,
+    model_roles: dict[str, str] | None,
+) -> EvalRun:
+    """Handle plain --suite branch (no golden dir, no code dir)."""
+    if model_roles:
+        _warn_unused_model_roles(load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum), model_roles)
+    return run_suite(suite, {}, layer=layer_enum, tier=tier_enum, model_roles=model_roles)
+
+
+def _finalize_and_report(
+    eval_run: EvalRun,
+    baseline_run: Path | None,
+    output_format: str,
+    output_file: Path | None,
+) -> None:
+    """Apply regression delta, classify gate, emit report, and set exit code."""
+    from gbr_eval.harness.reporter import ci_summary, console_report, json_report
+
+    delta: RegressionDelta | None = None
+    if baseline_run:
+        baseline = load_baseline(baseline_run)
+        delta = compare_runs(baseline, eval_run)
+        eval_run.baseline_run_id = baseline.run_id
+
+    eval_run.gate_result = classify_gate(eval_run, delta)
+
+    if output_format == "json":
+        report = json_report(eval_run, output_path=output_file)
+        click.echo(report)
+    else:
+        click.echo(console_report(eval_run, delta=delta))
+        click.echo(ci_summary(eval_run))
+
+    if eval_run.gate_result == GateResult.NO_GO:
+        raise SystemExit(1)
+    elif eval_run.gate_result == GateResult.NO_GO_ABSOLUTE:
+        raise SystemExit(2)
+
+
 @cli.command()
 @click.option("--suite", type=click.Path(exists=True, path_type=Path), help="Directory containing task YAMLs")
 @click.option("--task", "task_path", type=click.Path(exists=True, path_type=Path), help="Single task YAML file")
@@ -551,16 +724,7 @@ def run(
     model_role_pairs: tuple[str, ...],
 ) -> None:
     """Run eval tasks and report results."""
-    from gbr_eval.harness.reporter import ci_summary, console_report, json_report
-
-    model_roles: dict[str, str] | None = None
-    if model_role_pairs:
-        model_roles = {}
-        for pair in model_role_pairs:
-            if "=" not in pair:
-                raise click.UsageError(f"Invalid --model-role format: '{pair}' (expected role=model)")
-            role, model_id = pair.split("=", 1)
-            model_roles[role.strip()] = model_id.strip()
+    model_roles = _parse_model_roles(model_role_pairs)
 
     if not suite and not task_path:
         raise click.UsageError("Provide --suite or --task")
@@ -569,107 +733,25 @@ def run(
     if code_dir and golden_dir:
         raise click.UsageError("--code-dir and --golden-dir are mutually exclusive")
 
-    client = None
-    recorder = None
-
-    if endpoint or record_dir or replay_dir:
-        from gbr_eval.harness.client import EvalClient, OutputRecorder
-        if endpoint:
-            client = EvalClient(
-                base_url=endpoint,
-                headers={"X-Tenant-ID": tenant},
-                allow_internal=allow_internal,
-            )
-        if record_dir:
-            recorder = OutputRecorder(record_dir=record_dir)
-        elif replay_dir:
-            recorder = OutputRecorder(record_dir=replay_dir)
+    client, recorder = _setup_client_recorder(endpoint, allow_internal, tenant, record_dir, replay_dir)
 
     layer_enum = Layer(layer) if layer else None
     tier_enum = Tier(tier) if tier else None
 
     if code_dir:
-        from gbr_eval.harness.code_loader import run_engineering_suite, run_task_against_code
-
-        if task_path:
-            task = load_task(task_path)
-            result = run_task_against_code(task, code_dir)
-            eval_run = EvalRun(
-                run_id=str(uuid.uuid4()),
-                layer=task.layer,
-                tier=task.tier,
-                tasks_total=1,
-                tasks_passed=1 if result.passed else 0,
-                tasks_failed=0 if result.passed else 1,
-                task_results=[result],
-                overall_score=result.score,
-                finished_at=datetime.now(UTC),
-            )
-        else:
-            assert suite is not None
-            eval_run = run_engineering_suite(suite, code_dir, layer=layer_enum, tier=tier_enum)
+        eval_run = _run_code_eval(suite, task_path, code_dir, layer_enum, tier_enum)
     elif task_path:
-        task = load_task(task_path)
-        if model_roles:
-            _warn_unused_model_roles([task], model_roles)
-        if golden_dir:
-            doc_type = _extract_document_type(task)
-            cases = load_golden_cases(golden_dir, doc_type, tags=task.golden_set_tags) if doc_type else []
-            if cases:
-                result = run_task_against_golden_set(
-                    task, cases, self_eval=self_eval, client=client, recorder=recorder,
-                    model_roles=model_roles,
-                )
-            elif self_eval and task.expected:
-                result = run_task(task, dict(task.expected), model_roles=model_roles)
-            else:
-                result = run_task(task, {}, model_roles=model_roles)
-        else:
-            result = run_task(task, {}, model_roles=model_roles)
-        eval_run = EvalRun(
-            run_id=str(uuid.uuid4()),
-            layer=task.layer,
-            tier=task.tier,
-            tasks_total=1,
-            tasks_passed=1 if result.passed else 0,
-            tasks_failed=0 if result.passed else 1,
-            task_results=[result],
-            overall_score=result.score,
-            finished_at=datetime.now(UTC),
-        )
+        eval_run = _run_single_task_eval(task_path, golden_dir, self_eval, client, recorder, model_roles)
     elif golden_dir:
         assert suite is not None
-        if model_roles:
-            _warn_unused_model_roles(load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum), model_roles)
-        eval_run = run_suite_with_golden(
-            suite, golden_dir, self_eval=self_eval, layer=layer_enum, tier=tier_enum,
-            client=client, recorder=recorder, model_roles=model_roles,
+        eval_run = _run_golden_suite_eval(
+            suite, golden_dir, self_eval, layer_enum, tier_enum, client, recorder, model_roles
         )
     else:
         assert suite is not None
-        if model_roles:
-            _warn_unused_model_roles(load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum), model_roles)
-        eval_run = run_suite(suite, {}, layer=layer_enum, tier=tier_enum, model_roles=model_roles)
+        eval_run = _run_plain_suite_eval(suite, layer_enum, tier_enum, model_roles)
 
-    delta: RegressionDelta | None = None
-    if baseline_run:
-        baseline = load_baseline(baseline_run)
-        delta = compare_runs(baseline, eval_run)
-        eval_run.baseline_run_id = baseline.run_id
-
-    eval_run.gate_result = classify_gate(eval_run, delta)
-
-    if output_format == "json":
-        report = json_report(eval_run, output_path=output_file)
-        click.echo(report)
-    else:
-        click.echo(console_report(eval_run, delta=delta))
-        click.echo(ci_summary(eval_run))
-
-    if eval_run.gate_result == GateResult.NO_GO:
-        raise SystemExit(1)
-    elif eval_run.gate_result == GateResult.NO_GO_ABSOLUTE:
-        raise SystemExit(2)
+    _finalize_and_report(eval_run, baseline_run, output_format, output_file)
 
 
 @cli.command()

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import uuid
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING
 
 from click.testing import CliRunner
@@ -9,7 +12,49 @@ from click.testing import CliRunner
 if TYPE_CHECKING:
     from pathlib import Path
 
+from gbr_eval.harness.models import EvalRun, GraderResult, Layer, TaskResult
 from gbr_eval.harness.runner import cli
+
+
+def _make_eval_run(
+    task_id: str = "test.task",
+    score: float = 1.0,
+    passed: bool = True,
+    started_at: datetime | None = None,
+) -> EvalRun:
+    """Build a minimal EvalRun with a single TaskResult for fixture use."""
+    grader_result = GraderResult(
+        grader_type="exact_match",
+        field="cpf",
+        passed=passed,
+        score=score,
+        weight=1.0,
+    )
+    task_result = TaskResult(
+        task_id=task_id,
+        passed=passed,
+        score=score,
+        grader_results=[grader_result],
+        duration_ms=10.0,
+        pass_threshold=0.95,
+    )
+    return EvalRun(
+        run_id=str(uuid.uuid4()),
+        layer=Layer.PRODUCT,
+        tasks_total=1,
+        tasks_passed=1 if passed else 0,
+        tasks_failed=0 if passed else 1,
+        task_results=[task_result],
+        overall_score=score,
+        started_at=started_at or datetime.now(UTC),
+        finished_at=datetime.now(UTC),
+    )
+
+
+def _write_run_json(runs_dir: Path, eval_run: EvalRun) -> None:
+    """Serialize an EvalRun to a JSON file in runs_dir."""
+    file_path = runs_dir / f"run_{eval_run.run_id}.json"
+    file_path.write_text(eval_run.model_dump_json())
 
 
 def _write_task_yaml(path: Path, task_id: str = "test.cli", layer: str = "product") -> Path:
@@ -256,3 +301,158 @@ class TestCliMutualExclusion:
         assert result.exit_code != 0
         combined = (result.output or "") + str(result.exception or "")
         assert "mutually exclusive" in combined.lower()
+
+
+class TestCliTrends:
+    def test_trends_no_runs(self, tmp_path: Path):
+        """Empty runs dir exits cleanly and reports no alerts."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        runner = CliRunner()
+        result = runner.invoke(cli, ["trends", "--runs-dir", str(runs_dir)])
+        assert result.exit_code == 0
+        assert "No trend alerts" in result.output
+
+    def test_trends_with_stable_scores(self, tmp_path: Path):
+        """Three runs with identical scores should produce no trend alerts."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        base_time = datetime.now(UTC)
+        for i in range(3):
+            run = _make_eval_run(
+                task_id="extraction.cpf",
+                score=1.0,
+                passed=True,
+                started_at=base_time + timedelta(hours=i),
+            )
+            _write_run_json(runs_dir, run)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["trends", "--runs-dir", str(runs_dir)])
+        assert result.exit_code == 0
+        assert "No trend alerts" in result.output
+
+    def test_trends_json_output(self, tmp_path: Path):
+        """--output-format json produces valid JSON with expected keys."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        base_time = datetime.now(UTC)
+        for i in range(3):
+            run = _make_eval_run(
+                task_id="extraction.cpf",
+                score=1.0,
+                started_at=base_time + timedelta(hours=i),
+            )
+            _write_run_json(runs_dir, run)
+
+        runner = CliRunner()
+        result = runner.invoke(
+            cli, ["trends", "--runs-dir", str(runs_dir), "--output-format", "json"]
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "analyzed_runs" in data
+        assert "trend_alerts" in data
+        assert data["analyzed_runs"] == 3
+
+    def test_trends_detects_decline(self, tmp_path: Path):
+        """Three runs with strictly declining scores should produce a declining alert."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        base_time = datetime.now(UTC)
+        scores = [0.90, 0.80, 0.70]
+        for i, score in enumerate(scores):
+            run = _make_eval_run(
+                task_id="extraction.cpf",
+                score=score,
+                passed=score >= 0.95,
+                started_at=base_time + timedelta(hours=i),
+            )
+            _write_run_json(runs_dir, run)
+
+        runner = CliRunner()
+        result = runner.invoke(
+            cli, ["trends", "--runs-dir", str(runs_dir), "--output-format", "json"]
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        alerts = data["trend_alerts"]
+        assert len(alerts) >= 1
+        directions = [a["direction"] for a in alerts]
+        assert "declining" in directions
+
+
+class TestCliAnalyze:
+    def test_analyze_no_runs(self, tmp_path: Path):
+        """Empty runs dir exits cleanly with a 'No runs found' message."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analyze", "--runs-dir", str(runs_dir)])
+        assert result.exit_code == 0
+        assert "No runs found" in result.output
+
+    def test_analyze_console_output(self, tmp_path: Path):
+        """Runs with results produce analysis output containing key sections."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        base_time = datetime.now(UTC)
+        for i in range(2):
+            run = _make_eval_run(
+                task_id="extraction.cpf",
+                score=0.80,
+                passed=False,
+                started_at=base_time + timedelta(hours=i),
+            )
+            _write_run_json(runs_dir, run)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["analyze", "--runs-dir", str(runs_dir)])
+        assert result.exit_code == 0
+        # format_analysis always starts with this header
+        assert "Eval Analysis" in result.output
+        assert "extraction.cpf" in result.output
+
+    def test_analyze_json_output(self, tmp_path: Path):
+        """--output-format json produces valid JSON with expected top-level keys."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        run = _make_eval_run(task_id="extraction.cpf", score=1.0, passed=True)
+        _write_run_json(runs_dir, run)
+
+        runner = CliRunner()
+        result = runner.invoke(
+            cli, ["analyze", "--runs-dir", str(runs_dir), "--output-format", "json"]
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "runs_analyzed" in data
+        assert "task_stats" in data
+        assert "weakest_tasks" in data
+        assert "most_failing_fields" in data
+        assert data["runs_analyzed"] == 1
+
+    def test_analyze_top_option(self, tmp_path: Path):
+        """--top N limits the number of results in JSON output."""
+        runs_dir = tmp_path / "runs"
+        runs_dir.mkdir()
+        base_time = datetime.now(UTC)
+        # Create runs with 5 distinct tasks that fail
+        for i in range(5):
+            run = _make_eval_run(
+                task_id=f"task.failing.{i}",
+                score=0.50,
+                passed=False,
+                started_at=base_time + timedelta(hours=i),
+            )
+            _write_run_json(runs_dir, run)
+
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            ["analyze", "--runs-dir", str(runs_dir), "--top", "2", "--output-format", "json"],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        # weakest_tasks is limited to --top N
+        assert len(data["weakest_tasks"]) <= 2
