@@ -22,16 +22,50 @@ _API_TIMEOUT = 30.0
 _MAX_RETRIES = 3
 _BASE_DELAY = 1.0
 
+# ---------------------------------------------------------------------------
+# PII patterns for pre-sanitization before sending data to external LLM APIs.
+#
+# PATTERN INVENTORY — cross-reference with gbr-eval-frontend/src/lib/pii/patterns.ts
+#
+# Shared with TypeScript (both Python and TS handle these):
+#   - CPF formatted     r"\d{3}\.\d{3}\.\d{3}-\d{2}"
+#   - CNPJ formatted    r"\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}"
+#   - Email             r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b"
+#   - Phone (BR)        r"\(\d{2}\)\s?\d{4,5}-\d{4}"
+#   - RG                r"(?<!\d)\d{1,2}\.\d{3}\.\d{3}-[\dXx]"
+#   - PIS/PASEP         r"\d{3}\.\d{5}\.\d{2}-\d"
+#   - CPF unformatted   r"\b\d{11}\b"  (TS: CPF_unformatted)
+#   - CNPJ unformatted  r"\b\d{14}\b"  (TS: CNPJ_unformatted)
+#
+# Python-only (not in TypeScript):
+#   - CEP               r"\b\d{5}-?\d{3}\b"
+#     Reason: CEP combined with other data constitutes PII in structured JSON
+#     documents processed by the LLM judge. The TS frontend does not need it
+#     because it processes display text where street address patterns (handled by
+#     the Address regex) already cover the postal-code context.
+#
+# TypeScript-only (not in Python):
+#   - Address           Regex for "Rua|Av.|Avenida|..." street name patterns.
+#     Reason: Irrelevant for the LLM judge which processes structured JSON with
+#     discrete keyed fields (e.g. {"address": "Rua X, 10"}). The key name itself
+#     is not PII; only the value is, and CEP is a sufficient proxy here.
+#   - BRL_currency      r"R\$\s?\d{1,3}(?:\.\d{3})*(?:,\d{2})?"
+#     Reason: Currency amounts in structured financial documents are not PII —
+#     they are business data. The TS side redacts them from display to avoid
+#     misleading users; the LLM judge needs them for grading accuracy.
+#
+# See also: gbr-eval-frontend/src/lib/pii/patterns.ts
+# ---------------------------------------------------------------------------
 _PII_PATTERNS: list[tuple[str, str]] = [
-    (r"\d{3}\.\d{3}\.\d{3}-\d{2}", "000.000.000-XX"),
-    (r"\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}", "00.000.000/0000-XX"),
-    (r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", "redacted@example.com"),
-    (r"\(\d{2}\)\s?\d{4,5}-\d{4}", "(00) 00000-0000"),
-    (r"(?<!\d)\d{1,2}\.\d{3}\.\d{3}-[\dXx]", "0.000.000-X"),
-    (r"\d{3}\.\d{5}\.\d{2}-\d", "000.00000.00-0"),
-    (r"\b\d{11}\b", "00000000000"),
-    (r"\b\d{14}\b", "00000000000000"),
-    (r"\b\d{5}-?\d{3}\b", "00000-000"),
+    (r"\d{3}\.\d{3}\.\d{3}-\d{2}", "000.000.000-XX"),       # CPF formatted
+    (r"\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}", "00.000.000/0000-XX"),  # CNPJ formatted
+    (r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", "redacted@example.com"),   # Email
+    (r"\(\d{2}\)\s?\d{4,5}-\d{4}", "(00) 00000-0000"),           # Phone (BR)
+    (r"(?<!\d)\d{1,2}\.\d{3}\.\d{3}-[\dXx]", "0.000.000-X"),    # RG
+    (r"\d{3}\.\d{5}\.\d{2}-\d", "000.00000.00-0"),               # PIS/PASEP
+    (r"\b\d{11}\b", "00000000000"),                               # CPF unformatted
+    (r"\b\d{14}\b", "00000000000000"),                            # CNPJ unformatted
+    (r"\b\d{5}-?\d{3}\b", "00000-000"),                           # CEP (Python-only)
 ]
 
 _SYSTEM_PROMPT = """You are an expert evaluator for a document audit system.

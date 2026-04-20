@@ -705,6 +705,9 @@ def _finalize_and_report(
               help="Root directory containing target repos (for engineering layer eval)")
 @click.option("--model-role", "model_role_pairs", multiple=True,
               help="Role=model mapping (repeatable, e.g. --model-role grader=claude-sonnet-4-6)")
+@click.option("--parallel", is_flag=True, default=False,
+              help="Run suite tasks in parallel using asyncio (max 5 concurrent tasks). "
+                   "Only applies to --suite without --golden-dir or --code-dir.")
 def run(
     suite: Path | None,
     task_path: Path | None,
@@ -722,6 +725,7 @@ def run(
     tenant: str,
     code_dir: Path | None,
     model_role_pairs: tuple[str, ...],
+    parallel: bool,
 ) -> None:
     """Run eval tasks and report results."""
     model_roles = _parse_model_roles(model_role_pairs)
@@ -732,6 +736,8 @@ def run(
         raise click.UsageError("--self-eval and --endpoint are mutually exclusive")
     if code_dir and golden_dir:
         raise click.UsageError("--code-dir and --golden-dir are mutually exclusive")
+    if parallel and (task_path or golden_dir or code_dir):
+        raise click.UsageError("--parallel only applies to --suite without --golden-dir or --code-dir")
 
     client, recorder = _setup_client_recorder(endpoint, allow_internal, tenant, record_dir, replay_dir)
 
@@ -746,6 +752,18 @@ def run(
         assert suite is not None
         eval_run = _run_golden_suite_eval(
             suite, golden_dir, self_eval, layer_enum, tier_enum, client, recorder, model_roles
+        )
+    elif parallel:
+        import asyncio
+
+        from gbr_eval.harness.async_suite_runner import run_eval_run_async
+
+        assert suite is not None
+        tasks = load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum)
+        if model_roles:
+            _warn_unused_model_roles(tasks, model_roles)
+        eval_run = asyncio.run(
+            run_eval_run_async(tasks, {}, layer=layer_enum, model_roles=model_roles)
         )
     else:
         assert suite is not None

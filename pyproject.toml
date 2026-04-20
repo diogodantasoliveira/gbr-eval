@@ -18,6 +18,7 @@ dev = [
     "mypy>=1.10,<2",
     "types-PyYAML>=6.0,<7",
     "hypothesis>=6.0,<7",
+    "mutmut>=3.0",
 ]
 
 [project.scripts]
@@ -45,3 +46,7 @@ warn_unused_configs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.mutmut]
+paths_to_mutate = "src/gbr_eval/graders/deterministic.py"
+tests_dir = "tests/"

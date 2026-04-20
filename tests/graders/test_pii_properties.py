@@ -1,10 +1,12 @@
 """Property-based tests for PII sanitization (Hypothesis)."""
 from __future__ import annotations
 
+import re
+
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from gbr_eval.graders.model_judge import _sanitize_pii, _sanitize_pii_str
+from gbr_eval.graders.model_judge import _PII_PATTERNS, _sanitize_pii, _sanitize_pii_str
 
 
 class TestPiiStringProperties:
@@ -75,3 +77,43 @@ class TestPiiDictProperties:
         if isinstance(data, dict):
             result = _sanitize_pii(data)
             assert isinstance(result, dict)
+
+
+def test_pii_pattern_categories_documented() -> None:
+    """Ensure all PII pattern categories are accounted for.
+
+    Cross-reference with gbr-eval-frontend/src/lib/pii/patterns.ts.
+    Each entry in expected_categories must have at least one matching pattern
+    in _PII_PATTERNS. If a new category is added to either side, update both
+    Python (_PII_PATTERNS in model_judge.py) and TypeScript (patterns.ts).
+
+    TypeScript-only categories NOT expected here (by design):
+      - Address: structured JSON fields don't need street-name regex
+      - BRL_currency: currency values are business data, not PII for grading
+    """
+    # Canonical sample values per category — must be fully consumed by a pattern
+    category_samples: dict[str, str] = {
+        "cpf": "123.456.789-09",
+        "cnpj": "12.345.678/0001-99",
+        "email": "user@example.com",
+        "phone": "(11) 91234-5678",
+        "rg": "12.345.678-9",
+        "pis_pasep": "123.45678.90-1",
+        "cep": "01310-100",
+    }
+
+    expected_categories = set(category_samples)
+
+    covered: set[str] = set()
+    for category, sample in category_samples.items():
+        for pattern, _replacement in _PII_PATTERNS:
+            if re.search(pattern, sample):
+                covered.add(category)
+                break
+
+    missing = expected_categories - covered
+    assert not missing, (
+        f"PII categories with no matching pattern: {sorted(missing)}. "
+        "Add the pattern to _PII_PATTERNS in model_judge.py and update "
+        "gbr-eval-frontend/src/lib/pii/patterns.ts if applicable."
+    )
