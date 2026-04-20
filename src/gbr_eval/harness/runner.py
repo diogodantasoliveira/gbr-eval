@@ -20,6 +20,7 @@ import yaml
 
 import gbr_eval.graders  # noqa: F401 — trigger auto-registration
 from gbr_eval.graders.base import grade
+from gbr_eval.harness.client import EvalClientError
 from gbr_eval.harness.models import (
     Category,
     EvalRun,
@@ -361,8 +362,7 @@ def run_task_against_golden_set(
             continue
         try:
             output = _resolve_output(case, task, self_eval=self_eval, client=client, recorder=recorder)
-        except Exception as e:  # noqa: BLE001
-            # HTTP or other error — record as failed case, don't crash the suite
+        except (EvalClientError, OSError, json_mod.JSONDecodeError, ValueError, KeyError) as e:
             error_result = GraderResult(
                 grader_type="system",
                 passed=False,

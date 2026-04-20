@@ -198,7 +198,7 @@ class LLMJudge:
             ]
             prompt += "\n\n## Prior Grader Results\n" + "\n".join(lines) + "\n"
 
-        max_retries = int(spec.config.get("max_retries", _MAX_RETRIES))
+        max_retries = min(int(spec.config.get("max_retries", _MAX_RETRIES)), 10)
 
         try:
             client = anthropic.Anthropic(api_key=api_key)

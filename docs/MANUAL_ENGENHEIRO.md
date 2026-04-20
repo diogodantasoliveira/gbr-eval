@@ -2,7 +2,7 @@
 
 > Ultima atualizacao: 2026-04-20
 > Autor: Diogo Dantas (CLO/CAIO) + Claude (co-processador)
-> Status: Framework operacional, 500 testes, 40 golden cases (8/skill), 5 auditorias independentes
+> Status: Framework operacional, 533 testes, 40 golden cases (8/skill), 6 auditorias independentes
 
 ---
 
@@ -59,7 +59,7 @@ Dev: pytest >= 8.2, pytest-cov >= 5.0, ruff >= 0.4, mypy >= 1.10, types-PyYAML >
 ### Quality gates (rodar TODOS antes de qualquer PR)
 
 ```bash
-uv run pytest                                              # testes (500 tests)
+uv run pytest                                              # testes (533 tests)
 uv run pytest --cov=src/gbr_eval --cov-report=term-missing # cobertura >= 80%
 uv run ruff check .                                        # lint zero errors
 uv run mypy src/                                           # type check zero errors
@@ -73,7 +73,7 @@ Se qualquer um falhar, o PR nao fecha.
 
 ```
 gbr-eval/
-├── src/gbr_eval/                   # 23 modulos Python
+├── src/gbr_eval/                   # 28 modulos Python
 │   ├── graders/                    # 12 graders + dispatcher context-aware
 │   │   ├── base.py                 # Grader + ContextAwareGrader Protocols, _CONTEXT_AWARE registry, grade() dispatcher
 │   │   ├── deterministic.py        # 7 graders puros
@@ -99,9 +99,9 @@ gbr-eval/
 │   │   └── validator.py            # JSON Schema validation
 │   └── calibration/                # Inter-annotator agreement (Cohen's kappa)
 │       └── iaa.py
-├── tasks/                          # 34 task YAMLs
-│   ├── product/                    # classification(8), extraction(6), citation(6), cost(1), latency(1), decision(1)
-│   └── engineering/                # atom-back-end(3), engine-billing(2), engine-integracao(3)
+├── tasks/                          # 48 task YAMLs
+│   ├── product/                    # classification(11), extraction(6), citation(6), cost(1), latency(1), decision(1)
+│   └── engineering/                # atom-back-end(5), engine-billing(4), engine-integracao(5), garantia-ia(4), notifier(4)
 ├── golden/                         # Golden sets — ground truth anotado por humano
 │   ├── matricula/                  # 8 cases (5 standard + 2 edge + 1 confuser)
 │   ├── contrato_social/            # 8 cases
@@ -120,7 +120,7 @@ gbr-eval/
 │   ├── generate_all_synthetic.py   # Batch generation com env allowlist
 │   ├── compute_hashes.py           # SHA-256 dos PDFs originais
 │   └── sync_frontend.py            # Sincronizacao frontend com auth token
-├── tests/                          # 500 testes (pytest)
+├── tests/                          # 533 testes (pytest)
 │   ├── graders/                    # test_deterministic, test_field_f1, test_engineering, test_model_judge
 │   ├── harness/                    # test_runner, test_epochs, test_model_roles, test_grader_context, test_async_runner, test_task_helpers, test_reporter, test_analyzer, test_regression, test_trends, test_cli, test_client, test_eval_first_validation, test_golden_set_tags, test_postmortem, test_code_loader
 │   ├── solvers/                    # test_models, test_base
@@ -131,7 +131,7 @@ gbr-eval/
 │   ├── baseline_2026_04_18.json
 │   ├── self_eval_2026_04_18.json
 │   └── self_eval_2026_04_19.json
-├── docs/                           # 14 documentos
+├── docs/                           # 20 documentos
 ├── .github/                        # CI/CD
 │   ├── workflows/ci.yml            # pytest + ruff + mypy + eval-gate
 │   └── actions/gbr-eval-gate/      # GitHub Action reutilizavel
@@ -838,19 +838,21 @@ pass_threshold: 0.95
 
 Os `expected` contem PLACEHOLDERs porque os valores reais vem dos golden sets em tempo de execucao (via `--golden-dir`). O task define QUAIS graders rodar e COM QUAL peso; o golden set fornece os VALORES esperados.
 
-### Inventario de tasks (34 total)
+### Inventario de tasks (48 total)
 
 | Categoria | Tasks | Count |
 |-----------|-------|-------|
-| Classification | matricula, contrato_social, cnd, procuracao, certidao_trabalhista, balanco + 5 confusers (iptu_not_matricula, etc.) | 8+3=11 |
+| Classification | matricula, contrato_social, cnd, procuracao, certidao_trabalhista, balanco + confusers | 11 |
 | Extraction | matricula_cpf, contrato_social, cnd, procuracao, certidao_trabalhista, balanco | 6 |
 | Citation | matricula, contrato_social, cnd, procuracao, certidao_trabalhista, balanco | 6 |
 | Decision | score_aprovado | 1 |
 | Cost | journey_cost_limit | 1 |
 | Latency | sla_p95_limit | 1 |
-| Engineering (atom) | tenant_id_filter, rbac_enforcement, audit_log | 3 |
-| Engineering (billing) | decimal_not_float, idempotency_key | 2 |
-| Engineering (integracao) | configurable_timeout, no_credentials_in_code, retry_backoff | 3 |
+| Engineering (atom-back-end) | tenant_id_filter, rbac_enforcement, audit_log, sensitive_data_filter, api_versioning | 5 |
+| Engineering (engine-billing) | decimal_not_float, idempotency_key, audit_trail, reconciliation | 4 |
+| Engineering (engine-integracao) | configurable_timeout, no_credentials_in_code, retry_backoff, circuit_breaker, provider_isolation | 5 |
+| Engineering (garantia-ia) | prompt_versioning, pii_sanitization, output_schema, cost_tracking | 4 |
+| Engineering (notifier) | template_approval, idempotency, lgpd_opt_out, rate_limiting | 4 |
 
 **Engineering tasks** avaliam codigo (Camada E), nao outputs de IA. Usam graders `pattern_required`, `pattern_forbidden`, e `convention_check`.
 
@@ -1221,15 +1223,16 @@ O eval verifica se essas regras produzem o resultado correto contra golden sets 
 |--------|----------|--------|
 | Graders | 5 (base + deterministic + field_f1 + engineering + model_judge) | 12 graders implementados, testados |
 | Solvers | 3 (base + models + passthrough) | Solver Protocol + AgentTrace models, testados |
-| Harness | 10 (models + runner + async_runner + task_helpers + code_loader + reporter + regression + trends + analyzer + client) | Implementado, testado |
+| Harness | 11 (models + runner + async_runner + async_suite_runner + task_helpers + code_loader + reporter + regression + trends + analyzer + client) | Implementado, testado |
+| Shared | 1 (_shared.py) | Utilitarios compartilhados |
 | Calibracao | 1 (iaa.py) | Implementado, testado |
 | Contracts | 1 (validator.py) | Implementado |
 | CLI | runner.py (Click) | 2 comandos: `run`, `trends` |
-| CI | ci.yml + action.yml | 2 jobs: quality + eval-gate |
+| CI | ci.yml + action.yml | 2 jobs: quality + eval-gate (SHA-pinned actions) |
 | Frontend | Next.js 16 (204 arquivos TS) | 39 paginas, 57 API routes, 23 tabelas |
 | Tools | 4 scripts | generate_synthetic, generate_all_synthetic, compute_hashes, sync_frontend |
 
-500 testes passando. ruff clean. mypy clean. Cobertura >= 80%.
+533 testes passando. ruff clean. mypy clean. Cobertura >= 80%.
 
 ### Golden sets (Track A — Seed + Edge + Confuser)
 
@@ -1237,9 +1240,9 @@ O eval verifica se essas regras produzem o resultado correto contra golden sets 
 
 ### Tasks
 
-34 task YAMLs: 23 em `tasks/product/` (classification, extraction, citation, cost, latency, decision) + 8 em `tasks/engineering/` (atom, billing, integracao) + 3 confuser classification tasks adicionais.
+48 task YAMLs: 26 em `tasks/product/` (classification 11, extraction 6, citation 6, cost 1, latency 1, decision 1) + 22 em `tasks/engineering/` (atom-back-end 5, engine-billing 4, engine-integracao 5, garantia-ia 4, notifier 4).
 
-### Auditorias independentes (5 rodadas)
+### Auditorias independentes (6 rodadas)
 
 | Rodada | Agentes | Findings | Status |
 |--------|---------|----------|--------|
@@ -1247,9 +1250,10 @@ O eval verifica se essas regras produzem o resultado correto contra golden sets 
 | Audit #2 | 3 | Follow-up | Todos corrigidos |
 | Audit #3 | 3 (architect, code-reviewer, security-reviewer) | 25 findings | Todos corrigidos, 37 novos testes |
 | Audit #4 | 3 (fresh) | ~15 findings | Avaliados |
-| Audit #5 | Independente | 15 findings (1 CRITICAL, 6 HIGH, 8 MEDIUM) | Todos corrigidos, 26 novos testes, 500 total |
+| Audit #5 | Independente | 15 findings (1 CRITICAL, 6 HIGH, 8 MEDIUM) | Todos corrigidos, 26 novos testes |
+| Audit #6 | Re-audit (seguranca) | 4 imediatos + 3 medios | Imediatos corrigidos, 533 testes |
 
-Hardening from audits: overall_score mean, field_f1 spec.field priority, degraded_scores, slope trends, ReDoS guard, PII recursive walk, target_threshold validation, tags union, KeyError protection, CI injection fix, dependency upper bounds, ContextAwareGrader Protocol, _CONTEXT_AWARE registry, model_roles via GraderContext, shared _run_single_epoch, multi-epoch async_runner, SSRF protection, timing-safe auth, fail-closed middleware, PII RG/PIS patterns, error message sanitization, YAML config stripping.
+Hardening from audits: overall_score mean, field_f1 spec.field priority, degraded_scores, slope trends, ReDoS guard, PII recursive walk, target_threshold validation, tags union, KeyError protection, CI injection fix, dependency upper bounds, ContextAwareGrader Protocol, _CONTEXT_AWARE registry, model_roles via GraderContext, shared _run_single_epoch, multi-epoch async_runner, SSRF protection, timing-safe auth, fail-closed middleware, PII RG/PIS patterns, error message sanitization, YAML config stripping, SSRF redirect bypass prevention (_SSRFSafeRedirectHandler), IPv4-mapped IPv6 detection, CI SHA-pinned actions, narrowed exception handling in runner, max_retries cap (10).
 
 ### Eval runs gravados
 

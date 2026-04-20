@@ -143,7 +143,7 @@ Exemplos do que avalia:
 - Integracoes externas (SERPRO, ONR) tem mecanismo de retry com backoff?
 - Credenciais de acesso estao protegidas, nao escritas no codigo?
 
-**Status:** Planejado. 8 regras definidas para 3 sistemas prioritarios.
+**Status:** Operacional. 22 regras definidas para 5 sistemas prioritarios (atom-back-end, engine-billing, engine-integracao, garantia-ia, notifier). Execucao local-first via `--code-dir`.
 
 ### Camada P — Qualidade do Produto
 
@@ -157,7 +157,7 @@ Exemplos do que avalia:
 - Cada campo extraido tem citacao indicando de onde no documento veio?
 - O parecer final segue a rubrica definida?
 
-**Status:** Operacional. 23 tarefas de avaliacao, 40 golden sets, 12 avaliadores.
+**Status:** Operacional. 26 tarefas de avaliacao de produto, 40 golden sets, 12 avaliadores.
 
 ### Camada O — Qualidade Operacional (futuro)
 
@@ -648,13 +648,13 @@ Mensagens de erro do LLM-judge tambem sao sanitizadas — se uma excecao contive
 
 | Aspecto | Estado |
 |---------|--------|
-| Framework de avaliacao | **Operacional** — 23 modulos, 12 graders, runner sync e async |
-| Testes do framework | **500 testes** passando, cobertura >= 80% |
+| Framework de avaliacao | **Operacional** — 28 modulos, 12 graders, runner sync e async |
+| Testes do framework | **533 testes** passando, cobertura >= 80% |
 | Golden sets | **40 casos** em 5 tipos de documento (meta: 150+) |
-| Tarefas de avaliacao | **34 tasks** (23 produto + 8 engenharia + 3 confusers) |
+| Tarefas de avaliacao | **48 tasks** (26 produto + 22 engenharia) |
 | Painel administrativo | **Operacional** — 39 paginas, 57 rotas de API |
 | CI/CD | **Parcial** — testa o framework, mas ainda nao integrado aos repos de produto |
-| Auditorias independentes | **5 rodadas** concluidas, todas com correcoes aplicadas |
+| Auditorias independentes | **6 rodadas** concluidas, todas com correcoes aplicadas |
 | Primeiro cliente (Gate) | **Meta: 10/Mai/2026** (Banco Pine) |
 
 ### O que esta funcionando
@@ -668,12 +668,14 @@ Mensagens de erro do LLM-judge tambem sao sanitizadas — se uma excecao contive
 - **Painel web:** dashboard com KPIs, historico de execucoes, gerenciamento de golden sets
 - **Avaliacao com repeticao (epochs):** graders nao-deterministicos podem ser executados multiplas vezes com agregacao automatica
 - **Separacao de modelos (model roles):** o modelo usado para avaliar pode ser diferente do modelo avaliado (importante para compliance)
-- **Protecao contra SSRF:** o cliente HTTP valida que URLs nao apontam para servicos internos
+- **Protecao contra SSRF:** o cliente HTTP valida que URLs nao apontam para servicos internos, incluindo protecao contra redirects (HTTP 301/302) para IPs internos e deteccao de IPv4-mapped IPv6
+- **DNS rebinding protection:** re-resolve DNS no momento da chamada para detectar mudanca de IP publico para interno entre construcao e uso
+- **CI supply chain:** todas as GitHub Actions fixadas por SHA (nao por tag mutavel)
 - **Auth fail-closed:** painel rejeita acesso quando token nao configurado
 
 ### Auditorias realizadas
 
-O framework passou por 4 rodadas de auditoria independente, onde agentes especializados (arquiteto, revisor de codigo, especialista em seguranca) analisaram o sistema com olhar critico:
+O framework passou por 6 rodadas de auditoria independente, onde agentes especializados (arquiteto, revisor de codigo, especialista em seguranca) analisaram o sistema com olhar critico:
 
 | Rodada | Findings | Resultado |
 |--------|----------|-----------|
@@ -681,7 +683,8 @@ O framework passou por 4 rodadas de auditoria independente, onde agentes especia
 | Auditoria #2 | Follow-up | Todos corrigidos |
 | Auditoria #3 | 25 findings (3 agentes independentes) | Todos corrigidos, 37 testes adicionados |
 | Auditoria #4 | ~15 findings (3 agentes frescos) | Avaliados |
-| Auditoria #5 | 15 findings (1 critico, 6 altos, 8 medios) | Todos corrigidos — 500 testes |
+| Auditoria #5 | 15 findings (1 critico, 6 altos, 8 medios) | Todos corrigidos |
+| Auditoria #6 | 4 imediatos (SSRF redirect, SHA pins, exceptions, retry cap) | Todos corrigidos — 533 testes |
 
 ---
 
@@ -763,7 +766,7 @@ O LLM-judge usa um modelo diferente (Claude Sonnet) com uma rubrica especifica. 
 
 ### "O sistema esta pronto para producao?"
 
-O framework esta operacional e validado (4 auditorias). Porem, falta integrar com os repositorios de produto e expandir os golden sets. A meta e ter tudo pronto para o Gate Fase 1 em ~10/Mai/2026.
+O framework esta operacional e validado (6 auditorias independentes, 533 testes). Porem, falta integrar com os repositorios de produto e expandir os golden sets. A meta e ter tudo pronto para o Gate Fase 1 em ~10/Mai/2026.
 
 ### "Como isso ajuda na auditoria ISO 27001?"
 

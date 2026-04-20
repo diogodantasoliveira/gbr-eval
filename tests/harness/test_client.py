@@ -150,11 +150,14 @@ class TestEvalClient:
         mock_response.__enter__ = lambda s: s
         mock_response.__exit__ = MagicMock(return_value=False)
 
-        with patch("urllib.request.urlopen", return_value=mock_response) as mock_urlopen:
+        mock_opener = MagicMock()
+        mock_opener.open.return_value = mock_response
+
+        with patch("urllib.request.build_opener", return_value=mock_opener):
             result = client.call("/api/extract", {"skill": "matricula_v1"})
 
         assert result == response_data
-        args, kwargs = mock_urlopen.call_args
+        args, kwargs = mock_opener.open.call_args
         req: urllib.request.Request = args[0]
         assert req.get_header("X-tenant-id") == "test"
 
@@ -168,15 +171,24 @@ class TestEvalClient:
             fp=io.BytesIO(b"validation error"),
         )
 
-        with patch("urllib.request.urlopen", side_effect=http_error), pytest.raises(EvalClientError, match="HTTP 422"):
+        mock_opener = MagicMock()
+        mock_opener.open.side_effect = http_error
+
+        with (
+            patch("urllib.request.build_opener", return_value=mock_opener),
+            pytest.raises(EvalClientError, match="HTTP 422"),
+        ):
             client.call("/api/extract", {})
 
     def test_eval_client_call_connection_error(self) -> None:
         client = EvalClient(base_url="http://localhost:8000", allow_internal=True)
         url_error = urllib.error.URLError(reason="Connection refused")
 
+        mock_opener = MagicMock()
+        mock_opener.open.side_effect = url_error
+
         with (
-            patch("urllib.request.urlopen", side_effect=url_error),
+            patch("urllib.request.build_opener", return_value=mock_opener),
             pytest.raises(EvalClientError, match="Connection failed"),
         ):
             client.call("/api/extract", {})
@@ -184,8 +196,11 @@ class TestEvalClient:
     def test_eval_client_call_timeout(self) -> None:
         client = EvalClient(base_url="http://localhost:8000", allow_internal=True)
 
+        mock_opener = MagicMock()
+        mock_opener.open.side_effect = TimeoutError("timed out")
+
         with (
-            patch("urllib.request.urlopen", side_effect=TimeoutError("timed out")),
+            patch("urllib.request.build_opener", return_value=mock_opener),
             pytest.raises(EvalClientError, match="Timeout"),
         ):
             client.call("/api/extract", {})
@@ -198,8 +213,11 @@ class TestEvalClient:
         mock_response.__enter__ = lambda s: s
         mock_response.__exit__ = MagicMock(return_value=False)
 
+        mock_opener = MagicMock()
+        mock_opener.open.return_value = mock_response
+
         with (
-            patch("urllib.request.urlopen", return_value=mock_response),
+            patch("urllib.request.build_opener", return_value=mock_opener),
             pytest.raises(EvalClientError, match="Invalid JSON"),
         ):
             client.call("/api/extract", {})
@@ -242,16 +260,10 @@ class TestEvalClient:
         assert client.base_url == "http://8.8.8.8:8000"
 
     def test_dns_rebinding_blocked_at_call_time(self) -> None:
-        """DNS rebinding: construction resolves to public IP, call-time resolves to internal IP.
-
-        The __post_init__ check passes (public IP), but call() re-resolves and detects
-        the internal IP returned by the rebinding attack, raising EvalClientError.
-        """
-        # Construction-time: gethostbyname returns public IP — passes __post_init__
+        """DNS rebinding: construction resolves to public IP, call-time resolves to internal IP."""
         with patch("socket.gethostbyname", return_value="1.2.3.4"):
             client = EvalClient(base_url="http://staging.example.com:8000")
 
-        # Call-time: getaddrinfo returns internal IP — rebinding attack
         internal_addrinfo = [
             (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("10.0.0.1", 8000))
         ]
@@ -260,3 +272,51 @@ class TestEvalClient:
             pytest.raises(EvalClientError, match="SSRF protection \\(call-time\\)"),
         ):
             client.call("/api/extract", {"skill": "matricula_v1"})
+
+    def test_redirect_to_internal_ip_blocked(self) -> None:
+        """HTTP redirect to internal IP is blocked by _SSRFSafeRedirectHandler."""
+        from gbr_eval.harness.client import _SSRFSafeRedirectHandler
+
+        handler = _SSRFSafeRedirectHandler()
+        req = urllib.request.Request("http://public.example.com:8000/api/extract")
+
+        internal_addrinfo = [
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("169.254.169.254", 80))
+        ]
+
+        with (
+            patch("socket.getaddrinfo", return_value=internal_addrinfo),
+            pytest.raises(EvalClientError, match="SSRF protection.*redirect.*internal IP"),
+        ):
+            handler.redirect_request(
+                req, None, 302, "Found", {},  # type: ignore[arg-type]
+                "http://169.254.169.254/latest/meta-data/",
+            )
+
+    def test_redirect_to_public_ip_allowed(self) -> None:
+        """HTTP redirect to public IP passes through."""
+        from gbr_eval.harness.client import _SSRFSafeRedirectHandler
+
+        handler = _SSRFSafeRedirectHandler()
+        req = urllib.request.Request("http://public.example.com:8000/api/extract")
+
+        public_addrinfo = [
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 80))
+        ]
+
+        with patch("socket.getaddrinfo", return_value=public_addrinfo):
+            result = handler.redirect_request(
+                req, None, 302, "Found", {},  # type: ignore[arg-type]
+                "http://other-public.example.com/data",
+            )
+
+        assert result is not None
+
+    def test_ipv4_mapped_ipv6_blocked(self) -> None:
+        """IPv4-mapped IPv6 addresses (::ffff:127.0.0.1) are blocked."""
+        from gbr_eval.harness.client import _is_internal_ip
+
+        assert _is_internal_ip("::ffff:127.0.0.1") is True
+        assert _is_internal_ip("::ffff:10.0.0.1") is True
+        assert _is_internal_ip("::ffff:192.168.1.1") is True
+        assert _is_internal_ip("::ffff:8.8.8.8") is False

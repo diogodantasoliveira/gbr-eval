@@ -23,15 +23,52 @@ def _is_internal_ip(ip_str: str) -> bool:
         ip = ipaddress.ip_address(ip_str)
         if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
             return True
-        # Explicit IPv6 private ranges not always caught by is_private in older Python
         if isinstance(ip, ipaddress.IPv6Address):
-            # ::1 loopback, fe80::/10 link-local, fc00::/7 ULA (fc00:: and fd00::)
             ula_range = ipaddress.IPv6Network("fc00::/7")
             if ip in ula_range:
+                return True
+            # IPv4-mapped IPv6 (::ffff:127.0.0.1)
+            if ip.ipv4_mapped and _is_internal_ip(str(ip.ipv4_mapped)):
                 return True
         return False
     except ValueError:
         return True
+
+
+class _SSRFSafeRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Blocks redirects to internal IPs — prevents SSRF via HTTP 301/302."""
+
+    def redirect_request(
+        self,
+        req: urllib.request.Request,
+        fp: Any,
+        code: int,
+        msg: str,
+        headers: Any,
+        newurl: str,
+    ) -> urllib.request.Request | None:
+        from urllib.parse import urlparse
+
+        parsed = urlparse(newurl)
+        hostname = parsed.hostname
+        if not hostname:
+            raise EvalClientError(f"SSRF protection: redirect to invalid URL {newurl!r}")
+
+        try:
+            addrinfos = socket.getaddrinfo(hostname, parsed.port, proto=socket.IPPROTO_TCP)
+        except socket.gaierror as exc:
+            raise EvalClientError(
+                f"SSRF protection: cannot resolve redirect target {hostname!r}: {exc}"
+            ) from exc
+
+        for addrinfo in addrinfos:
+            resolved_ip = str(addrinfo[4][0])
+            if _is_internal_ip(resolved_ip):
+                raise EvalClientError(
+                    f"SSRF protection: redirect to {newurl!r} resolves to internal IP ({resolved_ip})"
+                )
+
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 @dataclass
@@ -118,8 +155,12 @@ class EvalClient:
             req.add_header("Host", host_header)
         for k, v in self.headers.items():
             req.add_header(k, v)
+        if not self.allow_internal:
+            opener = urllib.request.build_opener(_SSRFSafeRedirectHandler)
+        else:
+            opener = urllib.request.build_opener()
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            with opener.open(req, timeout=self.timeout) as resp:
                 result: dict[str, Any] = json.loads(resp.read())
                 return result
         except urllib.error.HTTPError as e:
