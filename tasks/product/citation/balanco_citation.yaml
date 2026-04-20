@@ -1,0 +1,38 @@
+task_id: citation.balanco.linking
+category: citation
+component: ai-engine
+layer: product
+tier: canary
+tenant_profile: global
+description: "Gate criterio 3: citation linking 100% para balanco patrimonial"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: balanco
+    skill: balanco_v1
+
+expected: {}
+
+graders:
+  - type: field_not_empty
+    field: citation.ativo_total
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.passivo_total
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.patrimonio_liquido
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0

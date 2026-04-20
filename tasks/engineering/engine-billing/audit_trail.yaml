@@ -1,0 +1,30 @@
+task_id: eng.billing.audit_trail
+category: classification
+component: engine-billing
+layer: engineering
+tier: gate
+description: "Every financial operation must have an audit trail"
+input:
+  payload:
+    repo: engine-billing
+    scan_target: "**/*.py"
+expected:
+  convention: audit_trail_required
+graders:
+  - type: convention_check
+    field: audit_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "audit_log|create_audit|AuditService|log_financial_action"
+          type: required
+          description: "Financial operations must have audit trail"
+        - pattern: "\\.commit\\(\\)(?!.*audit)"
+          type: forbidden
+          description: "Database commit without audit logging"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

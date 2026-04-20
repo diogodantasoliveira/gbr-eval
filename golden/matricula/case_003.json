@@ -1,0 +1,62 @@
+{
+  "case_number": 3,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pf_owner", "com_onus", "alienacao_fiduciaria", "consolidacao_propriedade", "regularizacao_fundiaria", "cliente_b"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T16:00:00Z",
+  "document_source": "internal:matricula:003",
+  "notes": "Matricula com alienacao fiduciaria constituida e posteriormente consolidada (banco tomou o imovel). Caso otimo para testar AF ativa vs extinta. Imovel originario de regularizacao fundiaria municipal. Proprietario atual e o banco (apos consolidacao).",
+  "expected_output": {
+    "document_type": "matricula",
+    "numero_matricula": "999.003",
+    "proprietario_cpf": "00.000.000/0001-12",
+    "proprietario_nome": "BANCO NACIONAL S.A.",
+    "area_total": 2000.00,
+    "onus": [
+      {
+        "tipo": "alienacao_fiduciaria",
+        "registro_av": "R-3",
+        "status": "cancelado",
+        "envolvidos": "Devedora fiduciante: Ana Beatriz Gomes Pereira (CPF 000.000.000-95). Credor fiduciario: BANCO NACIONAL S.A. Contrato de financiamento imobiliario. Extinta pela consolidacao da propriedade (AV-5)."
+      }
+    ],
+    "alienacao_fiduciaria": false,
+    "endereco": "Avenida dos Ipês, s/n, Bairro Planalto, Sao Bernardo/MA",
+    "comarca": "Sao Bernardo"
+  },
+  "citation": {
+    "numero_matricula": {
+      "page": 1,
+      "excerpt": "MATRICULA n. 999.003"
+    },
+    "proprietario_cpf": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-12 (credora fiduciaria, apos consolidacao AV-5)"
+    },
+    "proprietario_nome": {
+      "page": 2,
+      "excerpt": "Consolidacao da propriedade em favor da credora fiduciaria BANCO NACIONAL S.A."
+    },
+    "area_total": {
+      "page": 1,
+      "excerpt": "Area do terreno: 2.000,00 m2"
+    },
+    "onus": {
+      "page": 2,
+      "excerpt": "Alienacao fiduciaria constituida no R-3, extinta em razao da consolidacao da propriedade em favor do credor fiduciario (AV-5)"
+    },
+    "alienacao_fiduciaria": {
+      "page": 2,
+      "excerpt": "A alienacao fiduciaria foi extinta pela consolidacao. Imovel livre de AF ativa, porem propriedade consolidada ao banco."
+    },
+    "endereco": {
+      "page": 1,
+      "excerpt": "Avenida dos Ipês, s/n, Bairro Planalto, Sao Bernardo - MA"
+    },
+    "comarca": {
+      "page": 1,
+      "excerpt": "Sao Bernardo - MA"
+    }
+  }
+}

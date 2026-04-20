@@ -1,0 +1,24 @@
+task_id: eng.billing.idempotency_key
+category: classification
+component: engine-billing
+layer: engineering
+tier: gate
+description: "Every financial operation must have an idempotency key"
+input:
+  payload:
+    repo: engine-billing
+    scan_target: "**/*.py"
+expected:
+  convention: idempotency_required
+graders:
+  - type: pattern_required
+    field: idempotency_key
+    weight: 1.0
+    required: true
+    config:
+      pattern: "idempotency_key|idempotent|dedup_key"
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -1,0 +1,31 @@
+task_id: eng.atom.tenant_id_filter
+category: classification
+component: atom-back-end
+layer: engineering
+tier: gate
+description: "Every database query must filter by tenant_id"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "**/*.py"
+expected:
+  convention: tenant_id_required
+graders:
+  - type: pattern_required
+    field: tenant_id_usage
+    weight: 1.0
+    required: true
+    config:
+      pattern: '\.filter\(.*tenant_id|\.where\(.*tenant_id|tenant_id\s*=|filter_by\(.*tenant_id'
+      file_key: content
+  - type: pattern_forbidden
+    field: no_unfiltered_queries
+    weight: 1.0
+    required: true
+    config:
+      pattern: '\.query\([A-Za-z_][A-Za-z0-9_.]*\)\s*\.all\(\)|\.query\([A-Za-z_][A-Za-z0-9_.]*\)\s*\.first\(\)|\.query\([A-Za-z_][A-Za-z0-9_.]*\)\s*\.one\(\)'
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

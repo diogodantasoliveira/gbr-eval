@@ -1,0 +1,56 @@
+{
+  "case_number": 1,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj", "negativa", "trt2", "cliente_a", "raiz_cnpj"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T21:30:00Z",
+  "document_source": "internal:certidao_trabalhista:001",
+  "notes": "Certidao negativa de distribuicao de acoes trabalhistas. PJ identificada apenas pela raiz do CNPJ (sem razao social no documento). TRT 2a Regiao (SP). Nao constam acoes. Sem prazo de validade expresso. Certidao eletronica PJe.",
+  "expected_output": {
+    "document_type": "certidao_trabalhista",
+    "titular": "NAO INFORMADO NO DOCUMENTO (raiz CNPJ XX.XXX.777)",
+    "titular_cpf_cnpj": "00.000.000/0001-78",
+    "resultado": "negativa",
+    "processos": [],
+    "orgao_emissor": "Tribunal Regional do Trabalho da 2a Regiao (TRT-2)",
+    "abrangencia": "1o e 2o grau — polo passivo e polo ativo. Nao contempla processos fisicos nem arquivados definitivamente.",
+    "validade": null,
+    "data_emissao": "10/04/2026",
+    "codigo_verificacao": "173.438.052.385"
+  },
+  "citation": {
+    "titular": {
+      "page": 1,
+      "excerpt": "Raiz do CNPJ pesquisado: XX.XXX.777 (sem razao social informada)"
+    },
+    "titular_cpf_cnpj": {
+      "page": 1,
+      "excerpt": "Raiz do CNPJ pesquisado: XX.XXX.777"
+    },
+    "resultado": {
+      "page": 1,
+      "excerpt": "NAO CONSTAM acoes trabalhistas neste Tribunal Regional"
+    },
+    "processos": {
+      "page": 1,
+      "excerpt": "NAO CONSTAM acoes trabalhistas"
+    },
+    "orgao_emissor": {
+      "page": 1,
+      "excerpt": "Tribunal Regional do Trabalho da 2a Regiao (TRT-2)"
+    },
+    "abrangencia": {
+      "page": 1,
+      "excerpt": "Polo passivo (1o grau): Acao Trabalhista, Execucao... Polo passivo (2o grau): Acao Rescisoria..."
+    },
+    "data_emissao": {
+      "page": 1,
+      "excerpt": "Data e Hora de Emissao: 10/04/2026 as 10:35"
+    },
+    "codigo_verificacao": {
+      "page": 1,
+      "excerpt": "Codigo de Autenticidade: 173.438.052.385"
+    }
+  }
+}

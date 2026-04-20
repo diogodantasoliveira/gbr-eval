@@ -1,0 +1,24 @@
+task_id: eng.integracao.configurable_timeout
+category: classification
+component: engine-integracao
+layer: engineering
+tier: gate
+description: "Timeout must be configurable per integration, not hardcoded global"
+input:
+  payload:
+    repo: engine-integracao
+    scan_target: "**/*.py"
+expected:
+  convention: configurable_timeout
+graders:
+  - type: pattern_forbidden
+    field: no_hardcoded_timeout
+    weight: 1.0
+    required: true
+    config:
+      pattern: "timeout\\s*=\\s*\\d+[^.]"
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

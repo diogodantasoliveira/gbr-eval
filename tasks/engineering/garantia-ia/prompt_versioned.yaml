@@ -1,0 +1,27 @@
+task_id: eng.ia.prompt_versioned
+category: classification
+component: garantia_ia
+layer: engineering
+tier: gate
+description: "Every prompt must have explicit versioning"
+input:
+  payload:
+    repo: garantia_ia
+    scan_target: "**/*.py"
+expected:
+  convention: prompt_versioned_required
+graders:
+  - type: convention_check
+    field: prompt_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "prompt_version|@versioned_prompt|PROMPT_V\\d+|version.*prompt|prompt.*v\\d+"
+          type: required
+          description: "Every prompt must have explicit versioning"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

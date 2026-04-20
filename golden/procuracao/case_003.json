@@ -1,0 +1,55 @@
+{
+  "case_number": 3,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj_para_pf", "sa", "poderes_financeiros", "prazo_determinado", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T19:55:00Z",
+  "document_source": "internal:procuracao:003",
+  "notes": "Procuracao de S.A. de participacoes para PF com poderes financeiros amplos: assinar contratos, financiamentos, hipotecas, cheques, notas promissorias. Prazo determinado de 1 ano. Caso testa poderes financeiros complexos.",
+  "expected_output": {
+    "document_type": "procuracao",
+    "outorgante": "SABER PARTICIPACOES S/A",
+    "outorgante_cpf": "00.000.000/0001-36",
+    "outorgado": "GUSTAVO JUNQUEIRA ZANETTI",
+    "outorgado_cpf": "000.000.000-05",
+    "poderes_especificos": "Poderes especificos financeiros: assinar contratos, titulos, notas promissorias, duplicatas, cedulas hipotecarias e pignoratícias, contratos de financiamento. Emitir, endossar e assinar cheques. Contrair emprestimos e financiamentos com garantias fiduciarias e hipotecarias. Comprar e vender mercadorias e produtos.",
+    "validade": "17/11/2026",
+    "data_lavratura": "17/11/2025",
+    "cartorio": "1o Oficio — Servico Notarial e Protesto, Sao Jose dos Pinhais/PR. Tabeliao: Bel. Dalton Bishop Cordeiro. Livro 0893, fls 083-086."
+  },
+  "citation": {
+    "outorgante": {
+      "page": 1,
+      "excerpt": "SABER PARTICIPACOES S/A, CNPJ 00.000.000/0001-36, S.A. de capital fechado"
+    },
+    "outorgante_cpf": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-36"
+    },
+    "outorgado": {
+      "page": 1,
+      "excerpt": "Gustavo Junqueira Zanetti, CPF 000.000.000-05"
+    },
+    "outorgado_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-05"
+    },
+    "poderes_especificos": {
+      "page": 1,
+      "excerpt": "Assinar contratos, titulos, notas promissorias, duplicatas, cedulas hipotecarias. Contrair emprestimos e financiamentos com garantias fiduciarias e hipotecarias."
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Duracao: 01 ano a contar da data de lavratura. Termino: 17 de novembro de 2026."
+    },
+    "data_lavratura": {
+      "page": 1,
+      "excerpt": "Data de inicio: 17 de novembro de 2025"
+    },
+    "cartorio": {
+      "page": 1,
+      "excerpt": "1o Oficio — Servico Notarial e Protesto, Sao Jose dos Pinhais, Parana"
+    }
+  }
+}

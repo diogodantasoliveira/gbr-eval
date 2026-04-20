@@ -1,23 +1,47 @@
+# Golden Set — Balanço Patrimonial (balanco_v1)
+# Status: BLOQUEADO — tipo 293 tem 0 documentos no sistema (2026-04-18)
+#
+# DECISÃO CLO (2026-04-18):
+#   - Substituído por certidao_trabalhista_v1 como 5ª skill P0 do Track A
+#   - Motivo: tipo 293 (Balanço Patrimonial) tem 0 documentos cadastrados no backoffice
+#   - Manter schema pronto para quando documentos existirem (futuro)
+#   - divida_liquida e liquidez_corrente: campos derivados, anotar valor calculado
+#   - receita_liquida: OPCIONAL (null quando BP não inclui DRE). Tag 'sem_dre'.
+#   - Verificação A = P + PL obrigatória (alinhado com prompt do sistema)
+
 skill: balanco_v1
 document_type: balanco
 minimum_cases: 20
 current_cases: 0
 annotator: null
-status: empty
+status: blocked_no_documents
 
 critical_fields:
   - ativo_total
   - passivo_total
   - patrimonio_liquido
-  - divida_liquida
-  - liquidez_corrente
+  - divida_liquida       # DERIVADO: empréstimos_total - caixa_equivalentes
+  - liquidez_corrente    # DERIVADO: ativo_circulante / passivo_circulante
+
+important_fields:
+  - receita_liquida      # OPCIONAL — só quando DRE acompanha BP. null aceito.
+  - resultado_exercicio
+
+informative_fields:
+  - data_referencia
 
 field_weights:
-  ativo_total: 3
-  passivo_total: 3
-  patrimonio_liquido: 3
-  divida_liquida: 3
-  liquidez_corrente: 3
-  receita_liquida: 2
-  resultado_exercicio: 2
-  data_referencia: 1
+  ativo_total: 3           # CRITICAL — float (R$)
+  passivo_total: 3         # CRITICAL — float (R$)
+  patrimonio_liquido: 3    # CRITICAL — float (R$)
+  divida_liquida: 3        # CRITICAL — float (R$), derivado
+  liquidez_corrente: 3     # CRITICAL — float (ratio AC/PC, 2 casas decimais)
+  receita_liquida: 2       # IMPORTANT — float (R$) | null se sem DRE
+  resultado_exercicio: 2   # IMPORTANT — float (R$)
+  data_referencia: 1       # INFORMATIVE — string "dd/mm/aaaa"
+
+# Notas de anotação:
+# - divida_liquida = (empréstimos CP + empréstimos LP) - (caixa + equivalentes de caixa)
+# - liquidez_corrente = ativo_circulante / passivo_circulante (arredondar 2 casas)
+# - Se BP não tem DRE: receita_liquida = null, adicionar tag "sem_dre" no case
+# - Verificar: ativo_total == passivo_total + patrimonio_liquido (tolerância 0.01)

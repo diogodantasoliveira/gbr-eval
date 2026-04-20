@@ -1,0 +1,60 @@
+{
+  "case_number": 3,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pf", "negativa", "trt3", "cliente_a", "com_nome", "com_validade", "siap"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T22:00:00Z",
+  "document_source": "internal:certidao_trabalhista:003",
+  "notes": "Certidao negativa de distribuicao de acoes trabalhistas. PF com nome completo informado. TRT 3a Regiao (MG). Nao constam acoes. Validade expressa (25/01/2026). Certidao eletronica com sistemas SIAP1, SIAP2 e PJe. Diferencial: unico TRT fora de SP no golden set.",
+  "expected_output": {
+    "document_type": "certidao_trabalhista",
+    "titular": "VINICIUS JOSE PINHEIRO RAMOS",
+    "titular_cpf_cnpj": "000.000.000-72",
+    "resultado": "negativa",
+    "processos": [],
+    "orgao_emissor": "Tribunal Regional do Trabalho da 3a Regiao (TRT-3)",
+    "abrangencia": "1o e 2o grau — SIAP1 (processos fisicos 1a instancia), SIAP2 (processos fisicos 2a instancia) e PJe (processos eletronicos 1o e 2o graus). Pesquisa por CPF e nome vinculado na Receita Federal.",
+    "validade": "25/01/2026",
+    "data_emissao": "26/12/2025",
+    "codigo_verificacao": "TF0P.4VYN"
+  },
+  "citation": {
+    "titular": {
+      "page": 1,
+      "excerpt": "VINICIUS JOSE PINHEIRO RAMOS"
+    },
+    "titular_cpf_cnpj": {
+      "page": 1,
+      "excerpt": "CPF [anonimizado — ultimos 2 digitos: 72]"
+    },
+    "resultado": {
+      "page": 1,
+      "excerpt": "Nao consta processo em tramitacao contra a pessoa consultada"
+    },
+    "processos": {
+      "page": 1,
+      "excerpt": "Nao consta processo em tramitacao"
+    },
+    "orgao_emissor": {
+      "page": 1,
+      "excerpt": "Tribunal Regional do Trabalho da 3a Regiao (TRT da 3a Regiao - Minas Gerais)"
+    },
+    "abrangencia": {
+      "page": 1,
+      "excerpt": "SIAP1, SIAP2, Sistema do Processo Judicial eletronico (PJe) de 1o e 2o Graus"
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Valida ate 25/01/2026"
+    },
+    "data_emissao": {
+      "page": 1,
+      "excerpt": "26/12/2025 as 12h14min06s"
+    },
+    "codigo_verificacao": {
+      "page": 1,
+      "excerpt": "Codigo de Autenticidade: TF0P.4VYN"
+    }
+  }
+}

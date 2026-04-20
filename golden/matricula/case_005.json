@@ -1,0 +1,74 @@
+{
+  "case_number": 5,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pf_owner", "com_onus", "alienacao_fiduciaria_ativa", "penhora", "indisponibilidade", "apartamento", "cdhu", "vendedor_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T17:30:00Z",
+  "document_source": "internal:matricula:005",
+  "notes": "Apartamento CDHU com alienacao fiduciaria ATIVA (financiamento habitacional vigente). Alem da AF, possui indisponibilidade trabalhista e penhora civel vigentes. Caso essencial para testar alienacao_fiduciaria=true. Proprietaria PF, imovel de interesse social em Maua/SP.",
+  "expected_output": {
+    "document_type": "matricula",
+    "numero_matricula": "999.005",
+    "proprietario_cpf": "000.000.000-05",
+    "proprietario_nome": "MARINETE MACHADO DOS SANTOS",
+    "area_total": 68.38,
+    "onus": [
+      {
+        "tipo": "alienacao_fiduciaria",
+        "registro_av": "R-2",
+        "status": "ativo",
+        "envolvidos": "Devedora fiduciante: Marinete Machado dos Santos (CPF 000.000.000-05). Credora fiduciaria: Companhia de Desenvolvimento Habitacional e Urbano do Estado de Sao Paulo - C.D.H.U. (CNPJ 00.000.000/0001-09). Financiamento habitacional Lei 9.514/97. Valor: R$ 75.473,44. Prazo: 300 meses."
+      },
+      {
+        "tipo": "outro",
+        "registro_av": "Av-3",
+        "status": "ativo",
+        "envolvidos": "Indisponibilidade de bens — processo trabalhista 0002054-89.2010.5.02.0362, 2a Vara do Trabalho de Maua. Pessoa atingida: Marinete Machado dos Santos."
+      },
+      {
+        "tipo": "penhora",
+        "registro_av": "Av-4",
+        "status": "ativo",
+        "envolvidos": "Penhora sobre direitos e obrigacoes do imovel — execucao civel 0006325-82.2021.8.26.0348, 2a Vara Civel de Maua. Exequente: Conjunto Residencial Maua I (CNPJ 00.000.000/0001-93). Valor: R$ 13.591,62."
+      }
+    ],
+    "alienacao_fiduciaria": true,
+    "endereco": "Rua Nevada, 363, Bloco A, Apartamento 24, Maua/SP",
+    "comarca": "Maua"
+  },
+  "citation": {
+    "numero_matricula": {
+      "page": 1,
+      "excerpt": "Matricula 999.005 do Registro de Imoveis de Maua/SP"
+    },
+    "proprietario_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-05"
+    },
+    "proprietario_nome": {
+      "page": 1,
+      "excerpt": "MARINETE MACHADO DOS SANTOS, brasileira, solteira, maior, autonoma"
+    },
+    "area_total": {
+      "page": 1,
+      "excerpt": "Area total: 68,3843 m2 (area privativa 52,1784 m2 + area de uso comum 16,2059 m2)"
+    },
+    "onus": {
+      "page": "1-2",
+      "excerpt": "R.2 alienacao fiduciaria VIGENTE (CDHU), Av.3 indisponibilidade VIGENTE (trabalhista), Av.4 penhora VIGENTE (execucao civel condominio)"
+    },
+    "alienacao_fiduciaria": {
+      "page": 1,
+      "excerpt": "Alienacao fiduciaria constituida em R.2, em garantia de financiamento habitacional Lei 9.514/97. VIGENTE — nao ha registro de cancelamento."
+    },
+    "endereco": {
+      "page": 1,
+      "excerpt": "Rua Nevada, 363, Bloco A, Apartamento 24, perimetro urbano, Maua - SP"
+    },
+    "comarca": {
+      "page": 1,
+      "excerpt": "Registro de Imoveis de Maua - SP"
+    }
+  }
+}

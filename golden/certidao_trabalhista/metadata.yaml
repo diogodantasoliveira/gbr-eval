@@ -1,0 +1,44 @@
+# Golden Set — Certidão Trabalhista (certidao_trabalhista_v1)
+# Status: SEED COMPLETE (5 cases anotados 2026-04-18)
+#
+# DECISÃO CLO (2026-04-18):
+#   - Substitui balanço_v1 (tipo 293, 0 docs no sistema) como 5ª skill P0
+#   - Tipo 113: Certidão de Distribuição de Ações Trabalhistas (TRT 1ª instância)
+#   - 381 documentos disponíveis no backoffice — maior volume entre skills não cobertas
+#   - Valor CRÍTICO: risco trabalhista é critério de gate na decisão de crédito
+#   - resultado = "negativa" (sem processos) ou "positiva" (com processos listados)
+#   - processos = array de objetos quando positiva, array vazio quando negativa
+#   - Buscar diversidade: negativas, positivas, PF, PJ, diferentes TRTs
+
+skill: certidao_trabalhista_v1
+document_type: certidao_trabalhista
+minimum_cases: 20
+current_cases: 5
+annotator: diogo.dantas
+status: seed_complete
+
+critical_fields:
+  - titular
+  - titular_cpf_cnpj
+  - resultado           # negativa | positiva
+  - processos           # array de {numero, vara, status, valor_causa}
+
+important_fields:
+  - orgao_emissor        # TRT região
+  - abrangencia          # 1ª instância, 2ª instância, ambas
+  - validade
+
+informative_fields:
+  - data_emissao
+  - codigo_verificacao
+
+field_weights:
+  titular: 3              # CRITICAL — string
+  titular_cpf_cnpj: 3     # CRITICAL — CPF ou CNPJ
+  resultado: 3            # CRITICAL — enum: negativa | positiva
+  processos: 3            # CRITICAL — array de objetos (vazio se negativa)
+  orgao_emissor: 2        # IMPORTANT — string (ex: "TRT 2ª Região")
+  abrangencia: 2          # IMPORTANT — string
+  validade: 2             # IMPORTANT — date string dd/mm/aaaa
+  data_emissao: 1         # INFORMATIVE — date string dd/mm/aaaa
+  codigo_verificacao: 1   # INFORMATIVE — string alfanumérica

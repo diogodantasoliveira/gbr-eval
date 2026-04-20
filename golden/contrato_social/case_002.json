@@ -1,0 +1,51 @@
+{
+  "case_number": 2,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "sa", "multiplos_diretores", "administracao_conjunta", "capital_nao_localizado", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T18:15:00Z",
+  "document_source": "internal:contrato_social:002",
+  "notes": "Certidao de S.A. (PREMIER S.A.). Capital social e acionistas nao localizados na certidao — tipico de certidao simplificada de S.A. Tres diretores com poderes conjuntos e restricoes para operacoes acima de R$5M. Certidao tambem contem contrato social de L.G.D. Transportes Ltda (empresa anexa). Case testa: S.A. sem socios visiveis, poderes conjuntos com restricoes, campos null quando informacao ausente.",
+  "expected_output": {
+    "document_type": "contrato_social",
+    "cnpj": "00.000.000/0001-86",
+    "razao_social": "PREMIER S.A.",
+    "socios": [],
+    "participacao_percentual": {},
+    "capital_social": null,
+    "poderes": "Diretores representam a sociedade em conjunto. Restricoes: operacoes acima de R$ 5.000.000,00 requerem autorizacao assemblear (paragrafo 2o, artigo 19 do Estatuto Social).",
+    "objeto_social": null,
+    "data_constituicao": null
+  },
+  "citation": {
+    "cnpj": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-86"
+    },
+    "razao_social": {
+      "page": 1,
+      "excerpt": "PREMIER S.A."
+    },
+    "socios": {
+      "page": 1,
+      "excerpt": "Certidao de S.A. nao apresenta quadro de acionistas. Diretores: Luciano Eduardo dos Santos Neto, Marcelo Vinicius Schneider Filho, Tatiana Regina Santos Dorneles."
+    },
+    "capital_social": {
+      "page": 1,
+      "excerpt": "Capital social nao localizado na certidao"
+    },
+    "poderes": {
+      "page": 1,
+      "excerpt": "Representa a sociedade em conjunto com outro diretor. Restricoes para operacoes acima de R$ 5.000.000,00 que requerem autorizacao assemblear."
+    },
+    "objeto_social": {
+      "page": 1,
+      "excerpt": "Objeto social nao localizado na certidao"
+    },
+    "data_constituicao": {
+      "page": 1,
+      "excerpt": "Data de constituicao nao localizada na certidao"
+    }
+  }
+}

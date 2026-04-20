@@ -1,0 +1,59 @@
+task_id: extraction.certidao_trabalhista.fields
+category: extraction
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extracao dos campos criticos de certidao trabalhista"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: certidao_trabalhista
+    skill: certidao_trabalhista_v1
+
+expected:
+  titular: "PLACEHOLDER"
+  titular_cpf_cnpj: "PLACEHOLDER"
+  resultado: "PLACEHOLDER"
+  processos: "PLACEHOLDER"
+
+graders:
+  - type: field_f1
+    field: titular
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: resultado
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: processos
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: titular_cpf_cnpj
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: orgao_emissor
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: validade
+    weight: 2
+    config:
+      severity: high
+
+golden_set_tags: ["seed"]
+scoring_mode: hybrid
+pass_threshold: 0.95

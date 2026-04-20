@@ -1,0 +1,39 @@
+task_id: citation.cnd.linking
+category: citation
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Gate criterio 3: citation linking 100% para CND"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: cnd
+    skill: cnd_v1
+
+expected: {}
+
+graders:
+  - type: field_not_empty
+    field: citation.tipo_certidao
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.numero
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.validade
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["seed"]

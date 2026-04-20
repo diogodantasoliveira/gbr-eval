@@ -1,0 +1,27 @@
+task_id: eng.notifier.template_approved
+category: classification
+component: notifier
+layer: engineering
+tier: gate
+description: "Notifications must use approved templates, not inline text"
+input:
+  payload:
+    repo: notifier
+    scan_target: "**/*.py"
+expected:
+  convention: template_approved_required
+graders:
+  - type: convention_check
+    field: template_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "template_id|approved_template|get_template|TemplateService"
+          type: required
+          description: "Notifications must use approved templates, not inline text"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

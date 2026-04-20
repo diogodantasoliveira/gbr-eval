@@ -1,0 +1,55 @@
+{
+  "case_number": 4,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj_para_pf", "multiplos_outorgantes", "multiplos_outorgados", "poderes_imobiliarios", "cliente_b", "zuk_extrajudicial"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T20:05:00Z",
+  "document_source": "internal:procuracao:004",
+  "notes": "Procuracao institucional complexa: 4 outorgantes PJ do grupo BANCO EXEMPLO para 12 outorgados PF (bancarios). Poderes imobiliarios amplos (venda, compra, hipoteca, alienacao fiduciaria, permuta, renuncia). Prazo 2 anos. Multiplos substabelecimentos registrados. Caso testa extracao de multiplos outorgantes e outorgados, poderes imobiliarios complexos.",
+  "expected_output": {
+    "document_type": "procuracao",
+    "outorgante": "BANCO EXEMPLO S.A. (CNPJ 00.000.000/0001-12), BANCO EXEMPLO ADMINISTRADORA DE CONSORCIOS LTDA (CNPJ 00.000.000/0001-22), KARTON BANK S.A. (CNPJ 00.000.000/0001-89), BANCO EXEMPLO BERJ S.A. (CNPJ 00.000.000/0001-15)",
+    "outorgante_cpf": "00.000.000/0001-12",
+    "outorgado": "MARCOS GOMES DE AZEVEDO NETO e outros (12 outorgados PF)",
+    "outorgado_cpf": "000.000.000-34",
+    "poderes_especificos": "Poderes especificos imobiliarios: permuta, renuncia a propriedade, dacao em pagamento, transacao, venda e compra, cessao, venda com pacto adjeto de hipoteca, alienacao fiduciaria. Representacao perante cartorios de registro de imoveis.",
+    "validade": "15/05/2026",
+    "data_lavratura": "15/05/2024",
+    "cartorio": "1o Tabeliao de Notas de Osasco/SP. Livro 1481, fls 179-182."
+  },
+  "citation": {
+    "outorgante": {
+      "page": 1,
+      "excerpt": "BANCO EXEMPLO S.A. (CNPJ 00.000.000/0001-12) e tres outras empresas do grupo BANCO EXEMPLO"
+    },
+    "outorgante_cpf": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-12 (BANCO EXEMPLO S.A., outorgante principal)"
+    },
+    "outorgado": {
+      "page": 1,
+      "excerpt": "12 outorgados PF, bancarios. Primeiro: MARCOS GOMES DE AZEVEDO NETO, CPF 000.000.000-34"
+    },
+    "outorgado_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-34 (primeiro outorgado)"
+    },
+    "poderes_especificos": {
+      "page": 1,
+      "excerpt": "Poderes especificos: permuta, renuncia, dacao em pagamento, transacao, venda e compra, cessao, venda com pacto adjeto de hipoteca"
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Prazo determinado: 2 anos. Vigencia ate 15 de maio de 2026."
+    },
+    "data_lavratura": {
+      "page": 1,
+      "excerpt": "Data de lavratura: 15 de maio de 2024"
+    },
+    "cartorio": {
+      "page": 1,
+      "excerpt": "1o Tabeliao de Notas de Osasco-SP"
+    }
+  }
+}

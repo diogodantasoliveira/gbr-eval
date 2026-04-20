@@ -1,0 +1,2811 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GBR — AI Engine",
+    "description": "Document classification, extraction, fraud scoring",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health Check",
+        "description": "Basic liveness probe — always returns 200.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readiness Check",
+        "description": "Deep readiness probe — checks all infrastructure dependencies.\nReturns 200 if ready, 503 if any critical dependency is down.",
+        "operationId": "readiness_check_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classify": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Classify",
+        "description": "Classify a document image into a typology.",
+        "operationId": "classify_api_v1_classify_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClassifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassifyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/extract": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Extract",
+        "description": "Extract structured data from a classified document.",
+        "operationId": "extract_api_v1_extract_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authenticity": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Authenticity",
+        "description": "Evaluate document authenticity and return fraud score.",
+        "operationId": "authenticity_api_v1_authenticity_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticityResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ocr": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Ocr Extract",
+        "description": "Extract text from a PDF using Azure Computer Vision OCR.\n\nAccepts PDF bytes via multipart upload. Falls back to empty text\nif OCR is not enabled or fails.",
+        "operationId": "ocr_extract_api_v1_ocr_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_ocr_extract_api_v1_ocr_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OCRResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/will-ocr-read": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Will Ocr Read",
+        "description": "Evaluate whether a document image is legible enough for OCR processing.\n\nUses LLM vision (Haiku — cheapest tier) to score readability on a 0.0–1.0\nscale and classify the document as 'legivel' or 'baixa_legibilidade'.",
+        "operationId": "will_ocr_read_api_v1_will_ocr_read_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WillOCRReadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WillOCRReadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/process": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Full Process",
+        "description": "Full document processing: OCR (optional) + classify + extract + fraud score.\n\nCredit gate is checked once before any LLM work begins.\n\nWhen ``use_ocr`` is True and OCR is enabled, text is extracted from the\nPDF first via Azure Computer Vision. If OCR returns text, it is included\nin the response. Classification and extraction still use the image/PDF\nvia LLM Vision for highest accuracy.",
+        "operationId": "full_process_api_v1_process_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FullProcessRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FullProcessResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/coordinate": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Coordinate Audit",
+        "description": "Run a coordinated multi-agent audit with isolated workers.\n\nSpawns one worker per scope in parallel, then consolidates all findings\nthrough a parecer worker. Each worker operates with a restricted context\nso failures in one scope cannot corrupt results in another.\n\nScopes available: ``extraction``, ``compliance``, ``financial``, ``integration``",
+        "operationId": "coordinate_audit_api_v1_coordinate_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoordinateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Coordinate Audit Api V1 Coordinate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/coordinate/{task_id}": {
+      "get": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Get Coordination Status",
+        "description": "Poll coordination task status by task ID.\n\nReturns the current state of a coordinated audit task including worker\nstatuses and results when completed.",
+        "operationId": "get_coordination_status_api_v1_coordinate__task_id__get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Coordination Status Api V1 Coordinate  Task Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auto-dream/{tenant_id}": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Trigger Auto Dream",
+        "description": "Trigger autonomous memory consolidation for a tenant.\n\nScans the last 30 days of user memories, identifies cross-user patterns\nand promotes them to tenant-level memory.\n\nProtected: service-key only (no end-user access).",
+        "operationId": "trigger_auto_dream_api_v1_auto_dream__tenant_id__post",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoDreamResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/golden-sets/run": {
+      "post": {
+        "tags": [
+          "ai-engine",
+          "golden-sets"
+        ],
+        "summary": "Run Caixa golden set evaluation",
+        "description": "Execute golden set evaluation against stored fixtures.\n\nQuery params\n------------\ndocument_type : str, optional\n    Filter to a single doc type slug (e.g. rg, cnh, matricula_imovel).\ntier : str, optional\n    Filter to a quality tier: clean | degraded | edge_case | adversarial.",
+        "operationId": "run_golden_sets_api_v1_golden_sets_run_post",
+        "parameters": [
+          {
+            "name": "document_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Document Type"
+            }
+          },
+          {
+            "name": "tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tier"
+            }
+          },
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoldenSetRunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ingest-artifact": {
+      "post": {
+        "tags": [
+          "ai-engine"
+        ],
+        "summary": "Ingest Artifact",
+        "description": "Ingest an external artifact by URL, store it in S3, and optionally extract fields.\n\nDownloads the artifact from ``artifact_file_url``, stores it under\n``{tenant_id}/artifacts/{artifact_id}.{ext}`` in the documents bucket,\nthen — if the artifact is a PDF or image — runs LLM extraction and returns\nany extracted fields.",
+        "operationId": "ingest_artifact_api_v1_ingest_artifact_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestArtifactRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestArtifactResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prompts": {
+      "post": {
+        "tags": [
+          "prompts"
+        ],
+        "summary": "Create Prompt",
+        "description": "Create a new prompt template.\n\nThe prompt is created at version 1 and marked as active by default.",
+        "operationId": "create_prompt_api_v1_prompts_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromptCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromptEntity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prompts"
+        ],
+        "summary": "List Prompts",
+        "description": "List all prompt templates.\n\nBy default, soft-deleted prompts are excluded. Use ``include_deleted=true``\nto include them in the response — they will have ``deleted=true`` set.\nUse ``active_only=true`` to return only active (non-deleted) prompts.",
+        "operationId": "list_prompts_api_v1_prompts_get",
+        "parameters": [
+          {
+            "name": "active_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Filter to active prompts only",
+              "default": false,
+              "title": "Active Only"
+            },
+            "description": "Filter to active prompts only"
+          },
+          {
+            "name": "include_deleted",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include soft-deleted prompts in the response. Deleted prompts are annotated with deleted=True. Has no effect when active_only=true.",
+              "default": false,
+              "title": "Include Deleted"
+            },
+            "description": "Include soft-deleted prompts in the response. Deleted prompts are annotated with deleted=True. Has no effect when active_only=true."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromptEntity"
+                  },
+                  "title": "Response List Prompts Api V1 Prompts Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prompts/{prompt_id}": {
+      "get": {
+        "tags": [
+          "prompts"
+        ],
+        "summary": "Get Prompt",
+        "description": "Retrieve a single prompt by ID.",
+        "operationId": "get_prompt_api_v1_prompts__prompt_id__get",
+        "parameters": [
+          {
+            "name": "prompt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Prompt Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromptEntity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "prompts"
+        ],
+        "summary": "Update Prompt",
+        "description": "Update a prompt template.\n\nIf ``content`` or ``variables`` are changed, the version is bumped\nautomatically to maintain an audit trail.",
+        "operationId": "update_prompt_api_v1_prompts__prompt_id__patch",
+        "parameters": [
+          {
+            "name": "prompt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Prompt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromptUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromptEntity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "prompts"
+        ],
+        "summary": "Delete Prompt",
+        "description": "Soft-delete a prompt (sets is_active=False).\n\nThe prompt remains in the store for auditing; it will no longer\nappear in ``active_only`` filtered listings.",
+        "operationId": "delete_prompt_api_v1_prompts__prompt_id__delete",
+        "parameters": [
+          {
+            "name": "prompt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Prompt Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chat/message": {
+      "post": {
+        "tags": [
+          "chat",
+          "chat"
+        ],
+        "summary": "Chat Message",
+        "description": "Send a message to the Consultor IA and receive a streamed SSE response.\n\nEmits events:\n- ``{\"type\": \"token\", \"content\": \"...\"}`` — incremental response tokens\n- ``{\"type\": \"sources\", \"sources\": [...]}`` — document/rule references found\n- ``{\"type\": \"suggestions\", \"suggestions\": [...]}`` — 3 follow-up questions\n- ``{\"type\": \"done\", \"session_id\": \"...\"}`` — signals end of stream",
+        "operationId": "chat_message_api_v1_chat_message_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chat/session/end": {
+      "post": {
+        "tags": [
+          "chat",
+          "chat"
+        ],
+        "summary": "End Session",
+        "description": "Finalise a chat session: extract long-term memories and clear the session.\n\nShould be called when the user explicitly closes the chat or after a\nconfigurable inactivity timeout.",
+        "operationId": "end_session_api_v1_chat_session_end_post",
+        "parameters": [
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chat/history/{session_id}": {
+      "get": {
+        "tags": [
+          "chat",
+          "chat"
+        ],
+        "summary": "Get History",
+        "description": "Return the full message history for a session.",
+        "operationId": "get_history_api_v1_chat_history__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "x-service-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Key"
+            }
+          },
+          {
+            "name": "x-service-name",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Name"
+            }
+          },
+          {
+            "name": "x-request-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Signature"
+            }
+          },
+          {
+            "name": "x-request-timestamp",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Request-Timestamp"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthenticityRequest": {
+        "properties": {
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "s3_bucket": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "S3 Bucket"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "s3_key",
+          "tenant_id"
+        ],
+        "title": "AuthenticityRequest"
+      },
+      "AuthenticityResponse": {
+        "properties": {
+          "score": {
+            "type": "integer",
+            "title": "Score"
+          },
+          "indicadores": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Indicadores"
+          },
+          "resumo": {
+            "type": "string",
+            "title": "Resumo"
+          },
+          "recomendacao": {
+            "type": "string",
+            "title": "Recomendacao"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "indicadores",
+          "resumo",
+          "recomendacao"
+        ],
+        "title": "AuthenticityResponse"
+      },
+      "AutoDreamResponse": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "patterns_found": {
+            "type": "integer",
+            "title": "Patterns Found"
+          },
+          "memories_promoted": {
+            "type": "integer",
+            "title": "Memories Promoted"
+          },
+          "duplicates_skipped": {
+            "type": "integer",
+            "title": "Duplicates Skipped"
+          },
+          "summary_updated": {
+            "type": "boolean",
+            "title": "Summary Updated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "patterns_found",
+          "memories_promoted",
+          "duplicates_skipped",
+          "summary_updated"
+        ],
+        "title": "AutoDreamResponse",
+        "description": "Result of an auto-dream consolidation run."
+      },
+      "Body_ocr_extract_api_v1_ocr_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_ocr_extract_api_v1_ocr_post"
+      },
+      "ChatMessageRequest": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "audit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audit Id"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Message"
+          },
+          "audit_context": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audit Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "user_id",
+          "tenant_id",
+          "message"
+        ],
+        "title": "ChatMessageRequest"
+      },
+      "ClassifyRequest": {
+        "properties": {
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "s3_bucket": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "S3 Bucket"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "s3_key",
+          "tenant_id"
+        ],
+        "title": "ClassifyRequest"
+      },
+      "ClassifyResponse": {
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "title": "Tipo"
+          },
+          "confianca": {
+            "type": "number",
+            "title": "Confianca"
+          },
+          "alternativas": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Alternativas"
+          },
+          "motivo": {
+            "type": "string",
+            "title": "Motivo"
+          },
+          "below_threshold": {
+            "type": "boolean",
+            "title": "Below Threshold",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "tipo",
+          "confianca",
+          "alternativas",
+          "motivo"
+        ],
+        "title": "ClassifyResponse"
+      },
+      "CoordinateRequest": {
+        "properties": {
+          "audit_id": {
+            "type": "string",
+            "title": "Audit Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Scopes",
+            "default": [
+              "extraction",
+              "compliance",
+              "financial",
+              "integration"
+            ]
+          },
+          "context": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "audit_id",
+          "tenant_id"
+        ],
+        "title": "CoordinateRequest",
+        "description": "Request to run a coordinated multi-agent audit."
+      },
+      "EndSessionRequest": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "user_id",
+          "tenant_id"
+        ],
+        "title": "EndSessionRequest"
+      },
+      "EndSessionResponse": {
+        "properties": {
+          "memories_extracted": {
+            "type": "integer",
+            "title": "Memories Extracted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "memories_extracted"
+        ],
+        "title": "EndSessionResponse"
+      },
+      "ExtractRequest": {
+        "properties": {
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "s3_bucket": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "S3 Bucket"
+          },
+          "tipo_documento": {
+            "type": "string",
+            "title": "Tipo Documento"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "s3_key",
+          "tipo_documento",
+          "tenant_id"
+        ],
+        "title": "ExtractRequest"
+      },
+      "ExtractResponse": {
+        "properties": {
+          "campos": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Campos"
+          },
+          "campos_ausentes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Campos Ausentes"
+          },
+          "modelo_usado": {
+            "type": "string",
+            "title": "Modelo Usado"
+          },
+          "tipo_documento": {
+            "type": "string",
+            "title": "Tipo Documento"
+          }
+        },
+        "type": "object",
+        "required": [
+          "campos",
+          "campos_ausentes",
+          "modelo_usado",
+          "tipo_documento"
+        ],
+        "title": "ExtractResponse"
+      },
+      "FullProcessRequest": {
+        "properties": {
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "s3_bucket": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "S3 Bucket"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "tipo_documento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo Documento"
+          },
+          "use_ocr": {
+            "type": "boolean",
+            "title": "Use Ocr",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "s3_key",
+          "tenant_id"
+        ],
+        "title": "FullProcessRequest",
+        "description": "Process a document end-to-end: OCR (optional) + classify + extract + fraud score."
+      },
+      "FullProcessResponse": {
+        "properties": {
+          "classification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClassifyResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "authenticity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthenticityResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ocr_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ocr Text"
+          },
+          "tipo_documento_final": {
+            "type": "string",
+            "title": "Tipo Documento Final"
+          },
+          "needs_hitl": {
+            "type": "boolean",
+            "title": "Needs Hitl",
+            "default": false
+          },
+          "hitl_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Hitl Reasons",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "tipo_documento_final"
+        ],
+        "title": "FullProcessResponse"
+      },
+      "GoldenSetRunResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "passed": {
+            "type": "integer",
+            "title": "Passed"
+          },
+          "failed": {
+            "type": "integer",
+            "title": "Failed"
+          },
+          "accuracy_pct": {
+            "type": "number",
+            "title": "Accuracy Pct"
+          },
+          "precision": {
+            "type": "number",
+            "title": "Precision"
+          },
+          "recall": {
+            "type": "number",
+            "title": "Recall"
+          },
+          "f1_score": {
+            "type": "number",
+            "title": "F1 Score"
+          },
+          "by_difficulty": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "By Difficulty"
+          },
+          "by_tier": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "By Tier"
+          },
+          "failures": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Failures"
+          },
+          "elapsed_seconds": {
+            "type": "number",
+            "title": "Elapsed Seconds"
+          },
+          "filters": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Filters"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "passed",
+          "failed",
+          "accuracy_pct",
+          "precision",
+          "recall",
+          "f1_score",
+          "by_difficulty",
+          "by_tier",
+          "failures",
+          "elapsed_seconds",
+          "filters"
+        ],
+        "title": "GoldenSetRunResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistoryResponse": {
+        "properties": {
+          "messages": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Messages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "title": "HistoryResponse"
+      },
+      "IngestArtifactRequest": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "purchase_id": {
+            "type": "string",
+            "title": "Purchase Id"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "artifact_file_url": {
+            "type": "string",
+            "title": "Artifact File Url"
+          },
+          "artifact_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Type"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "purchase_id",
+          "provider",
+          "artifact_file_url"
+        ],
+        "title": "IngestArtifactRequest"
+      },
+      "IngestArtifactResponse": {
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "title": "Artifact Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "extracted_fields": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Extracted Fields",
+            "default": {}
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "artifact_id",
+          "tenant_id",
+          "provider",
+          "status"
+        ],
+        "title": "IngestArtifactResponse"
+      },
+      "OCRResponse": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "text_length": {
+            "type": "integer",
+            "title": "Text Length"
+          },
+          "chunks": {
+            "type": "integer",
+            "title": "Chunks",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "source",
+          "text_length"
+        ],
+        "title": "OCRResponse",
+        "description": "Response from OCR text extraction."
+      },
+      "PromptCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Variables"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "content"
+        ],
+        "title": "PromptCreate",
+        "description": "Schema for creating a new prompt."
+      },
+      "PromptEntity": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Variables"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "deleted": {
+            "type": "boolean",
+            "title": "Deleted",
+            "default": false
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "default": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "content"
+        ],
+        "title": "PromptEntity",
+        "description": "Core prompt entity with versioning support."
+      },
+      "PromptUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "variables": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variables"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "PromptUpdate",
+        "description": "Schema for updating an existing prompt.\n\nOnly supplied fields are applied. Updating content or variables\nbumps the version automatically."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WillOCRReadRequest": {
+        "properties": {
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "s3_bucket": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "S3 Bucket"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "s3_key",
+          "tenant_id"
+        ],
+        "title": "WillOCRReadRequest"
+      },
+      "WillOCRReadResponse": {
+        "properties": {
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "classification": {
+            "type": "string",
+            "title": "Classification"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "classification"
+        ],
+        "title": "WillOCRReadResponse"
+      }
+    }
+  }
+}

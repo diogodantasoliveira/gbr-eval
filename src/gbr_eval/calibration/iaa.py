@@ -49,7 +49,7 @@ def cohens_kappa(
 
     labels = sorted(set(annotator_a) | set(annotator_b))
 
-    observed = sum(a == b for a, b in zip(annotator_a, annotator_b, strict=False)) / n
+    observed = sum(a == b for a, b in zip(annotator_a, annotator_b, strict=True)) / n
 
     expected = 0.0
     for label in labels:

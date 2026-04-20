@@ -1,0 +1,104 @@
+{
+  "case_number": 2,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pf_owner", "com_onus", "multiplos_onus", "penhora", "indisponibilidade", "restricao_judicial", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T15:30:00Z",
+  "document_source": "internal:matricula:002",
+  "notes": "Matricula complexa com multiplos onus vigentes: 2 indisponibilidades, 4 penhoras, 1 restricao judicial ambiental. Hipoteca antiga ja cancelada. Proprietario PF. Loteamento irregular (Sierra Madre). Caso excelente para testar campo onus como lista detalhada.",
+  "expected_output": {
+    "document_type": "matricula",
+    "numero_matricula": "999.002",
+    "proprietario_cpf": "000.000.000-77",
+    "proprietario_nome": "CLAUDIO EDUARDO RODRIGUES",
+    "area_total": 1900.00,
+    "onus": [
+      {
+        "tipo": "hipoteca",
+        "registro_av": "Av.1",
+        "status": "cancelado",
+        "envolvidos": "Banco do Centro-Oeste S/A (credor hipotecario)"
+      },
+      {
+        "tipo": "acao_judicial",
+        "registro_av": "Av.5",
+        "status": "ativo",
+        "envolvidos": "Associacao Ecologica e Cultural (autora) — restricao ambiental, proibicao de desmatamento e venda de lotes"
+      },
+      {
+        "tipo": "outro",
+        "registro_av": "Av.7",
+        "status": "ativo",
+        "envolvidos": "Indisponibilidade de bens — Processo 2o Oficio Falencia e Recuperacoes Judiciais TJSP"
+      },
+      {
+        "tipo": "outro",
+        "registro_av": "Av.11",
+        "status": "ativo",
+        "envolvidos": "Indisponibilidade de bens — Processo 5o Oficio Civel TJSP"
+      },
+      {
+        "tipo": "penhora",
+        "registro_av": "Av.8",
+        "status": "ativo",
+        "envolvidos": "Execucao trabalhista — TRT 2a Regiao — R$ 16.500,00"
+      },
+      {
+        "tipo": "penhora",
+        "registro_av": "Av.10",
+        "status": "ativo",
+        "envolvidos": "Execucao fiscal — 45o Oficio Judicial Foro Central TJSP — R$ 68.600,00"
+      },
+      {
+        "tipo": "penhora",
+        "registro_av": "Av.13",
+        "status": "ativo",
+        "envolvidos": "Execucao civil — 2o Oficio Falencia e Recuperacoes Judiciais TJSP"
+      },
+      {
+        "tipo": "penhora",
+        "registro_av": "Av.16",
+        "status": "ativo",
+        "envolvidos": "Execucao civil — 31o Oficio Civel Foro Central TJSP"
+      }
+    ],
+    "alienacao_fiduciaria": false,
+    "endereco": "Lote 06, Quadra 17, loteamento Parque das Serras, Mairipora/SP",
+    "comarca": "Mairipora"
+  },
+  "citation": {
+    "numero_matricula": {
+      "page": 1,
+      "excerpt": "MATRICULA n. 999.002 do Oficial de Registro de Imoveis de Mairipora/SP"
+    },
+    "proprietario_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-77"
+    },
+    "proprietario_nome": {
+      "page": 1,
+      "excerpt": "CLAUDIO EDUARDO RODRIGUES, brasileiro, solteiro, maior, do comercio"
+    },
+    "area_total": {
+      "page": 1,
+      "excerpt": "area do terreno: 1.900,00 m2"
+    },
+    "onus": {
+      "page": "1-3",
+      "excerpt": "Multiplos onus averbados: hipoteca (cancelada), restricao judicial ambiental, 2 indisponibilidades, 4 penhoras"
+    },
+    "alienacao_fiduciaria": {
+      "page": "1-3",
+      "excerpt": "Nao consta alienacao fiduciaria entre os onus registrados"
+    },
+    "endereco": {
+      "page": 1,
+      "excerpt": "Lote 06 da Quadra 17 do loteamento denominado Parque das Serras, zona urbana"
+    },
+    "comarca": {
+      "page": 1,
+      "excerpt": "municipio e comarca de Mairipora, Estado de Sao Paulo"
+    }
+  }
+}

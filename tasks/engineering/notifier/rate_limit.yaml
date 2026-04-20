@@ -1,0 +1,27 @@
+task_id: eng.notifier.rate_limit
+category: classification
+component: notifier
+layer: engineering
+tier: gate
+description: "Notification sending must have rate limiting"
+input:
+  payload:
+    repo: notifier
+    scan_target: "**/*.py"
+expected:
+  convention: rate_limit_required
+graders:
+  - type: convention_check
+    field: rate_limit_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "rate_limit|throttle|RateLimiter|cooldown|send_limit"
+          type: required
+          description: "Notification sending must have rate limiting"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

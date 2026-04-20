@@ -1,0 +1,59 @@
+{
+  "case_number": 5,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "socio_pj", "ltda", "industria", "administracao_isolada", "capital_alto", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T19:00:00Z",
+  "document_source": "internal:contrato_social:005",
+  "notes": "LTDA com socio unico PJ (Politex, outra empresa do grupo). Administrador e PF diferente dos socios. Capital social alto (R$14.8M). Administracao isolada com vedacao para atividades estranhas ao objeto. Caso testa: socio PJ (CNPJ em vez de CPF), administrador distinto do socio, capital alto.",
+  "expected_output": {
+    "document_type": "contrato_social",
+    "cnpj": "00.000.000/0001-30",
+    "razao_social": "MR POLIMEROS INDUSTRIA E COMERCIO LTDA",
+    "socios": [
+      {
+        "nome": "POLITEX INDUSTRIA E COMERCIO DE COMPOSTOS PLASTICOS E RECUPERADOS LTDA",
+        "cpf": "00.000.000/0001-40",
+        "percentual": 100.0
+      }
+    ],
+    "participacao_percentual": {
+      "POLITEX INDUSTRIA E COMERCIO DE COMPOSTOS PLASTICOS E RECUPERADOS LTDA": 100.0
+    },
+    "capital_social": 14823000.00,
+    "poderes": "Administrador Felipe Pinto de Carvalho (CPF 000.000.000-31) com poderes isolados para administrar e representar a sociedade ativa e passivamente. Vedacao: nao pode engajar a sociedade em atividades estranhas ao objeto social.",
+    "objeto_social": "Fabricacao de artefatos de material plastico para usos diversos; industria de compostos e comercializacao de polimeros; investimento e participacao em outras sociedades.",
+    "data_constituicao": "30/07/2011"
+  },
+  "citation": {
+    "cnpj": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-30"
+    },
+    "razao_social": {
+      "page": 1,
+      "excerpt": "MR Polimeros Industria e Comercio Ltda."
+    },
+    "socios": {
+      "page": 1,
+      "excerpt": "Politex Industria e Comercio de Compostos Plasticos e Recuperados Ltda., CNPJ 00.000.000/0001-40, 100% das quotas"
+    },
+    "capital_social": {
+      "page": 1,
+      "excerpt": "Capital social R$ 14.823.000,00"
+    },
+    "poderes": {
+      "page": 1,
+      "excerpt": "Administrador investido de todos os poderes para administrar isoladamente a Sociedade"
+    },
+    "objeto_social": {
+      "page": 1,
+      "excerpt": "Fabricacao de artefatos de material plastico para outros usos diversos"
+    },
+    "data_constituicao": {
+      "page": 1,
+      "excerpt": "Data inicio atividades: 30/07/2011"
+    }
+  }
+}

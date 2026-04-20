@@ -6,6 +6,7 @@ from difflib import SequenceMatcher
 from typing import Any
 
 from gbr_eval.graders.base import register_grader
+from gbr_eval.graders.deterministic import _MISSING, _get_field
 from gbr_eval.harness.models import GraderResult, GraderSpec
 
 
@@ -21,12 +22,40 @@ def _numeric_match(a: Any, b: Any, tolerance: float = 0.01) -> bool:
         return False
 
 
+def _compare_list(actual: list[Any], expected: list[Any], fuzzy_ratio: float, numeric_tolerance: float) -> bool:
+    if len(actual) != len(expected):
+        return False
+    matched_indices: set[int] = set()
+    for exp_item in expected:
+        found = False
+        for i, act_item in enumerate(actual):
+            if i not in matched_indices and _compare_field(act_item, exp_item, fuzzy_ratio, numeric_tolerance):
+                matched_indices.add(i)
+                found = True
+                break
+        if not found:
+            return False
+    return True
+
+
 def _compare_field(actual: Any, expected: Any, fuzzy_ratio: float, numeric_tolerance: float) -> bool:
     if actual is None or expected is None:
-        return actual == expected
+        return bool(actual == expected)
 
     if isinstance(expected, bool):
-        return actual == expected
+        return isinstance(actual, bool) and actual == expected
+
+    if isinstance(expected, list):
+        if not isinstance(actual, list):
+            return False
+        return _compare_list(actual, expected, fuzzy_ratio, numeric_tolerance)
+
+    if isinstance(expected, dict):
+        if not isinstance(actual, dict):
+            return False
+        if set(expected.keys()) != set(actual.keys()):
+            return False
+        return all(_compare_field(actual[k], expected[k], fuzzy_ratio, numeric_tolerance) for k in expected)
 
     if isinstance(expected, (int, float)):
         return _numeric_match(actual, expected, numeric_tolerance)
@@ -44,7 +73,23 @@ class FieldF1:
         fuzzy_ratio = float(spec.config.get("fuzzy_ratio", 0.85))
         numeric_tolerance = float(spec.config.get("numeric_tolerance", 0.01))
 
-        fields_to_check = critical_fields if scope == "critical_only" and critical_fields else list(expected.keys())
+        if spec.field:
+            fields_to_check = [spec.field]
+        elif scope == "critical_only" and critical_fields:
+            fields_to_check = critical_fields
+        else:
+            fields_to_check = list(expected.keys())
+
+        if scope == "critical_only" and not critical_fields and not spec.field:
+            return GraderResult(
+                grader_type="field_f1",
+                field=spec.field,
+                passed=False,
+                score=0.0,
+                weight=spec.weight,
+                required=spec.required,
+                details="scope=critical_only but no critical_fields configured",
+            )
 
         if not fields_to_check:
             return GraderResult(
@@ -62,18 +107,26 @@ class FieldF1:
         false_negatives = 0
 
         for field_name in fields_to_check:
-            exp_val = expected.get(field_name)
-            act_val = output.get(field_name)
+            exp_val = _get_field(expected, field_name)
+            act_val = _get_field(output, field_name)
 
-            if exp_val is not None and act_val is not None:
+            if act_val is _MISSING and exp_val is _MISSING:
+                continue
+            if act_val is _MISSING:
+                false_negatives += 1
+            elif exp_val is _MISSING:
+                false_positives += 1
+            elif exp_val is None and act_val is None:
+                true_positives += 1
+            elif exp_val is not None and act_val is not None:
                 if _compare_field(act_val, exp_val, fuzzy_ratio, numeric_tolerance):
                     true_positives += 1
                 else:
                     false_positives += 1
                     false_negatives += 1
-            elif exp_val is not None and act_val is None:
+            elif exp_val is not None:
                 false_negatives += 1
-            elif exp_val is None and act_val is not None:
+            else:
                 false_positives += 1
 
         tp_fp = true_positives + false_positives

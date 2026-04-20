@@ -1,0 +1,47 @@
+{
+  "case_number": 202,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["edge_case", "socios_vazio"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:contrato_social:edge_202",
+  "notes": "Empresa holding sem sócios individuais registrados.",
+  "expected_output": {
+    "document_type": "contrato_social",
+    "cnpj": "00.000.000/0001-88",
+    "razao_social": "DELGADO REPRESENTACAO COMERCIAL LTDA",
+    "socios": [],
+    "participacao_percentual": {},
+    "capital_social": 1000.00,
+    "poderes": "Socio-administrador com poderes amplos de administracao, podendo praticar todos os atos pertinentes a gestao da sociedade, incluindo contratar emprestimos, outorgar procuracoes, prestar garantias. Atuacao isolada.",
+    "objeto_social": "Representacao comercial, intermediacao e agenciamento de negocios mercantis, atuando como representante e agente do comercio de combustiveis, minerais, produtos siderurgicos e quimicos, conforme Lei 4.886/65.",
+    "data_constituicao": "02/02/2026"
+  },
+  "citation": {
+    "cnpj": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-88"
+    },
+    "razao_social": {
+      "page": 1,
+      "excerpt": "DELGADO REPRESENTACAO COMERCIAL LTDA"
+    },
+    "capital_social": {
+      "page": 1,
+      "excerpt": "Capital social R$ 1.000,00, dividido em 1.000 quotas de R$ 1,00"
+    },
+    "poderes": {
+      "page": 1,
+      "excerpt": "Socio-Administrador com poderes amplos de administracao"
+    },
+    "objeto_social": {
+      "page": 1,
+      "excerpt": "Representacao comercial, intermediacao e agenciamento de negocios mercantis"
+    },
+    "data_constituicao": {
+      "page": 1,
+      "excerpt": "Data de constituicao: 02/02/2026"
+    }
+  }
+}

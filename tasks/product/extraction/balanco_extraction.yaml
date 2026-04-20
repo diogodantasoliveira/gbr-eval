@@ -1,0 +1,60 @@
+task_id: extraction.balanco.fields
+category: extraction
+component: ai-engine
+layer: product
+tier: canary
+tenant_profile: global
+description: "Verifica extracao dos campos criticos de balanco patrimonial"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: balanco
+    skill: balanco_v1
+
+expected:
+  ativo_total: 0.0
+  passivo_total: 0.0
+  patrimonio_liquido: 0.0
+  divida_liquida: 0.0
+  liquidez_corrente: 0.0
+
+graders:
+  - type: numeric_tolerance
+    field: ativo_total
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      tolerance: 0.01
+  - type: numeric_tolerance
+    field: passivo_total
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      tolerance: 0.01
+  - type: numeric_tolerance
+    field: patrimonio_liquido
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      tolerance: 0.01
+  - type: numeric_tolerance
+    field: divida_liquida
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      tolerance: 0.02
+  - type: numeric_tolerance
+    field: liquidez_corrente
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      tolerance: 0.05
+
+scoring_mode: hybrid
+pass_threshold: 0.95

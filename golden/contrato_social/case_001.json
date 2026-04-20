@@ -1,0 +1,59 @@
+{
+  "case_number": 1,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "socio_unico", "ltda", "representacao_comercial", "on_abertura_contas"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T18:00:00Z",
+  "document_source": "internal:contrato_social:001",
+  "notes": "Contrato social simples: socio unico (100%), LTDA, sócio-administrador com poderes amplos. Capital social minimo R$1.000. Empresa de representacao comercial. Caso baseline para testar extracao basica.",
+  "expected_output": {
+    "document_type": "contrato_social",
+    "cnpj": "00.000.000/0001-88",
+    "razao_social": "DELGADO REPRESENTACAO COMERCIAL LTDA",
+    "socios": [
+      {
+        "nome": "ROBERTO ORTEGA DELGADO",
+        "cpf": "000.000.000-38",
+        "percentual": 100.0
+      }
+    ],
+    "participacao_percentual": {
+      "ROBERTO ORTEGA DELGADO": 100.0
+    },
+    "capital_social": 1000.00,
+    "poderes": "Socio-administrador com poderes amplos de administracao, podendo praticar todos os atos pertinentes a gestao da sociedade, incluindo contratar emprestimos, outorgar procuracoes, prestar garantias. Atuacao isolada.",
+    "objeto_social": "Representacao comercial, intermediacao e agenciamento de negocios mercantis, atuando como representante e agente do comercio de combustiveis, minerais, produtos siderurgicos e quimicos, conforme Lei 4.886/65.",
+    "data_constituicao": "02/02/2026"
+  },
+  "citation": {
+    "cnpj": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-88"
+    },
+    "razao_social": {
+      "page": 1,
+      "excerpt": "DELGADO REPRESENTACAO COMERCIAL LTDA"
+    },
+    "socios": {
+      "page": 1,
+      "excerpt": "ROBERTO ORTEGA DELGADO, CPF 000.000.000-38, 1.000 quotas (100%)"
+    },
+    "capital_social": {
+      "page": 1,
+      "excerpt": "Capital social R$ 1.000,00, dividido em 1.000 quotas de R$ 1,00"
+    },
+    "poderes": {
+      "page": 1,
+      "excerpt": "Socio-Administrador com poderes amplos de administracao"
+    },
+    "objeto_social": {
+      "page": 1,
+      "excerpt": "Representacao comercial, intermediacao e agenciamento de negocios mercantis"
+    },
+    "data_constituicao": {
+      "page": 1,
+      "excerpt": "Data de constituicao: 02/02/2026"
+    }
+  }
+}

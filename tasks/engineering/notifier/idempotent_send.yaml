@@ -1,0 +1,27 @@
+task_id: eng.notifier.idempotent_send
+category: classification
+component: notifier
+layer: engineering
+tier: gate
+description: "Notification sends must be idempotent"
+input:
+  payload:
+    repo: notifier
+    scan_target: "**/*.py"
+expected:
+  convention: idempotent_send_required
+graders:
+  - type: convention_check
+    field: idempotency_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "idempotency_key|dedup_key|message_id.*unique|IdempotencyGuard"
+          type: required
+          description: "Notification sends must be idempotent"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

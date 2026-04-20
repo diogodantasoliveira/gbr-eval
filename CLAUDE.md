@@ -3,31 +3,44 @@
 ## Identidade do projeto
 - **Nome:** gbr-eval
 - **Propósito:** Framework de avaliação eval-first para os produtos GarantiaBR
-- **Repos alvo:** `GarantiaBR/gbr-engines` (atual), futuros repos reconstruídos
+- **Repos alvo:** engine-integracao, garantia_ia, notifier, engine-billing, atom-back-end (5 prioritários)
 - **Relação:** Projeto SEPARADO — não vive dentro do monorepo gbr-engines
 - **Owner:** Diogo Dantas (CAIO)
 - **Jira:** https://garantiabr.atlassian.net/jira/software/c/projects/ADA/boards/266 | Projeto: ADA
 - **Confluence:** https://garantiabr.atlassian.net/wiki/spaces/team77124ebccfd54308acd71a43125ef8b5 | Espaço: Produtos Core
-- **Stack:** Python 3.12+, uv, pytest, ruff, mypy
+- **Stack:** Python 3.12+, uv, pytest, ruff, mypy | Frontend: Next.js 16, pnpm, Drizzle ORM, SQLite
 
 ## O que é este projeto
 
 gbr-eval é o framework de avaliação que define e verifica critérios de qualidade para dois tipos de uso de LLM na GarantiaBR:
 
-1. **LLM como Desenvolvedor (L1):** Claude Code gerando código para a plataforma — segue CLAUDE.md? Filtra por tenant_id? Não hardcoda dados de negócio?
-2. **LLM como Produto (L2):** ai-engine, extractor, parecer, compliance_agent produzindo outputs para clientes — extrai o CPF correto? O scoring bate com o golden set?
+1. **Camada Engineering:** Claude Code gerando código para a plataforma — segue CLAUDE.md? Filtra por tenant_id? Não hardcoda dados de negócio?
+2. **Camada Product:** ai-engine, extractor, parecer, compliance_agent produzindo outputs para clientes — extrai o CPF correto? O scoring bate com o golden set?
 
 ### Metodologia: Eval-First
 
 Este projeto existe ANTES dos sistemas que ele avalia. Os produtos legados (plataforma-modular, originacao_imobiliaria) serão descontinuados e reconstruídos. gbr-eval define os critérios de qualidade que as novas construções devem atender desde o dia 1.
 
-### Três camadas de qualidade
+### Quatro camadas de qualidade
 
-| Camada | O que avalia | Implementação |
-|--------|-------------|---------------|
-| **L0** (estática) | lint, type-check, testes unitários | Já existe no CI dos repos alvo |
-| **L1** (dev agent) | Claude Code gera código correto? | Sprint 1 — este projeto |
-| **L2** (product AI) | ai-engine produz outputs corretos? | Schema agora, implementação quando produção existir |
+gbr-eval é o **backbone centralizado de qualidade** da GarantiaBR. Todas as regras vivem aqui, consumidas por cada repo via CI.
+
+| Camada | Nome | O que avalia | Status |
+|--------|------|-------------|--------|
+| **E** | Engineering Quality | Código segue padrões de engenharia e regras de domínio por repo? | Planejado — regras definidas para 5 repos |
+| **P** | Product Quality | Outputs de IA corretos contra golden sets? | Parcial — 34 tasks, 40 golden cases, 12 graders, self-eval operacional |
+| **O** | Operational | SLAs, custos, disponibilidade | Futuro |
+| **C** | Compliance | LGPD, BACEN, audit trail, ISO 27001 | Futuro |
+
+### 5 repos alvo (Camada E)
+
+| Repo | Domínio | Regras de domínio |
+|------|---------|-------------------|
+| engine-integracao | Integrações externas | retry/backoff, circuit breaker, timeout por provider, credential vault |
+| garantia_ia | IA/prompts | prompt versionado, PII sanitizada, output schema, cost tracking |
+| notifier | Notificações | template aprovado, idempotência, LGPD opt-out, rate limiting |
+| engine-billing | Billing | Decimal (nunca float), idempotency key, audit trail, reconciliação par |
+| atom-back-end | Backoffice | tenant_id em toda query, RBAC, audit log, dados sensíveis filtrados |
 
 ## Regra Zero — Nunca Inferir
 
@@ -93,14 +106,32 @@ uv run ruff check .                                        # lint
 uv run mypy src/                                           # type check
 
 # Rodar uma suite de eval
-uv run python -m gbr_eval.harness.runner --suite layer1
+uv run python -m gbr_eval.harness.runner run --suite tasks/product/
 
 # Rodar task específica
-uv run python -m gbr_eval.harness.runner --task tasks/layer1/extraction/matricula_cpf.yaml
+uv run python -m gbr_eval.harness.runner run --task tasks/product/extraction/matricula_cpf.yaml
+
+# Self-eval (golden sets como output)
+uv run python -m gbr_eval.harness.runner run --suite tasks/product/ --golden-dir golden/ --self-eval
+
+# Com model roles (override de modelo para graders)
+uv run python -m gbr_eval.harness.runner run --suite tasks/product/ --model-role grader=claude-sonnet-4-6
+
+# Com endpoint HTTP real (dev local — requer --allow-internal)
+uv run python -m gbr_eval.harness.runner run --task tasks/product/extraction/matricula_cpf.yaml --endpoint http://localhost:8000 --allow-internal
+
+# Análise de trends
+uv run python -m gbr_eval.harness.runner analyze --runs-dir runs/
 
 # Rodar testes específicos
 uv run pytest tests/graders/test_deterministic.py          # um arquivo
 uv run pytest -k "test_exact_match"                        # por nome
+
+# Frontend admin panel
+cd frontend && pnpm install                                   # setup
+cd frontend && pnpm dev                                       # dev server (port 3002)
+cd frontend && pnpm type-check                                # TypeScript check
+cd frontend && pnpm db:push                                   # apply DB schema
 ```
 
 ## Arquitetura
@@ -108,58 +139,87 @@ uv run pytest -k "test_exact_match"                        # por nome
 ```
 gbr-eval/
 ├── src/gbr_eval/
-│   ├── graders/          # Graders: f(input, output, reference, config) → score
-│   │   ├── base.py       # Interface abstrata + registry
-│   │   ├── deterministic.py  # exact_match, numeric_range, regex, field_not_empty, set_membership, string_contains
-│   │   ├── field_f1.py   # F1 por campo com fuzzy matching
-│   │   └── model_judge.py    # LLM-as-judge (Claude Sonnet) — NÃO puro
-│   ├── harness/          # Runner de avaliação
-│   │   ├── runner.py     # Execução de tasks, scoring modes, load YAML
-│   │   ├── models.py     # Pydantic models (Task, GraderResult, EvalRun)
-│   │   └── reporter.py   # Geração de relatórios (CI, console, JSON)
-│   ├── contracts/        # Schema snapshots dos repos alvo
-│   │   └── schemas/      # Cópias versionadas dos schemas de API
-│   └── calibration/      # Concordância inter-anotador
-│       └── iaa.py        # Cohen's kappa, concordance tracking
-├── tasks/                # Definições de tarefas de avaliação (YAML)
-│   ├── layer1/           # L1: dev agent behavior
-│   │   ├── extraction/   # Graders de extração
-│   │   ├── classification/ # Graders de classificação
-│   │   ├── decision/     # Graders de decisão determinística
-│   │   ├── citation/     # Graders de citation linking
-│   │   ├── cost/         # Graders de custo
-│   │   └── latency/      # Graders de latência
-│   └── layer2/           # L2: product AI (schema only por ora)
-├── golden/               # Golden sets por tipo de documento (5 P0 skills)
-│   ├── matricula/        # metadata.yaml + case_NNN.json
-│   ├── contrato_social/
-│   ├── cnd/
-│   ├── procuracao/
-│   └── balanco/
-├── tests/                # Testes do próprio framework (pytest)
-│   ├── graders/          # Testes dos graders
-│   ├── harness/          # Testes do runner e reporter
-│   └── contracts/        # Testes de contract testing
-└── docs/                 # Documentação
+│   ├── graders/              # 12 graders + dispatcher context-aware
+│   │   ├── base.py           # Grader + ContextAwareGrader Protocols, _CONTEXT_AWARE registry, grade() dispatcher
+│   │   ├── deterministic.py  # 7 graders puros (exact_match, numeric_range, etc.)
+│   │   ├── engineering.py    # 3 graders de engenharia (pattern_required/forbidden, convention_check) + ReDoS guard
+│   │   ├── field_f1.py       # F1 por campo com fuzzy matching
+│   │   └── model_judge.py    # LLM-as-judge (Claude Sonnet) — NÃO puro, context_aware=True, PII recursivo
+│   ├── solvers/              # Solver Protocol (async) + AgentTrace models
+│   │   ├── base.py           # Solver Protocol, registry (@register_solver)
+│   │   ├── models.py         # ToolCall, Message, AgentTrace (Pydantic)
+│   │   └── passthrough.py    # PassthroughSolver (returns trace unchanged)
+│   ├── harness/              # Runner de avaliação
+│   │   ├── models.py         # Pydantic: Task, TaskResult, GraderResult, EvalRun, GraderContext, ScoreReducer
+│   │   ├── runner.py         # load_task, run_task, run_suite, _run_single_epoch, CLI
+│   │   ├── async_runner.py   # run_task_with_solver (async, uses _run_single_epoch)
+│   │   ├── task_helpers.py   # task_with() — copia tasks com overrides validados
+│   │   ├── client.py         # EvalClient (HTTP + SSRF protection), OutputRecorder
+│   │   ├── code_loader.py    # Code Loader: carrega arquivos de repos alvo para eval de engenharia
+│   │   ├── reporter.py       # Console, JSON, JUnit XML, CI summary
+│   │   ├── regression.py     # RegressionDelta, classify_gate
+│   │   ├── trends.py         # TrendAlert, detect_trends
+│   │   └── analyzer.py       # Utilitários de análise
+│   ├── contracts/            # Schema snapshots dos repos alvo
+│   │   └── validator.py      # JSON Schema validation (standalone, sem deps externas)
+│   └── calibration/          # Concordância inter-anotador
+│       └── iaa.py            # Cohen's kappa, concordance tracking
+├── tasks/                    # 48 task YAMLs
+│   ├── product/              # classification(10), extraction(7), citation(6), cost(1), latency(1), decision(1)
+│   └── engineering/          # atom-back-end(5), engine-billing(4), engine-integracao(5), garantia-ia(4), notifier(4)
+├── golden/                   # Golden sets — ground truth anotado por humano (40 cases)
+│   ├── matricula/            # 8 cases (5 standard + 2 edge + 1 confuser)
+│   ├── contrato_social/      # 8 cases (5 standard + 2 edge + 1 confuser)
+│   ├── cnd/                  # 8 cases (5 standard + 2 edge + 1 confuser)
+│   ├── procuracao/           # 8 cases (5 standard + 2 edge + 1 confuser)
+│   ├── certidao_trabalhista/ # 8 cases (5 standard + 2 edge + 1 confuser)
+│   ├── balanco/              # 0 cases (blocked — 0 docs disponíveis)
+│   └── red_team/             # 0 cases (blocked — authenticity_flag pendente)
+├── frontend/                 # Admin panel — Next.js 16 + SQLite (40 páginas, 57 API routes)
+│   ├── src/app/              # Pages e API routes
+│   ├── src/db/               # Drizzle ORM, 23 tabelas
+│   ├── src/lib/              # PII redaction, validations, scoring
+│   └── src/components/       # UI components (shadcn/ui)
+├── tools/                    # Scripts auxiliares
+│   ├── generate_synthetic.py # Gerador de golden sets sintéticos (4 categorias, Claude em contexto separado)
+│   ├── generate_all_synthetic.py # Batch generation com env allowlist
+│   ├── compute_hashes.py     # SHA-256 dos PDFs originais
+│   └── sync_frontend.py      # Sincronização frontend com auth token
+├── tests/                    # ~496 testes do framework (pytest)
+│   ├── graders/              # test_deterministic, test_field_f1, test_engineering, test_model_judge
+│   ├── harness/              # test_runner, test_epochs, test_model_roles, test_grader_context, test_async_runner, test_task_helpers, test_client, test_reporter, test_regression, test_trends, test_cli, test_resolve_output, test_analyzer, test_code_loader, test_eval_first_validation, test_golden_set_tags, test_postmortem
+│   ├── solvers/              # test_models, test_base
+│   ├── contracts/            # Testes de contract testing
+│   ├── integration/          # test_golden_set_smoke
+│   └── test_calibration.py   # Testes de IAA (root level)
+├── docs/                     # Documentação (19 documentos)
+└── runs/                     # Resultados de eval runs (JSON)
 ```
 
-### Dois runners — papéis diferentes
+### Runners e Solvers
 
 | Runner | O que faz | Quando roda |
 |--------|-----------|-------------|
 | **pytest** | Testa o framework (graders, models, runner, calibration) | CI do gbr-eval (`uv run pytest`) |
 | **CLI (runner.py)** | Executa suites de eval contra outputs reais ou gravados | CI dos repos alvo + avaliações manuais |
+| **async_runner.py** | Executa tasks via Solver Protocol (async, captura AgentTrace) | Eval de trajetória de agentes |
 
-pytest testa SE os graders funcionam. O CLI testa O QUE os graders avaliam.
+pytest testa SE os graders funcionam. O CLI testa O QUE os graders avaliam. O async_runner testa COMO o agente chegou no resultado.
+
+Ambos os runners (sync e async) delegam grading para `_run_single_epoch()` — função compartilhada que garante lógica idêntica. Suportam multi-epoch com short-circuit para graders determinísticos e score reducers (MEAN, MEDIAN, AT_LEAST_ONE, ALL_PASS, MAJORITY).
 
 ## Invariantes — NUNCA violar
 
 ### 1. Graders são funções puras
 ```python
-def grade(input: dict, output: dict, reference: dict, config: GraderConfig) -> GraderResult:
+class Grader(Protocol):
+    def grade(self, output: dict, expected: dict, spec: GraderSpec) -> GraderResult: ...
+
+class ContextAwareGrader(Protocol):
+    def grade(self, output: dict, expected: dict, spec: GraderSpec, *, context: GraderContext | None = None) -> GraderResult: ...
 ```
 Mesma assinatura para CI, sampling em produção, e triggers de ação.
-**Exceção documentada:** LLM-judge não é puro (chama API externa, não-determinístico). Tratado como caso especial.
+**Exceção documentada:** LLM-judge não é puro (chama API externa, não-determinístico). Registrado com `context_aware=True` — recebe resultados de graders anteriores via `GraderContext`. Runtime dispatch via `_CONTEXT_AWARE` set (não `@runtime_checkable` isinstance).
 
 ### 2. Zero tautologia
 O golden set NUNCA é gerado automaticamente a partir do expected do task. Cada golden set é:
@@ -168,15 +228,15 @@ O golden set NUNCA é gerado automaticamente a partir do expected do task. Cada 
 - Versionado e rastreável (quem anotou, quando, hash do documento)
 
 ### 3. Contract testing via snapshots
-gbr-eval mantém cópias dos schemas de API dos repos alvo em `contracts/schemas/`. Quando o repo alvo muda um schema sem atualizar o snapshot aqui, o CI do gbr-eval QUEBRA. Isso é comportamento desejado — força sincronização.
+gbr-eval mantém estrutura para cópias dos schemas de API dos repos alvo em `contracts/schemas/` (atualmente vazio — preparado para populamento). Quando populado, mudanças de schema sem atualizar o snapshot quebram o CI. O frontend já tem CRUD de contracts, versioning e drift detection prontos.
 
 ### 4. Separação build-time vs operate-time
 - **Build-time (CI):** graders rodam como gate antes do merge. Resultado: pass/fail no PR.
-- **Operate-time (futuro L2):** graders rodam como sampling em produção. Resultado: métricas, alertas, dashboards.
+- **Operate-time (futuro camada operational):** graders rodam como sampling em produção. Resultado: métricas, alertas, dashboards.
 - Mesmos graders, contextos diferentes. A configuração (threshold, blocking vs informative) muda, o código não.
 
 ### 5. Schema wide, implementation narrow
-Os schemas Pydantic cobrem as 3 camadas (L0, L1, L2). A implementação atual cobre apenas L1. Schemas de L2 existem mas não têm tasks nem graders — estão prontos para quando a produção existir.
+Os schemas Pydantic cobrem as 4 camadas (engineering, product, operational, compliance). A implementação atual cobre engineering e product. Schemas de operational e compliance existem mas não têm tasks nem graders — estão prontos para quando a produção existir.
 
 ### 6. LLM-judge: informative primeiro, blocking depois
 O LLM-judge começa como **informative** no CI (anota no PR, não bloqueia merge). Após 50+ runs, mede auto-concordância (mesmo input 3x → mesmo resultado?). Se concordância >= 0.90, promove a blocking. Decisão baseada em dados, não palpite.
@@ -190,14 +250,14 @@ Os 13 critérios do Gate Fase 1 (Confluence ADA) que este eval deve verificar:
 
 | # | Critério Gate | Grader(s) | Layer |
 |---|---|---|---|
-| 1 | Classification >= 90% | `accuracy` over golden set | L2 |
-| 2 | Extraction >= 95% (P0) | `field_f1` per field | L2 |
-| 3 | Citation linking = 100% | `field_not_empty` on citation | L2 |
-| 4 | Evaluator detection >= 80% | Red team suite (injected docs) | L2 |
-| 5 | Cost <= R$50/journey | `numeric_range` on cost metric | L2 |
-| 6 | Audit trail = 100% | Schema completeness check | L1/L2 |
-| 7 | Security P0 = Zero | SAST + manual (fora do eval) | L0 |
-| 8 | SLA P95 < 10 min | `numeric_range` on duration | L2 |
+| 1 | Classification >= 90% | `accuracy` over golden set | product |
+| 2 | Extraction >= 95% (P0) | `field_f1` per field | product |
+| 3 | Citation linking = 100% | `field_not_empty` on citation | product |
+| 4 | Evaluator detection >= 80% | Red team suite (injected docs) | product |
+| 5 | Cost <= R$50/journey | `numeric_range` on cost metric | product |
+| 6 | Audit trail = 100% | Schema completeness check | engineering/product |
+| 7 | Security P0 = Zero | SAST + manual (fora do eval) | engineering |
+| 8 | SLA P95 < 10 min | `numeric_range` on duration | operational |
 | 9-13 | Business/UX criteria | Fora do escopo do eval automatizado | — |
 
 ## 5 P0 Skills — Golden Sets Prioritários
@@ -208,7 +268,8 @@ Os 13 critérios do Gate Fase 1 (Confluence ADA) que este eval deve verificar:
 | `contrato_social_v1` | Contrato social | CNPJ, razão social, sócios %, capital, poderes |
 | `cnd_v1` | Certidão negativa | tipo, número, órgão, validade, status |
 | `procuracao_v1` | Procuração | outorgante, outorgado, poderes específicos, validade |
-| `balanco_v1` | Balanço patrimonial | ativo total, passivo, PL, dívida líquida, liquidez corrente |
+| `certidao_trabalhista_v1` | Certidão trabalhista | titular, resultado, processos (array), órgão emissor |
+| ~~`balanco_v1`~~ | ~~Balanço patrimonial~~ | ~~Blocked — 0 docs disponíveis. Substituído por certidao_trabalhista~~ |
 
 ## Regras de decisão determinísticas
 
@@ -259,12 +320,15 @@ Score = SUM(field_weight × field_confidence) / SUM(critical_weights)
 - **Nunca commitar** `.env`, credenciais, ou dados não-anonimizados
 - **Nunca importar** código de gbr-engines diretamente — usar contract schemas
 - **Secrets:** `ANTHROPIC_API_KEY` é a única env var sensível. Testes que dependem dela usam `pytest.mark.skipif`
+- **PII no LLM-judge:** sanitização recursiva de CPF, CNPJ, RG, PIS/PASEP, telefone e email antes de enviar ao modelo. Mensagens de erro também são sanitizadas via `_sanitize_pii_str()`.
+- **SSRF:** `EvalClient` resolve DNS e bloqueia IPs internos (127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16). Bypass explícito via `allow_internal=True` para dev local.
+- **Frontend auth:** middleware com comparação timing-safe (SHA-256 via Web Crypto) + fail-closed quando `ADMIN_API_TOKEN` não configurado (retorna 503, dev bypass via `DISABLE_AUTH=true`)
 
 ## Convenções obrigatórias
 
 - **Branch:** `tipo/descricao-curta` (ex: `feat/grader-field-f1`, `fix/runner-timeout`)
 - **Commit:** `tipo(escopo): mensagem` — Conventional Commits
-  - **Escopos válidos:** graders, harness, contracts, golden, calibration, tasks, docs, ci
+  - **Escopos válidos:** graders, harness, contracts, golden, calibration, tasks, docs, ci, frontend
 - **PR:** `[EVAL] tipo: descricao` (sem Jira até ter projeto próprio)
 - **Testes:** pytest, padrão AAA (Arrange, Act, Assert), coverage >= 80%
 - **Naming:** `test_<action>_<result>` (ex: `test_exact_match_pass_when_equal`)
@@ -296,6 +360,31 @@ Regras detalhadas em `.claude/rules/`:
 | **VibeCodable** | Novos graders determinísticos, task YAMLs, testes, reporter formatters | SIM | Code review normal |
 | **Hardening** | Rubrics do LLM-judge, thresholds de aprovação, golden sets, calibração | NÃO — humano decide | Diogo aprova |
 
+## Frontend — Admin Panel de Eval
+
+O frontend é uma aplicação Next.js 16 com SQLite local que serve como painel de administração e observabilidade do eval. Não é um dashboard estático — é uma aplicação completa com 40 páginas e 57 API routes.
+
+### Módulos
+
+| Módulo | O que faz |
+|--------|-----------|
+| **Dashboard** | KPIs, recent runs, active alerts, quick links |
+| **Runs** | Import, view, trends, comparison, postmortem |
+| **Golden Sets** | CRUD, import/export JSON, case versioning, PII redaction |
+| **Tasks** | Definição de tasks, graders, thresholds |
+| **Rubrics** | CRUD, A/B testing, concordance tracking, promotion lifecycle |
+| **Conventions** | Rules, coverage matrix, import de CLAUDE.md |
+| **Calibration** | Sessions, annotations, disagreements, Cohen's kappa |
+| **Contracts** | Schema snapshots, version history, OpenAPI import, drift detection |
+| **Skills** | Skill definitions, field schemas, criticality |
+| **Alerts** | Score drops, regressions, trend declines |
+
+### Webhook para CI
+`POST /api/runs/webhook` com Bearer token auth permite ingestão de eval runs diretamente do CI pipeline.
+
+### DB local (SQLite)
+23 tabelas via Drizzle ORM. WAL mode. Foreign keys enforced. PII redaction em endpoints de golden sets e grader data.
+
 ## Relação com gbr-engines
 
 gbr-eval é **consumidor** de gbr-engines, nunca ao contrário:
@@ -308,9 +397,9 @@ gbr-eval é **consumidor** de gbr-engines, nunca ao contrário:
 ### Contexto necessário de gbr-engines
 
 Para entender o que este eval avalia, consultar no gbr-engines:
-- `CLAUDE.md` — convenções que o L1 eval verifica
-- `services/ai-engine/app/prompts/` — prompts dos agentes IA (L2 eval target)
-- `services/athena/` — motor de regras determinístico (L2 eval target)
+- `CLAUDE.md` — convenções que a camada engineering verifica
+- `services/ai-engine/app/prompts/` — prompts dos agentes IA (camada product eval target)
+- `services/athena/` — motor de regras determinístico (camada product eval target)
 - `shared/scoring/field_comparison.py` — scoring engine (referência para field_f1)
 - `docs/EVALS.md` — spec do eval legado (referência do que NÃO repetir)
 - `evals/harness/mock_generator.py` — anti-pattern: tautological testing

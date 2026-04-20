@@ -1,23 +1,45 @@
+# Golden Set — Contrato Social / Junta Comercial (contrato_social_v1)
+# Status: VAZIO — aguardando anotação pelo CLO (Diogo)
+#
+# DECISÃO CLO (2026-04-18):
+#   - socios: array de objetos {nome, cpf, percentual}
+#   - participacao_percentual: embutido em cada sócio (não campo separado)
+#   - capital_social: float (normalizado de "R$ X.XXX,XX")
+#   - poderes: string descritiva ("conjunta"/"isolada"/etc)
+
 skill: contrato_social_v1
 document_type: contrato_social
 minimum_cases: 20
-current_cases: 0
-annotator: null
-status: empty
+current_cases: 5
+annotator: diogo.dantas
+status: seed_complete
 
 critical_fields:
   - cnpj
   - razao_social
-  - socios
-  - capital_social
+  - socios        # array de {nome, cpf, percentual}
   - poderes
 
+important_fields:
+  - capital_social
+  - participacao_percentual  # redundante (dentro de socios[].percentual), mantido para backward compat
+
+informative_fields:
+  - objeto_social
+  - data_constituicao
+
 field_weights:
-  cnpj: 3
-  razao_social: 3
-  socios: 3
-  participacao_percentual: 2
-  capital_social: 2
-  poderes: 3
-  objeto_social: 1
-  data_constituicao: 1
+  cnpj: 3                    # CRITICAL — string "XX.XXX.XXX/XXXX-XX"
+  razao_social: 3            # CRITICAL — string
+  socios: 3                  # CRITICAL — array de {nome: str, cpf: str, percentual: float}
+  participacao_percentual: 2 # IMPORTANT — dict {nome: percentual} (derivado de socios)
+  capital_social: 2          # IMPORTANT — float (em R$)
+  poderes: 3                 # CRITICAL — string ("conjunta"/"isolada"/"conforme cláusula X")
+  objeto_social: 1           # INFORMATIVE — string
+  data_constituicao: 1       # INFORMATIVE — string "dd/mm/aaaa"
+
+# Tipos de dados esperados no golden set:
+# socios: [
+#   {"nome": "João da Silva", "cpf": "000.000.000-12", "percentual": 50.0},
+#   {"nome": "Maria Santos", "cpf": "000.000.000-34", "percentual": 50.0}
+# ]

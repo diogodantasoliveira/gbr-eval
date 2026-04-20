@@ -1,0 +1,24 @@
+task_id: eng.atom_back_end.bff_atom_headers
+category: classification
+component: atom-back-end
+layer: engineering
+tier: gate
+description: "BFF routes must use atomHeaders(), never serviceAuthKey()"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "**/*.py"
+expected:
+  convention: bff_atom_headers
+graders:
+  - type: pattern_required
+    field: bff_atom_headers
+    weight: 1.0
+    required: true
+    config:
+      pattern: "serviceAuthKey\\("
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

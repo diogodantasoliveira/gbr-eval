@@ -1,0 +1,63 @@
+task_id: extraction.cnd.fields
+category: extraction
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extracao dos campos criticos de certidao negativa de debitos"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: cnd
+    skill: cnd_v1
+
+expected:
+  tipo_certidao: "PLACEHOLDER"
+  numero: "PLACEHOLDER"
+  orgao_emissor: "PLACEHOLDER"
+  validade: "PLACEHOLDER"
+  status: "PLACEHOLDER"
+  cpf_cnpj_consultado: "PLACEHOLDER"
+
+graders:
+  - type: exact_match
+    field: tipo_certidao
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: numero
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: orgao_emissor
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: validade
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: status
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+  - type: exact_match
+    field: cpf_cnpj_consultado
+    weight: 2
+    config:
+      severity: high
+
+golden_set_tags: ["seed"]
+scoring_mode: hybrid
+pass_threshold: 0.95

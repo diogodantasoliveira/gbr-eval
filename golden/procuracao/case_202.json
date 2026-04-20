@@ -1,0 +1,47 @@
+{
+  "case_number": 202,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["edge_case", "campos_parciais"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:procuracao:edge_202",
+  "notes": "Procuração particular sem reconhecimento de firma, sem cartório.",
+  "expected_output": {
+    "document_type": "procuracao",
+    "outorgante": "RODRIGO SANTOS LIMA",
+    "outorgante_cpf": "000.000.000-65",
+    "outorgado": "GERALDO DA COSTA",
+    "outorgado_cpf": null,
+    "poderes_especificos": "Poderes amplos e ilimitados para vender, ceder, onerar, quitar e transferir veiculo para seu proprio nome ou a terceiros. Conduzir veiculo, receber e dar quitacao, assinar DUT e ATPV, pagar taxas e multas, representar perante DETRAN, CIRETRAN, seguradoras. Com substabelecimento.",
+    "validade": "23/11/2024",
+    "data_lavratura": "23/05/2024",
+    "cartorio": null
+  },
+  "citation": {
+    "outorgante": {
+      "page": 1,
+      "excerpt": "RODRIGO SANTOS LIMA, CPF 000.000.000-65"
+    },
+    "outorgante_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-65"
+    },
+    "outorgado": {
+      "page": 1,
+      "excerpt": "GERALDO DA COSTA, CNPJ 00.000.000/0001-01"
+    },
+    "poderes_especificos": {
+      "page": 1,
+      "excerpt": "Poderes amplos e ilimitados para VENDER, CEDER, ONERAR, QUITAR E TRANSFERIR veiculo"
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Prazo: 6 meses, data de termino: 23 de novembro de 2024"
+    },
+    "data_lavratura": {
+      "page": 1,
+      "excerpt": "Trasladado na mesma data da lavratura (23/05/2024)"
+    }
+  }
+}

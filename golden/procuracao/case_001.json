@@ -1,0 +1,55 @@
+{
+  "case_number": 1,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pf_para_pj", "veiculo", "prazo_determinado", "substabelecimento", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T19:45:00Z",
+  "document_source": "internal:procuracao:001",
+  "notes": "Procuracao de veiculo — PF outorgante para PJ outorgado. Prazo determinado (6 meses). Poderes amplos para vender/ceder/onerar veiculo. Com autorizacao para substabelecimento.",
+  "expected_output": {
+    "document_type": "procuracao",
+    "outorgante": "RODRIGO SANTOS LIMA",
+    "outorgante_cpf": "000.000.000-65",
+    "outorgado": "GERALDO DA COSTA",
+    "outorgado_cpf": "00.000.000/0001-01",
+    "poderes_especificos": "Poderes amplos e ilimitados para vender, ceder, onerar, quitar e transferir veiculo para seu proprio nome ou a terceiros. Conduzir veiculo, receber e dar quitacao, assinar DUT e ATPV, pagar taxas e multas, representar perante DETRAN, CIRETRAN, seguradoras. Com substabelecimento.",
+    "validade": "23/11/2024",
+    "data_lavratura": "23/05/2024",
+    "cartorio": "13o Cartorio de Registro Civil das Pessoas Naturais da Comarca da Capital de Sao Paulo/SP — Subdistrito do Butanta"
+  },
+  "citation": {
+    "outorgante": {
+      "page": 1,
+      "excerpt": "RODRIGO SANTOS LIMA, CPF 000.000.000-65"
+    },
+    "outorgante_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-65"
+    },
+    "outorgado": {
+      "page": 1,
+      "excerpt": "GERALDO DA COSTA, CNPJ 00.000.000/0001-01"
+    },
+    "outorgado_cpf": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-01"
+    },
+    "poderes_especificos": {
+      "page": 1,
+      "excerpt": "Poderes amplos e ilimitados para VENDER, CEDER, ONERAR, QUITAR E TRANSFERIR veiculo"
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Prazo: 6 meses, data de termino: 23 de novembro de 2024"
+    },
+    "data_lavratura": {
+      "page": 1,
+      "excerpt": "Trasladado na mesma data da lavratura (23/05/2024)"
+    },
+    "cartorio": {
+      "page": 1,
+      "excerpt": "13o Cartorio de Registro Civil das Pessoas Naturais da Comarca da Capital de Sao Paulo/SP, Subdistrito do Butanta. Livro 0596, fls 023/024."
+    }
+  }
+}

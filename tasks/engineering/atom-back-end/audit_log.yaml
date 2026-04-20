@@ -1,0 +1,30 @@
+task_id: eng.atom.audit_log
+category: classification
+component: atom-back-end
+layer: engineering
+tier: gate
+description: "Every administrative action must have audit logging"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "app/api/**/*.py"
+expected:
+  convention: audit_log_required
+graders:
+  - type: convention_check
+    field: audit_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "audit_log|create_audit|log_action"
+          type: required
+          description: "Audit logging function call"
+        - pattern: "print\\(.*password|print\\(.*secret|print\\(.*token"
+          type: forbidden
+          description: "Sensitive data in print statements"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

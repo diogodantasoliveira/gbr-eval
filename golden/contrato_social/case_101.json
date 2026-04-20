@@ -1,0 +1,14 @@
+{
+  "case_number": 101,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["confuser", "alteracao_como_contrato_social"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:contrato_social:confuser_001",
+  "notes": "Alteração contratual enviada como contrato social. Sistema deve classificar como alteracao_contratual.",
+  "expected_output": {
+    "document_type": "alteracao_contratual"
+  },
+  "citation": {}
+}

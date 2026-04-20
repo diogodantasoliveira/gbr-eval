@@ -1,0 +1,74 @@
+{
+  "case_number": 4,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj_owner", "onus_cancelados", "imovel_rural", "arrolamento_bens", "indisponibilidade", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T17:00:00Z",
+  "document_source": "internal:matricula:004",
+  "notes": "Imovel rural grande (fazenda 1.391 ha) em Mato Grosso. Tres onus historicos todos cancelados (2 arrolamentos de bens Receita Federal + 1 indisponibilidade judicial). Cadeia dominial: Unibanco -> PF -> PJ atual. Bom case para testar distincao entre onus existentes vs vigentes.",
+  "expected_output": {
+    "document_type": "matricula",
+    "numero_matricula": "999.004",
+    "proprietario_cpf": "00.000.000/0001-50",
+    "proprietario_nome": "ALMEPAR ALUMINIOS LTDA",
+    "area_total": 13911335.00,
+    "onus": [
+      {
+        "tipo": "outro",
+        "registro_av": "R-2",
+        "status": "cancelado",
+        "envolvidos": "Arrolamento de bens — Delegacia da Receita Federal de Curitiba. Cancelado pela AV-5."
+      },
+      {
+        "tipo": "outro",
+        "registro_av": "R-3",
+        "status": "cancelado",
+        "envolvidos": "Arrolamento de bens — Delegacia da Receita Federal de Curitiba. Cancelado pela AV-4."
+      },
+      {
+        "tipo": "outro",
+        "registro_av": "AV-7",
+        "status": "cancelado",
+        "envolvidos": "Indisponibilidade de bens — 10a Vara Civel de Londrina/PR. Cancelada pela AV-8."
+      }
+    ],
+    "alienacao_fiduciaria": false,
+    "endereco": "Fazenda Mirindiba, municipio de Campos de Julio, comarca de Comodoro/MT",
+    "comarca": "Comodoro"
+  },
+  "citation": {
+    "numero_matricula": {
+      "page": 1,
+      "excerpt": "Matricula 999.004 do Registro de Imoveis de Comodoro/MT"
+    },
+    "proprietario_cpf": {
+      "page": 2,
+      "excerpt": "CNPJ 00.000.000/0001-50"
+    },
+    "proprietario_nome": {
+      "page": 2,
+      "excerpt": "ALMEPAR ALUMINIOS LTDA, com sede na Rua Antonio de Carvalho Lage Filho, s/n, barracoes 3 e 4, Londrina-PR"
+    },
+    "area_total": {
+      "page": 1,
+      "excerpt": "Area do terreno: 1.391,1335 ha"
+    },
+    "onus": {
+      "page": "1-2",
+      "excerpt": "R-2 arrolamento cancelado AV-5, R-3 arrolamento cancelado AV-4, AV-7 indisponibilidade cancelada AV-8. Situacao Atual: Nao ha onus vigentes."
+    },
+    "alienacao_fiduciaria": {
+      "page": "1-2",
+      "excerpt": "Nao consta alienacao fiduciaria entre os onus registrados"
+    },
+    "endereco": {
+      "page": 1,
+      "excerpt": "Imovel rural denominado Fazenda Mirindiba, situado no municipio de Campos de Julio, comarca de Comodoro, estado de Mato Grosso"
+    },
+    "comarca": {
+      "page": 1,
+      "excerpt": "comarca de Comodoro, estado de Mato Grosso"
+    }
+  }
+}

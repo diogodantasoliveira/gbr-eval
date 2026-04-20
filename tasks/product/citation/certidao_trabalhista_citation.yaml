@@ -1,0 +1,45 @@
+task_id: citation.certidao_trabalhista.linking
+category: citation
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Gate criterio 3: citation linking 100% para certidao trabalhista"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: certidao_trabalhista
+    skill: certidao_trabalhista_v1
+
+expected: {}
+
+graders:
+  - type: field_not_empty
+    field: citation.titular
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.resultado
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.orgao_emissor
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.data_emissao
+    weight: 2
+    required: true
+    config:
+      severity: high
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["seed"]

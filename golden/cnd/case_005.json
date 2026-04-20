@@ -1,0 +1,50 @@
+{
+  "case_number": 5,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj", "negativa", "rfb_pgfn", "sem_debitos", "spe"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T19:35:00Z",
+  "document_source": "internal:cnd:005",
+  "notes": "CND Federal PJ — Certidao Negativa pura. SPE imobiliaria (Sociedade de Proposito Especifico). Caso adicional PJ negativa para consistencia.",
+  "expected_output": {
+    "document_type": "cnd",
+    "tipo_certidao": "Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao",
+    "numero": "1094.01E1.A61B.E6AB",
+    "orgao_emissor": "Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)",
+    "validade": "07/10/2026",
+    "status": "negativa",
+    "cpf_cnpj_consultado": "00.000.000/0001-05",
+    "data_emissao": "10/04/2026"
+  },
+  "citation": {
+    "tipo_certidao": {
+      "page": 1,
+      "excerpt": "Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao"
+    },
+    "numero": {
+      "page": 1,
+      "excerpt": "Codigo de Controle: 1094.01E1.A61B.E6AB"
+    },
+    "orgao_emissor": {
+      "page": 1,
+      "excerpt": "RFB e PGFN, vinculados ao Ministerio da Fazenda"
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Validade ate 07/10/2026"
+    },
+    "status": {
+      "page": 1,
+      "excerpt": "Nao constam pendencias em seu nome relativas a creditos tributarios administrados pela RFB e a inscricoes em DAU junto a PGFN"
+    },
+    "cpf_cnpj_consultado": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-05"
+    },
+    "data_emissao": {
+      "page": 1,
+      "excerpt": "10/04/2026 as 13:29:21"
+    }
+  }
+}

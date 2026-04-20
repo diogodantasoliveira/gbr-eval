@@ -1,0 +1,30 @@
+task_id: eng.integracao.retry_backoff
+category: classification
+component: engine-integracao
+layer: engineering
+tier: gate
+description: "Retries must use exponential backoff, never fixed sleep"
+input:
+  payload:
+    repo: engine-integracao
+    scan_target: "**/*.py"
+expected:
+  convention: backoff_required
+graders:
+  - type: convention_check
+    field: retry_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "backoff|exponential|retry.*delay.*\\*|tenacity"
+          type: required
+          description: "Exponential backoff or retry library"
+        - pattern: "sleep\\(\\d+\\).*retry|while.*True.*sleep\\(\\d+\\)"
+          type: forbidden
+          description: "Fixed sleep in retry loop"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

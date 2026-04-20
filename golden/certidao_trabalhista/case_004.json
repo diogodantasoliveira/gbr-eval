@@ -1,0 +1,67 @@
+{
+  "case_number": 4,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj", "positiva", "trt10", "cliente_b", "recuperacao_judicial", "41_processos", "multiplas_varas"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T22:30:00Z",
+  "document_source": "internal:certidao_trabalhista:004",
+  "notes": "Certidao POSITIVA de distribuicao de acoes trabalhistas. PJ em recuperacao judicial identificada pela raiz do CNPJ (sem CNPJ completo). TRT 10a Regiao (Tocantins/DF). CONSTAM 41 acoes trabalhistas em 9 varas diferentes (Araguaina-TO, Palmas-TO, Taguatinga-DF, Brasilia-DF, Guarai-TO, Gurupi-TO). Case CRITICO para testar extracao do array processos com multiplas varas. Sem prazo de validade. Certidao eletronica PJe.",
+  "expected_output": {
+    "document_type": "certidao_trabalhista",
+    "titular": "ARAGUARI AGROPECUARIA LTDA. EM RECUPERACAO JUDICIAL",
+    "titular_cpf_cnpj": "NAO INFORMADO NO DOCUMENTO (raiz CNPJ XX.XXX.815)",
+    "resultado": "positiva",
+    "processos": [
+      {"vara": "1a Vara do Trabalho de Araguaina - TO", "quantidade": 11},
+      {"vara": "1a Vara do Trabalho de Palmas - TO", "quantidade": 5},
+      {"vara": "1a Vara do Trabalho de Taguatinga - DF", "quantidade": 2},
+      {"vara": "2a Vara do Trabalho de Araguaina - TO", "quantidade": 13},
+      {"vara": "5a Vara do Trabalho de Taguatinga - DF", "quantidade": 1},
+      {"vara": "6a Vara do Trabalho de Brasilia - DF", "quantidade": 1},
+      {"vara": "7a Vara do Trabalho de Brasilia - DF", "quantidade": 1},
+      {"vara": "18a Vara do Trabalho de Brasilia - DF", "quantidade": 1},
+      {"vara": "Vara do Trabalho de Guarai - TO", "quantidade": 1},
+      {"vara": "Vara do Trabalho de Gurupi - TO", "quantidade": 5}
+    ],
+    "orgao_emissor": "Tribunal Regional do Trabalho da 10a Regiao (TRT-10)",
+    "abrangencia": "PJe 1o e 2o grau — polo passivo e polo ativo. Nao contempla processos fisicos, arquivados definitivamente, nem debitos no BNDT. Classes processuais especificas listadas para cada polo/grau.",
+    "validade": null,
+    "data_emissao": "06/10/2025",
+    "codigo_verificacao": "90.999.309.368"
+  },
+  "citation": {
+    "titular": {
+      "page": 1,
+      "excerpt": "ARAGUARI AGROPECUARIA LTDA. EM RECUPERACAO JUDICIAL"
+    },
+    "titular_cpf_cnpj": {
+      "page": 1,
+      "excerpt": "Raiz do CNPJ pesquisado: XX.XXX.815"
+    },
+    "resultado": {
+      "page": 1,
+      "excerpt": "A certidao atesta a EXISTENCIA de acoes trabalhistas distribuidas em face da empresa. Foram identificadas 41 acoes trabalhistas"
+    },
+    "processos": {
+      "page": 1,
+      "excerpt": "1a Vara do Trabalho de Araguaina - TO: 11 processos; 2a Vara do Trabalho de Araguaina - TO: 13 processos; ..."
+    },
+    "orgao_emissor": {
+      "page": 1,
+      "excerpt": "Tribunal Regional do Trabalho da 10a Regiao"
+    },
+    "abrangencia": {
+      "page": 1,
+      "excerpt": "Pesquisa no Sistema de Processo Eletronico da Justica do Trabalho (PJe) no TRT da 10a Regiao"
+    },
+    "data_emissao": {
+      "page": 1,
+      "excerpt": "06/10/2025 as 11:06"
+    },
+    "codigo_verificacao": {
+      "page": 1,
+      "excerpt": "Codigo de Autenticidade: 90.999.309.368"
+    }
+  }
+}

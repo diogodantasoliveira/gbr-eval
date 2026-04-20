@@ -1,9 +1,9 @@
 skill: cnd_v1
 document_type: cnd
 minimum_cases: 20
-current_cases: 0
-annotator: null
-status: empty
+current_cases: 5
+annotator: diogo.dantas
+status: seed_complete
 
 critical_fields:
   - tipo_certidao
@@ -12,10 +12,16 @@ critical_fields:
   - validade
   - status
 
+important_fields:
+  - cpf_cnpj_consultado
+
+informative_fields:
+  - data_emissao
+
 field_weights:
   tipo_certidao: 3
   numero: 3
-  orgao_emissor: 2
+  orgao_emissor: 3
   validade: 3
   status: 3
   cpf_cnpj_consultado: 2

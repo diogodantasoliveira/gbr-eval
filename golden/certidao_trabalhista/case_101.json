@@ -1,0 +1,14 @@
+{
+  "case_number": 101,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["confuser", "certidao_civel_como_trabalhista"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:certidao_trabalhista:confuser_001",
+  "notes": "Certidão de distribuição cível enviada como certidão trabalhista. Sistema deve classificar como certidao_distribuicao_civel.",
+  "expected_output": {
+    "document_type": "certidao_distribuicao_civel"
+  },
+  "citation": {}
+}

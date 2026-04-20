@@ -1,0 +1,57 @@
+task_id: extraction.contrato_social.fields
+category: extraction
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extracao dos campos criticos de contrato social"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: contrato_social
+    skill: contrato_social_v1
+
+expected:
+  cnpj: "PLACEHOLDER"
+  razao_social: "PLACEHOLDER"
+  socios: "PLACEHOLDER"
+  capital_social: "PLACEHOLDER"
+  poderes: "PLACEHOLDER"
+
+graders:
+  - type: exact_match
+    field: cnpj
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: razao_social
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: socios
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: numeric_tolerance
+    field: capital_social
+    weight: 2
+    config:
+      severity: high
+      tolerance: 0.01
+      allow_null: true
+  - type: field_f1
+    field: poderes
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+golden_set_tags: ["seed"]
+scoring_mode: hybrid
+pass_threshold: 0.95

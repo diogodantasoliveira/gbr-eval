@@ -1,0 +1,106 @@
+name: gbr-eval Gate
+description: Run gbr-eval quality gate against a target repository
+
+inputs:
+  layer:
+    description: "Eval layer to run (engineering, product, operational, compliance)"
+    required: true
+    default: "product"
+  tier:
+    description: "Task tier filter (gate, regression, canary)"
+    required: false
+    default: "gate"
+  golden-dir:
+    description: "Path to golden set directory"
+    required: false
+    default: "golden/"
+  tasks-dir:
+    description: "Path to task YAML directory"
+    required: false
+    default: "tasks/"
+  self-eval:
+    description: "Run in self-eval mode"
+    required: false
+    default: "true"
+  python-version:
+    description: "Python version"
+    required: false
+    default: "3.12"
+  fail-on-no-go:
+    description: "Fail the step if gate result is NO_GO"
+    required: false
+    default: "true"
+
+outputs:
+  gate-result:
+    description: "Gate result (go, conditional_go, no_go, no_go_absolute)"
+    value: ${{ steps.eval.outputs.gate_result }}
+  overall-score:
+    description: "Overall score (0.0-1.0)"
+    value: ${{ steps.eval.outputs.overall_score }}
+  report-path:
+    description: "Path to eval report JSON"
+    value: ${{ steps.eval.outputs.report_path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        enable-cache: true
+
+    - name: Set up Python
+      shell: bash
+      env:
+        PYTHON_VERSION: ${{ inputs.python-version }}
+      run: uv python install "$PYTHON_VERSION"
+
+    - name: Install gbr-eval
+      shell: bash
+      run: uv sync --all-extras
+
+    - name: Run eval gate
+      id: eval
+      shell: bash
+      env:
+        SELF_EVAL: ${{ inputs.self-eval }}
+        TIER: ${{ inputs.tier }}
+        TASKS_DIR: ${{ inputs.tasks-dir }}
+        GOLDEN_DIR: ${{ inputs.golden-dir }}
+        LAYER: ${{ inputs.layer }}
+        FAIL_ON_NO_GO: ${{ inputs.fail-on-no-go }}
+      run: |
+        SELF_EVAL_FLAG=""
+        if [ "$SELF_EVAL" = "true" ]; then
+          SELF_EVAL_FLAG="--self-eval"
+        fi
+
+        TIER_FLAG=""
+        if [ -n "$TIER" ]; then
+          TIER_FLAG="--tier ${TIER}"
+        fi
+
+        REPORT_PATH="eval-report-${LAYER}.json"
+
+        uv run gbr-eval run \
+          --suite "${TASKS_DIR}/${LAYER}/" \
+          --golden-dir "${GOLDEN_DIR}" \
+          $SELF_EVAL_FLAG \
+          $TIER_FLAG \
+          --output-format json \
+          --output-file "$REPORT_PATH" \
+          || EXIT_CODE=$?
+
+        if [ -f "$REPORT_PATH" ]; then
+          GATE=$(REPORT_PATH="$REPORT_PATH" python3 -c "import json, os; r=json.load(open(os.environ['REPORT_PATH'])); print(r.get('gate_result','unknown'))")
+          SCORE=$(REPORT_PATH="$REPORT_PATH" python3 -c "import json, os; r=json.load(open(os.environ['REPORT_PATH'])); print(r.get('overall_score',0))")
+          echo "gate_result=$GATE" >> "$GITHUB_OUTPUT"
+          echo "overall_score=$SCORE" >> "$GITHUB_OUTPUT"
+          echo "report_path=$REPORT_PATH" >> "$GITHUB_OUTPUT"
+          echo "::notice::Eval gate: $GATE (score: $SCORE)"
+        fi
+
+        if [ "$FAIL_ON_NO_GO" = "true" ] && [ "${EXIT_CODE:-0}" -ne 0 ]; then
+          exit $EXIT_CODE
+        fi

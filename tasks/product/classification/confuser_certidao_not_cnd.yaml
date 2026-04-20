@@ -1,0 +1,28 @@
+task_id: classification.confuser.certidao_not_cnd
+category: classification
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Certidao generica nao deve ser classificada como CND (confuser negativo)"
+
+input:
+  endpoint: /api/v1/classify
+  payload:
+    skill: cnd_v1
+    document_type_actual: certidao_casamento
+
+expected:
+  document_type: certidao_casamento
+
+graders:
+  - type: exact_match
+    field: document_type
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["confuser"]

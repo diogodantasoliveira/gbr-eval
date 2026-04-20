@@ -1,0 +1,31 @@
+task_id: eng.billing.decimal_not_float
+category: classification
+component: engine-billing
+layer: engineering
+tier: gate
+description: "Financial calculations must use Decimal, never float"
+input:
+  payload:
+    repo: engine-billing
+    scan_target: "**/*.py"
+expected:
+  convention: decimal_required
+graders:
+  - type: pattern_required
+    field: decimal_import
+    weight: 1.0
+    required: true
+    config:
+      pattern: "from decimal import Decimal|import decimal"
+      file_key: content
+  - type: pattern_forbidden
+    field: no_float_money
+    weight: 1.0
+    required: true
+    config:
+      pattern: "float\\(.*price|float\\(.*amount|float\\(.*total|float\\(.*cost|float\\(.*valor"
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

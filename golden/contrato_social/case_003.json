@@ -1,0 +1,59 @@
+{
+  "case_number": 3,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "socio_unico", "ltda", "holding", "poderes_com_vedacoes", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T18:30:00Z",
+  "document_source": "internal:contrato_social:003",
+  "notes": "Holding de participacoes com socio unico. Poderes amplos MAS com vedacoes expressas (proibido conceder avais, fiancas ou garantias em favor de terceiros). Caso testa extracao de restricoes nos poderes — nao basta dizer 'poderes amplos', precisa capturar vedacoes.",
+  "expected_output": {
+    "document_type": "contrato_social",
+    "cnpj": "00.000.000/0001-48",
+    "razao_social": "SDA PARTICIPACOES LTDA",
+    "socios": [
+      {
+        "nome": "SERGIO DOMINGUES DE OLIVEIRA",
+        "cpf": "000.000.000-87",
+        "percentual": 100.0
+      }
+    ],
+    "participacao_percentual": {
+      "SERGIO DOMINGUES DE OLIVEIRA": 100.0
+    },
+    "capital_social": 10000.00,
+    "poderes": "Socio unico/administrador com poderes amplos para gerir negocios sociais, administrativos e financeiros. VEDACOES: proibido usar denominacao social em negocios estranhos ao objeto, inclusive concessao de avais, fiancas ou quaisquer garantias em favor de terceiros.",
+    "objeto_social": "Outras sociedades de participacao, exceto holdings (CNAE 6463-8/00); Holdings de instituicoes nao financeiras (CNAE 6462-0/00).",
+    "data_constituicao": "01/12/2022"
+  },
+  "citation": {
+    "cnpj": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-48"
+    },
+    "razao_social": {
+      "page": 1,
+      "excerpt": "SDA PARTICIPACOES LTDA"
+    },
+    "socios": {
+      "page": 1,
+      "excerpt": "SERGIO DOMINGUES DE OLIVEIRA, CPF 000.000.000-87, 100% das quotas"
+    },
+    "capital_social": {
+      "page": 1,
+      "excerpt": "Capital social R$ 10.000,00"
+    },
+    "poderes": {
+      "page": 1,
+      "excerpt": "Poderes amplos com vedacoes expressas: proibido conceder avais, fiancas ou garantias em favor de terceiros"
+    },
+    "objeto_social": {
+      "page": 1,
+      "excerpt": "Outras sociedades de participacao, exceto holdings; Holdings de instituicoes nao financeiras"
+    },
+    "data_constituicao": {
+      "page": 1,
+      "excerpt": "Data inicio atividades: 01/12/2022"
+    }
+  }
+}

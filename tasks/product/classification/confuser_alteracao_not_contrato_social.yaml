@@ -1,0 +1,28 @@
+task_id: classification.confuser.alteracao_not_contrato_social
+category: classification
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Alteracao contratual nao deve ser classificada como contrato social (confuser negativo)"
+
+input:
+  endpoint: /api/v1/classify
+  payload:
+    skill: contrato_social_v1
+    document_type_actual: alteracao_contratual
+
+expected:
+  document_type: alteracao_contratual
+
+graders:
+  - type: exact_match
+    field: document_type
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["confuser"]

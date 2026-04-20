@@ -1,0 +1,63 @@
+task_id: extraction.matricula.cpf_proprietario
+category: extraction
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração do CPF do proprietário em matrícula de imóvel"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: matricula
+    skill: matricula_v1
+
+expected:
+  proprietario_cpf: "PLACEHOLDER — substituir por golden set real"
+  proprietario_nome: "PLACEHOLDER"
+  numero_matricula: "PLACEHOLDER"
+  onus: "PLACEHOLDER"
+  alienacao_fiduciaria: "PLACEHOLDER"
+  area_total: "PLACEHOLDER"
+
+graders:
+  - type: exact_match
+    field: proprietario_cpf
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: numero_matricula
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: onus
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: alienacao_fiduciaria
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: proprietario_nome
+    weight: 2
+    config:
+      severity: high
+  - type: numeric_tolerance
+    field: area_total
+    weight: 2
+    config:
+      severity: high
+      tolerance: 0.01
+      allow_null: true
+
+golden_set_tags: ["seed"]
+scoring_mode: hybrid
+pass_threshold: 0.95

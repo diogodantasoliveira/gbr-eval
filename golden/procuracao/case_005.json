@@ -1,0 +1,55 @@
+{
+  "case_number": 5,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj_para_pf", "poderes_judiciais", "ad_judicia", "prazo_determinado", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T20:15:00Z",
+  "document_source": "internal:procuracao:005",
+  "notes": "Procuracao de empresa de construcoes para advogado PF. Poderes ad judicia e et extra (judiciais e extrajudiciais). Prazo 6 meses. Caso testa poderes judiciais — diferente dos bancarios/imobiliarios dos outros cases.",
+  "expected_output": {
+    "document_type": "procuracao",
+    "outorgante": "DM CONSTRUCOES E PROJETOS LTDA",
+    "outorgante_cpf": "00.000.000/0001-45",
+    "outorgado": "MARCIO AUGUSTO LACERDA BARBOSA",
+    "outorgado_cpf": "000.000.000-69",
+    "poderes_especificos": "Poderes especificos: clausula ad judicia e et extra — constituir advogado com poderes judiciais e extrajudiciais amplos para representacao em juizo e fora dele.",
+    "validade": "10/09/2025",
+    "data_lavratura": "10/03/2025",
+    "cartorio": "4o Tabelionato de Notas do Rio de Janeiro/RJ (4o Oficio de Notas). Tabeliao: Hamilton Barros. Livro 4938, fls 195/196."
+  },
+  "citation": {
+    "outorgante": {
+      "page": 1,
+      "excerpt": "DM CONSTRUCOES E PROJETOS LTDA, CNPJ 00.000.000/0001-45"
+    },
+    "outorgante_cpf": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-45"
+    },
+    "outorgado": {
+      "page": 1,
+      "excerpt": "Marcio Augusto Lacerda Barbosa, CPF 000.000.000-69"
+    },
+    "outorgado_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-69"
+    },
+    "poderes_especificos": {
+      "page": 1,
+      "excerpt": "Constituir advogado com poderes da clausula ad judicia e et extra"
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Prazo: 6 meses a contar da data de assinatura. Termino: 10/09/2025."
+    },
+    "data_lavratura": {
+      "page": 1,
+      "excerpt": "Data de inicio: 10/03/2025"
+    },
+    "cartorio": {
+      "page": 1,
+      "excerpt": "4o Tabelionato de Notas, Rio de Janeiro/RJ. Tabeliao Hamilton Barros."
+    }
+  }
+}

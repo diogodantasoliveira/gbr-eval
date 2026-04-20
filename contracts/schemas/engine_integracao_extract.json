@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EngineIntegracaoExtractResponse",
+  "description": "Response schema for engine-integracao extraction endpoint",
+  "type": "object",
+  "required": ["request_id", "status", "provider", "result"],
+  "properties": {
+    "request_id": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["success", "error", "timeout", "partial"] },
+    "provider": { "type": "string" },
+    "provider_action": { "type": "string" },
+    "result": { "type": "object" },
+    "retry_count": { "type": "integer", "minimum": 0 },
+    "duration_ms": { "type": "number", "minimum": 0 },
+    "timestamp": { "type": "string", "format": "date-time" }
+  }
+}

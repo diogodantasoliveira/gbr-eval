@@ -1,0 +1,71 @@
+{
+  "case_number": 4,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "sa", "multiplos_socios", "administracao_conjunta", "vedacoes", "garantias_autorizadas", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T18:45:00Z",
+  "document_source": "internal:contrato_social:004",
+  "notes": "S.A. com 3 acionistas e percentuais assimetricos (25/50/25). Administracao conjunta com vedacoes expressas (proibido avais/fiancas em favor de terceiros). Representacao isolada apenas perante orgaos publicos. Sociedade autorizada a prestar garantias em favor de Natured Laboratorio S.A. Caso excelente para testar multiplos socios, poderes conjuntos com restricoes, e derivacao de participacao_percentual.",
+  "expected_output": {
+    "document_type": "contrato_social",
+    "cnpj": "00.000.000/0001-29",
+    "razao_social": "RUBICON INDUSTRIA, COMERCIO, IMPORTACAO E EXPORTACAO S.A.",
+    "socios": [
+      {
+        "nome": "DEBORA CRISTIANO GOMES",
+        "cpf": "000.000.000-42",
+        "percentual": 25.0
+      },
+      {
+        "nome": "JOSE CARLOS CRISTIANO",
+        "cpf": "000.000.000-00",
+        "percentual": 50.0
+      },
+      {
+        "nome": "MARCOS ANTONIO GOMES",
+        "cpf": "000.000.000-11",
+        "percentual": 25.0
+      }
+    ],
+    "participacao_percentual": {
+      "DEBORA CRISTIANO GOMES": 25.0,
+      "JOSE CARLOS CRISTIANO": 50.0,
+      "MARCOS ANTONIO GOMES": 25.0
+    },
+    "capital_social": 150000.00,
+    "poderes": "Presidente/Administrador (Marcos Antonio Gomes) exerce administracao em conjunto com Jose Carlos Cristiano. Assinaturas em conjunto para negocios da sociedade. Vedacoes: proibido avais, fiancas, endossos de favor e garantias em favor de terceiros. Representacao isolada perante orgaos publicos.",
+    "objeto_social": "Comercio e importacao de borracha sintetica e natural, negro de fumo, aceleradores e artigos plasticos em geral, pecas e acessorios para bicicletas, artigos de perfumaria, cosmeticos, toucador e higiene pessoal.",
+    "data_constituicao": "19/05/2008"
+  },
+  "citation": {
+    "cnpj": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-29"
+    },
+    "razao_social": {
+      "page": 1,
+      "excerpt": "RUBICON INDUSTRIA, COMERCIO, IMPORTACAO E EXPORTACAO S.A."
+    },
+    "socios": {
+      "page": 1,
+      "excerpt": "Debora Cristiano Gomes (25%), Jose Carlos Cristiano (50%), Marcos Antonio Gomes (25%)"
+    },
+    "capital_social": {
+      "page": 1,
+      "excerpt": "Capital social R$ 150.000,00"
+    },
+    "poderes": {
+      "page": 1,
+      "excerpt": "Administracao em conjunto, vedacoes expressas para avais/fiancas/garantias em favor de terceiros, representacao isolada perante orgaos publicos"
+    },
+    "objeto_social": {
+      "page": 1,
+      "excerpt": "Comercio e Importacao de borracha sintetica e natural, negro de fumo, aceleradores e artigos plasticos"
+    },
+    "data_constituicao": {
+      "page": 1,
+      "excerpt": "Data inicio atividades: 19/05/2008"
+    }
+  }
+}

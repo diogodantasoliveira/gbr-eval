@@ -1,0 +1,63 @@
+task_id: extraction.procuracao.fields
+category: extraction
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extracao dos campos criticos de procuracao"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: procuracao
+    skill: procuracao_v1
+
+expected:
+  outorgante: "PLACEHOLDER"
+  outorgante_cpf: "PLACEHOLDER"
+  outorgado: "PLACEHOLDER"
+  outorgado_cpf: "PLACEHOLDER"
+  poderes_especificos: "PLACEHOLDER"
+  validade: "PLACEHOLDER"
+
+graders:
+  - type: field_f1
+    field: outorgante
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: outorgado
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_f1
+    field: poderes_especificos
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: validade
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: outorgante_cpf
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+  - type: exact_match
+    field: outorgado_cpf
+    weight: 2
+    config:
+      severity: high
+
+golden_set_tags: ["seed"]
+scoring_mode: hybrid
+pass_threshold: 0.95

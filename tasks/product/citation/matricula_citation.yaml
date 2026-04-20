@@ -1,0 +1,38 @@
+task_id: citation.matricula.linking
+category: citation
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Gate criterio 3: citation linking 100% para matricula"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: matricula
+    skill: matricula_v1
+
+expected: {}
+
+graders:
+  - type: field_not_empty
+    field: citation.proprietario_cpf
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.numero_matricula
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.area_total
+    weight: 2
+    config:
+      severity: high
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["seed"]

@@ -1,0 +1,46 @@
+{
+  "case_number": 202,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["edge_case", "campo_ausente"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:cnd:edge_202",
+  "notes": "CND emitida sem CPF/CNPJ do consultado no corpo do documento.",
+  "expected_output": {
+    "document_type": "cnd",
+    "tipo_certidao": "Certidao Positiva com Efeitos de Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao",
+    "numero": "1F53.7F14.12B9.B7B2",
+    "orgao_emissor": "Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)",
+    "validade": "07/10/2026",
+    "status": "positiva_com_efeitos_de_negativa",
+    "cpf_cnpj_consultado": null,
+    "data_emissao": "10/04/2026"
+  },
+  "citation": {
+    "tipo_certidao": {
+      "page": 1,
+      "excerpt": "Certidao Positiva com Efeitos de Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao"
+    },
+    "numero": {
+      "page": 1,
+      "excerpt": "Codigo de Controle: 1F53.7F14.12B9.B7B2"
+    },
+    "orgao_emissor": {
+      "page": 1,
+      "excerpt": "Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)"
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Validade ate 07/10/2026"
+    },
+    "status": {
+      "page": 1,
+      "excerpt": "Conforme disposto nos arts. 205 e 206 do CTN, este documento tem os mesmos efeitos da certidao negativa"
+    },
+    "data_emissao": {
+      "page": 1,
+      "excerpt": "Data e Hora de Emissao: 10/04/2026 as 13:27:02"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+task_id: decision.score.aprovado
+category: decision
+component: athena
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que score >= 0.90 com zero critical non-conforming gera decisão 'aprovado'"
+
+input:
+  endpoint: /api/v1/evaluate
+  payload: {}
+
+expected:
+  decision: "aprovado"
+  score: 0.95
+
+graders:
+  - type: exact_match
+    field: decision
+    weight: 3
+    required: true
+  - type: numeric_range
+    field: score
+    weight: 2
+    config:
+      min: 0.90
+      max: 1.0
+
+scoring_mode: hybrid
+pass_threshold: 1.0

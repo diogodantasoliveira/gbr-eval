@@ -1,0 +1,27 @@
+task_id: eng.ia.cost_tracking
+category: classification
+component: garantia_ia
+layer: engineering
+tier: gate
+description: "Every LLM call must track cost/token usage"
+input:
+  payload:
+    repo: garantia_ia
+    scan_target: "**/*.py"
+expected:
+  convention: cost_tracking_required
+graders:
+  - type: convention_check
+    field: cost_tracking_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "usage|token_count|cost_usd|track_cost|log_cost|total_tokens"
+          type: required
+          description: "Every LLM call must track cost/token usage"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

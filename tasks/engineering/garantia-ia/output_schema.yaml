@@ -1,0 +1,27 @@
+task_id: eng.ia.output_schema
+category: classification
+component: garantia_ia
+layer: engineering
+tier: gate
+description: "AI output must have a Pydantic/TypedDict schema"
+input:
+  payload:
+    repo: garantia_ia
+    scan_target: "**/*.py"
+expected:
+  convention: output_schema_required
+graders:
+  - type: convention_check
+    field: output_schema_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "BaseModel|TypedDict|@validate_output|response_model=|OutputSchema"
+          type: required
+          description: "AI output must have a Pydantic/TypedDict schema"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

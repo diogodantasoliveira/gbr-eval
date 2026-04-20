@@ -1,0 +1,14 @@
+{
+  "case_number": 101,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["confuser", "certidao_casamento_como_cnd"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:cnd:confuser_001",
+  "notes": "Certidão de casamento enviada como CND. Sistema deve classificar como certidao_casamento.",
+  "expected_output": {
+    "document_type": "certidao_casamento"
+  },
+  "citation": {}
+}

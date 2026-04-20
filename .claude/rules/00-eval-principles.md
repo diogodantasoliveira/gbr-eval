@@ -4,7 +4,12 @@
 Golden sets são anotados por humano (CLO). Claude pode SUGERIR campos esperados, mas NUNCA pode criar um golden set e declarar como "validado".
 
 ## Graders devem ser funções puras
-Todo grader determinístico: `f(input, output, reference, config) → score`. Sem side effects, sem estado, sem I/O. Exceção única: LLM-judge (documentada).
+Todo grader determinístico implementa o Protocol:
+```python
+class Grader(Protocol):
+    def grade(self, output: dict, expected: dict, spec: GraderSpec) -> GraderResult: ...
+```
+Sem side effects, sem estado, sem I/O. Exceção única: LLM-judge (documentada).
 
 ## Zero tautologia
 Nunca comparar output consigo mesmo. Se um teste precisa de expected, o expected vem de um golden set real, não de um mock gerado.

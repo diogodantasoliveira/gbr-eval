@@ -1,0 +1,1484 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GBR — HITL",
+    "description": "Human-in-the-Loop review engine: queue de revisao humana para extracoes e regras",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health Check",
+        "description": "Basic liveness probe — always returns 200.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readiness Check",
+        "description": "Deep readiness probe — checks all infrastructure dependencies.\nReturns 200 if ready, 503 if any critical dependency is down.",
+        "operationId": "readiness_check_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue": {
+      "get": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "List Queue",
+        "description": "List review items with optional filters and pagination.",
+        "operationId": "list_queue_api_v1_queue_get",
+        "parameters": [
+          {
+            "name": "audit_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Audit Id"
+            }
+          },
+          {
+            "name": "prioridade",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReviewPriority"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Prioridade"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReviewStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "campo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campo"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReviewItemResponse"
+                  },
+                  "title": "Response List Queue Api V1 Queue Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Create Review Item",
+        "description": "Create a new review item in the HITL queue.",
+        "operationId": "create_review_item_api_v1_queue_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewItemCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue/{item_id}": {
+      "get": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Get Review Item",
+        "description": "Get a single review item by ID.",
+        "operationId": "get_review_item_api_v1_queue__item_id__get",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue/{item_id}/confirm": {
+      "post": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Confirm Item Route",
+        "description": "Confirm an extraction as correct.",
+        "operationId": "confirm_item_route_api_v1_queue__item_id__confirm_post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ConfirmRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue/{item_id}/correct": {
+      "post": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Correct Item Route",
+        "description": "Correct an extracted value.",
+        "operationId": "correct_item_route_api_v1_queue__item_id__correct_post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue/{item_id}/reject": {
+      "post": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Reject Item Route",
+        "description": "Reject an extraction.",
+        "operationId": "reject_item_route_api_v1_queue__item_id__reject_post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue/{item_id}/skip": {
+      "post": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Skip Item Route",
+        "description": "Skip a review item (come back later).",
+        "operationId": "skip_item_route_api_v1_queue__item_id__skip_post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue/bulk-approve": {
+      "post": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Bulk Approve",
+        "description": "Auto-approve all pending items with confidence above threshold for an audit.",
+        "operationId": "bulk_approve_api_v1_queue_bulk_approve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkApproveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkApproveResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/metrics": {
+      "get": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Get Metrics",
+        "description": "Get HITL queue metrics (intervention rate, accuracy, etc.).",
+        "operationId": "get_metrics_api_v1_metrics_get",
+        "parameters": [
+          {
+            "name": "audit_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Audit Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HITLMetricsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/queue": {
+      "get": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Admin List Queue",
+        "description": "Cross-tenant queue listing for platform admins.",
+        "operationId": "admin_list_queue_api_v1_admin_queue_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by tenant (null=all)",
+              "title": "Tenant Id"
+            },
+            "description": "Filter by tenant (null=all)"
+          },
+          {
+            "name": "audit_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Audit Id"
+            }
+          },
+          {
+            "name": "prioridade",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Prioridade"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "campo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campo"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Admin List Queue Api V1 Admin Queue Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/metrics": {
+      "get": {
+        "tags": [
+          "hitl"
+        ],
+        "summary": "Admin Metrics",
+        "description": "Cross-tenant HITL metrics for platform admins.",
+        "operationId": "admin_metrics_api_v1_admin_metrics_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Admin Metrics Api V1 Admin Metrics Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/decisions/delegate": {
+      "post": {
+        "tags": [
+          "decisions"
+        ],
+        "summary": "Delegate Item",
+        "description": "Delegate a HITL queue item to another user.",
+        "operationId": "delegate_item_api_v1_decisions_delegate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DelegateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DelegateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/decisions/my": {
+      "get": {
+        "tags": [
+          "decisions"
+        ],
+        "summary": "My Decisions",
+        "description": "Return recent decisions made by the current authenticated user.",
+        "operationId": "my_decisions_api_v1_decisions_my_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionsListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/decisions/delegated-to-me": {
+      "get": {
+        "tags": [
+          "decisions"
+        ],
+        "summary": "Delegated To Me",
+        "description": "Return HITL items that have been delegated to the current user.",
+        "operationId": "delegated_to_me_api_v1_decisions_delegated_to_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionsListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BulkApproveRequest": {
+        "properties": {
+          "audit_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Audit Id"
+          },
+          "threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Threshold",
+            "description": "Minimum confidence to auto-approve"
+          }
+        },
+        "type": "object",
+        "required": [
+          "audit_id",
+          "threshold"
+        ],
+        "title": "BulkApproveRequest",
+        "description": "Request to auto-approve items above a confidence threshold."
+      },
+      "BulkApproveResponse": {
+        "properties": {
+          "approved_count": {
+            "type": "integer",
+            "title": "Approved Count"
+          },
+          "skipped_count": {
+            "type": "integer",
+            "title": "Skipped Count"
+          },
+          "total_evaluated": {
+            "type": "integer",
+            "title": "Total Evaluated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "approved_count",
+          "skipped_count",
+          "total_evaluated"
+        ],
+        "title": "BulkApproveResponse",
+        "description": "Response for bulk approve operation."
+      },
+      "ConfirmRequest": {
+        "properties": {
+          "notas": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notas",
+            "description": "Optional reviewer notes"
+          }
+        },
+        "type": "object",
+        "title": "ConfirmRequest",
+        "description": "Body for confirming an extraction as correct."
+      },
+      "CorrectRequest": {
+        "properties": {
+          "valor_corrigido": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Valor Corrigido",
+            "description": "The corrected value"
+          },
+          "notas": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notas",
+            "description": "Optional reviewer notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "valor_corrigido"
+        ],
+        "title": "CorrectRequest",
+        "description": "Body for correcting an extracted value."
+      },
+      "DecisionItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "reviewed_by": {
+            "type": "string",
+            "title": "Reviewed By"
+          },
+          "delegated_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delegated To"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "tenant_id",
+          "action",
+          "reviewed_by",
+          "delegated_to",
+          "reason",
+          "created_at"
+        ],
+        "title": "DecisionItem"
+      },
+      "DecisionsListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DecisionsListResponse"
+      },
+      "DelegateRequest": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "to_user_id": {
+            "type": "string",
+            "title": "To User Id"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id",
+          "to_user_id"
+        ],
+        "title": "DelegateRequest"
+      },
+      "DelegateResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "to": {
+            "type": "string",
+            "title": "To"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "delegated_at": {
+            "type": "string",
+            "title": "Delegated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "item_id",
+          "to",
+          "reason",
+          "delegated_at"
+        ],
+        "title": "DelegateResponse"
+      },
+      "HITLMetricsResponse": {
+        "properties": {
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items",
+            "default": 0
+          },
+          "pending_items": {
+            "type": "integer",
+            "title": "Pending Items",
+            "default": 0
+          },
+          "confirmed_items": {
+            "type": "integer",
+            "title": "Confirmed Items",
+            "default": 0
+          },
+          "corrected_items": {
+            "type": "integer",
+            "title": "Corrected Items",
+            "default": 0
+          },
+          "rejected_items": {
+            "type": "integer",
+            "title": "Rejected Items",
+            "default": 0
+          },
+          "skipped_items": {
+            "type": "integer",
+            "title": "Skipped Items",
+            "default": 0
+          },
+          "intervention_rate": {
+            "type": "number",
+            "title": "Intervention Rate",
+            "default": 0.0
+          },
+          "avg_confidence": {
+            "type": "number",
+            "title": "Avg Confidence",
+            "default": 0.0
+          },
+          "avg_review_time_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Review Time Seconds"
+          },
+          "accuracy_rate": {
+            "type": "number",
+            "title": "Accuracy Rate",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "title": "HITLMetricsResponse",
+        "description": "HITL queue metrics."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "RejectRequest": {
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "maxLength": 1024,
+            "title": "Motivo",
+            "description": "Reason for rejection"
+          }
+        },
+        "type": "object",
+        "required": [
+          "motivo"
+        ],
+        "title": "RejectRequest",
+        "description": "Body for rejecting an extraction."
+      },
+      "ReviewItemCreate": {
+        "properties": {
+          "audit_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Audit Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Tenant Id"
+          },
+          "campo": {
+            "type": "string",
+            "maxLength": 256,
+            "title": "Campo"
+          },
+          "valor_extraido": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Valor Extraido"
+          },
+          "confianca": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confianca"
+          },
+          "alternativas": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternativas"
+          },
+          "pdf_page": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdf Page"
+          },
+          "pdf_bbox": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdf Bbox"
+          },
+          "prioridade": {
+            "$ref": "#/components/schemas/ReviewPriority",
+            "default": "media"
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "audit_id",
+          "tenant_id",
+          "campo",
+          "valor_extraido",
+          "confianca",
+          "source"
+        ],
+        "title": "ReviewItemCreate",
+        "description": "Schema for creating a new review item."
+      },
+      "ReviewItemResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "audit_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Audit Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "campo": {
+            "type": "string",
+            "title": "Campo"
+          },
+          "valor_extraido": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Valor Extraido"
+          },
+          "confianca": {
+            "type": "number",
+            "title": "Confianca"
+          },
+          "alternativas": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternativas"
+          },
+          "pdf_page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdf Page"
+          },
+          "pdf_bbox": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdf Bbox"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "valor_corrigido": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Corrigido"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "prioridade": {
+            "$ref": "#/components/schemas/ReviewPriority"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "audit_id",
+          "tenant_id",
+          "campo",
+          "valor_extraido",
+          "confianca",
+          "status",
+          "prioridade",
+          "source",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ReviewItemResponse",
+        "description": "Schema for returning a review item."
+      },
+      "ReviewPriority": {
+        "type": "string",
+        "enum": [
+          "alta",
+          "media",
+          "baixa"
+        ],
+        "title": "ReviewPriority"
+      },
+      "ReviewStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "confirmed",
+          "corrected",
+          "rejected",
+          "skipped"
+        ],
+        "title": "ReviewStatus"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

@@ -8,28 +8,51 @@
 #   reviewed_by: segundo revisor (Claude ou especialista)
 #   fields: campos extraídos esperados
 #   citation: referência ao trecho do documento
+#
+# DECISÃO CLO (2026-04-18):
+#   - onus: lista detalhada de ônus (array de objetos), NÃO boolean
+#     Cada objeto: {tipo, registro_av, status_cancelamento, envolvidos}
+#   - alienacao_fiduciaria: derivado da lista de ônus (subtipo)
+#     Mantido como campo separado para grading direto, mas valor vem da lista
 
 skill: matricula_v1
 document_type: matricula
 minimum_cases: 20
-current_cases: 0
-annotator: null
-status: empty
+current_cases: 5
+annotator: diogo.dantas
+status: seed_complete
 
 critical_fields:
   - numero_matricula
   - proprietario_cpf
+  - onus           # lista detalhada — array de objetos
+  - alienacao_fiduciaria  # derivado de onus (boolean: existe AF ativa na lista?)
+
+important_fields:
   - proprietario_nome
   - area_total
-  - onus
-  - alienacao_fiduciaria
+
+informative_fields:
+  - endereco
+  - comarca
 
 field_weights:
-  numero_matricula: 3   # CRITICAL
-  proprietario_cpf: 3   # CRITICAL
-  proprietario_nome: 2  # IMPORTANT
-  area_total: 2         # IMPORTANT
-  onus: 3               # CRITICAL
-  alienacao_fiduciaria: 3  # CRITICAL
-  endereco: 1           # INFORMATIVE
-  comarca: 1            # INFORMATIVE
+  numero_matricula: 3   # CRITICAL — string
+  proprietario_cpf: 3   # CRITICAL — string (CPF/CNPJ do último proprietário)
+  proprietario_nome: 2  # IMPORTANT — string
+  area_total: 2         # IMPORTANT — float (m²)
+  onus: 3               # CRITICAL — array de {tipo, registro_av, status, envolvidos}
+  alienacao_fiduciaria: 3  # CRITICAL — boolean (derivado: existe AF ativa em onus?)
+  endereco: 1           # INFORMATIVE — string
+  comarca: 1            # INFORMATIVE — string
+
+# Tipos de dados esperados no golden set:
+# onus: [
+#   {
+#     "tipo": "hipoteca" | "alienacao_fiduciaria" | "penhora" | "usufruto" | "acao_judicial" | "outro",
+#     "registro_av": "R-5" | "AV-3" | etc,
+#     "status": "ativo" | "cancelado",
+#     "envolvidos": "Nome do credor / beneficiário"
+#   }
+# ]
+# alienacao_fiduciaria: true | false (true se existe pelo menos 1 onus tipo="alienacao_fiduciaria" com status="ativo")

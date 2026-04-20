@@ -1,0 +1,38 @@
+task_id: citation.contrato_social.linking
+category: citation
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Gate criterio 3: citation linking 100% para contrato social"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: contrato_social
+    skill: contrato_social_v1
+
+expected: {}
+
+graders:
+  - type: field_not_empty
+    field: citation.cnpj
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.razao_social
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: citation.socios
+    weight: 2
+    config:
+      severity: high
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["seed"]

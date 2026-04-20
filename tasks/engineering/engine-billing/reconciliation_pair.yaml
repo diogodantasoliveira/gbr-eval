@@ -1,0 +1,24 @@
+task_id: eng.billing.reconciliation_pair
+category: classification
+component: engine-billing
+layer: engineering
+tier: gate
+description: "Every debit must have a reconciliation pair"
+input:
+  payload:
+    repo: engine-billing
+    scan_target: "**/*.py"
+expected:
+  convention: reconciliation_required
+graders:
+  - type: pattern_required
+    field: reconciliation_check
+    weight: 1.0
+    required: true
+    config:
+      pattern: "reconcile|reconciliation|ReconciliationService|reconciliation_pair"
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

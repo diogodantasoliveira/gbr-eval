@@ -6,13 +6,14 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class Layer(StrEnum):
-    L0 = "L0"
-    L1 = "L1"
-    L2 = "L2"
+    ENGINEERING = "engineering"
+    PRODUCT = "product"
+    OPERATIONAL = "operational"
+    COMPLIANCE = "compliance"
 
 
 class Tier(StrEnum):
@@ -39,12 +40,40 @@ class ScoringMode(StrEnum):
     HYBRID = "hybrid"
 
 
+class ScoreReducer(StrEnum):
+    MEAN = "mean"
+    AT_LEAST_ONE = "at_least_one"
+    ALL_PASS = "all_pass"
+    MAJORITY = "majority"
+    MEDIAN = "median"
+
+
+class Severity(StrEnum):
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+
+class GateResult(StrEnum):
+    GO = "go"
+    CONDITIONAL_GO = "conditional_go"
+    NO_GO = "no_go"
+    NO_GO_ABSOLUTE = "no_go_absolute"
+
+
 class GraderSpec(BaseModel):
     type: str
     field: str | None = None
     weight: float = 1.0
     required: bool = False
     config: dict[str, Any] = Field(default_factory=dict)
+    model_role: str | None = None
+
+
+class GraderContext(BaseModel):
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    previous_results: list[GraderResult] = Field(default_factory=list)
 
 
 class TaskInput(BaseModel):
@@ -65,7 +94,28 @@ class Task(BaseModel):
     expected: dict[str, Any] = Field(default_factory=dict)
     graders: list[GraderSpec]
     scoring_mode: ScoringMode = ScoringMode.WEIGHTED
-    pass_threshold: float = 0.95
+    pass_threshold: float = Field(ge=0.0, le=1.0, default=0.95)
+    target_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
+    baseline_run_id: str | None = None
+    regression_signal: str | None = None
+    eval_owner: str | None = None
+    eval_cadence: str | None = None
+    golden_set_tags: list[str] | None = None
+    epochs: int = Field(default=1, ge=1, le=100)
+    reducers: list[ScoreReducer] = Field(default_factory=lambda: [ScoreReducer.MEAN])
+    primary_reducer: ScoreReducer = ScoreReducer.MEAN
+
+    @model_validator(mode="after")
+    def _validate_thresholds(self) -> Task:
+        if self.target_threshold is not None and self.target_threshold < self.pass_threshold:
+            raise ValueError(
+                f"target_threshold ({self.target_threshold}) must be >= pass_threshold ({self.pass_threshold})"
+            )
+        if self.primary_reducer not in self.reducers:
+            raise ValueError(
+                f"primary_reducer ({self.primary_reducer}) must be in reducers list ({self.reducers})"
+            )
+        return self
 
 
 class GraderResult(BaseModel):
@@ -77,6 +127,8 @@ class GraderResult(BaseModel):
     required: bool = False
     details: str = ""
     error: str | None = None
+    severity: Severity | None = None
+    file_path: str | None = None
 
 
 class TaskResult(BaseModel):
@@ -85,7 +137,11 @@ class TaskResult(BaseModel):
     score: float = Field(ge=0.0, le=1.0)
     grader_results: list[GraderResult]
     duration_ms: float = 0.0
+    pass_threshold: float = 0.95
     error: str | None = None
+    golden_set_tags: list[str] | None = None
+    reducer_scores: dict[str, float] = Field(default_factory=dict)
+    epoch_scores: list[float] = Field(default_factory=list)
 
 
 class EvalRun(BaseModel):
@@ -100,3 +156,15 @@ class EvalRun(BaseModel):
     task_results: list[TaskResult] = Field(default_factory=list)
     overall_score: float = 0.0
     metadata: dict[str, Any] = Field(default_factory=dict)
+    gate_result: GateResult | None = None
+    baseline_run_id: str | None = None
+
+
+class PostMortem(BaseModel):
+    what: str
+    root_cause: str
+    impact: str
+    fix: str
+    prevention: str
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

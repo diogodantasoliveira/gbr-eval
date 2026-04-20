@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExtractResponse",
+  "description": "Schema snapshot — AI engine extraction response",
+  "type": "object",
+  "required": ["document_type", "fields", "confidence"],
+  "properties": {
+    "document_type": {"type": "string"},
+    "fields": {"type": "object"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+  }
+}

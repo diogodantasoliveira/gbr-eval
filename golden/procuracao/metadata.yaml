@@ -1,15 +1,22 @@
 skill: procuracao_v1
 document_type: procuracao
 minimum_cases: 20
-current_cases: 0
-annotator: null
-status: empty
+current_cases: 5
+annotator: diogo.dantas
+status: seed_complete
 
 critical_fields:
   - outorgante
   - outorgado
   - poderes_especificos
   - validade
+
+important_fields:
+  - outorgado_cpf
+
+informative_fields:
+  - data_lavratura
+  - cartorio
 
 field_weights:
   outorgante: 3

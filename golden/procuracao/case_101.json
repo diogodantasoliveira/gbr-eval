@@ -1,0 +1,14 @@
+{
+  "case_number": 101,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["confuser", "substabelecimento_como_procuracao"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:procuracao:confuser_001",
+  "notes": "Substabelecimento enviado como procuração. Sistema deve classificar como substabelecimento.",
+  "expected_output": {
+    "document_type": "substabelecimento"
+  },
+  "citation": {}
+}

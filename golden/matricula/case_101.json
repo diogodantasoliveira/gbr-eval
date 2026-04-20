@@ -1,0 +1,14 @@
+{
+  "case_number": 101,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["confuser", "iptu_como_matricula"],
+  "annotator": "claude_assistant",
+  "reviewed_by": null,
+  "created_at": "2026-04-19T22:00:00Z",
+  "document_source": "internal:matricula:confuser_001",
+  "notes": "IPTU enviado como matrícula. Sistema deve classificar como iptu, não matricula.",
+  "expected_output": {
+    "document_type": "iptu"
+  },
+  "citation": {}
+}

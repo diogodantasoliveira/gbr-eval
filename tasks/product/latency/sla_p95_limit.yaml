@@ -1,0 +1,27 @@
+task_id: latency.sla.p95
+category: latency
+component: ai-engine
+layer: product
+tier: gate
+tenant_profile: global
+description: "Gate criterio 8: SLA P95 < 10 minutos (600000ms) por journey"
+
+input:
+  endpoint: /api/v1/metrics/latency
+  payload: {}
+
+expected:
+  p95_ms: 600000.0
+
+graders:
+  - type: numeric_range
+    field: p95_ms
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      min: 0
+      max: 600000.0
+
+scoring_mode: binary
+pass_threshold: 1.0

@@ -1,0 +1,55 @@
+{
+  "case_number": 2,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj_para_pf", "multiplos_outorgantes", "poderes_bancarios", "prazo_indeterminado", "cliente_a"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T19:50:00Z",
+  "document_source": "internal:procuracao:002",
+  "notes": "Procuracao com 3 outorgantes PJ (mesmo grupo empresarial) para 1 outorgado PF. Poderes bancarios especificos (Banco Santander). Prazo indeterminado. Com substabelecimento. Caso testa multiplos outorgantes e poderes bancarios especificos.",
+  "expected_output": {
+    "document_type": "procuracao",
+    "outorgante": "N.R.A. DE ALMEIDA (CNPJ 00.000.000/0001-73), N.R.A. DE ALMEIDA Filial (CNPJ 00.000.000/0002-54), NELSON R F DE ALMEIDA LTDA (CNPJ 00.000.000/0001-97)",
+    "outorgante_cpf": "00.000.000/0001-73",
+    "outorgado": "FERNANDO SOUZA DA SILVA",
+    "outorgado_cpf": "000.000.000-53",
+    "poderes_especificos": "Poderes especificos para representacao junto ao Banco Santander S.A.: abrir, movimentar e encerrar contas bancarias; requerer, assinar, emitir e endossar cheques. Sem limitacoes alem do escopo bancario.",
+    "validade": "indeterminado",
+    "data_lavratura": "09/03/2023",
+    "cartorio": "1o Oficio de Notas, Protesto e Registro de Boa Vista/RR. Tabeliao: Bel. Joziel Silva Wariss Loureiro. Livro 1194, fls 189."
+  },
+  "citation": {
+    "outorgante": {
+      "page": 1,
+      "excerpt": "Tres outorgantes PJ: N.R.A. DE ALMEIDA (CNPJ 00.000.000/0001-73), N.R.A. DE ALMEIDA Filial (CNPJ 00.000.000/0002-54), NELSON R F DE ALMEIDA LTDA (CNPJ 00.000.000/0001-97)"
+    },
+    "outorgante_cpf": {
+      "page": 1,
+      "excerpt": "CNPJ 00.000.000/0001-73 (outorgante principal/matriz)"
+    },
+    "outorgado": {
+      "page": 1,
+      "excerpt": "Fernando Souza da Silva, CPF 000.000.000-53"
+    },
+    "outorgado_cpf": {
+      "page": 1,
+      "excerpt": "CPF 000.000.000-53"
+    },
+    "poderes_especificos": {
+      "page": 1,
+      "excerpt": "Poderes especificos para representacao junto ao Banco Santander S.A. Abrir, movimentar e/ou encerrar conta bancaria."
+    },
+    "validade": {
+      "page": 1,
+      "excerpt": "Prazo: Por tempo indeterminado"
+    },
+    "data_lavratura": {
+      "page": 1,
+      "excerpt": "Data da lavratura: 09/03/2023"
+    },
+    "cartorio": {
+      "page": 1,
+      "excerpt": "1o Oficio de Notas, Protesto e Registro de Boa Vista, Boa Vista/RR"
+    }
+  }
+}

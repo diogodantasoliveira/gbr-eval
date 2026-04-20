@@ -1,0 +1,27 @@
+task_id: eng.notifier.lgpd_optout
+category: classification
+component: notifier
+layer: engineering
+tier: gate
+description: "Must check LGPD opt-out before sending notifications"
+input:
+  payload:
+    repo: notifier
+    scan_target: "**/*.py"
+expected:
+  convention: lgpd_optout_required
+graders:
+  - type: convention_check
+    field: lgpd_conventions
+    weight: 1.0
+    required: true
+    config:
+      file_key: content
+      rules:
+        - pattern: "opt_out|consent_check|notification_preference|unsubscribe|check_consent"
+          type: required
+          description: "Must check LGPD opt-out before sending notifications"
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

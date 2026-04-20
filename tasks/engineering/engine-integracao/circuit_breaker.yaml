@@ -1,0 +1,24 @@
+task_id: eng.integracao.circuit_breaker
+category: classification
+component: engine-integracao
+layer: engineering
+tier: gate
+description: "External API calls must use circuit breaker pattern"
+input:
+  payload:
+    repo: engine-integracao
+    scan_target: "**/*.py"
+expected:
+  convention: circuit_breaker_required
+graders:
+  - type: pattern_required
+    field: circuit_breaker_usage
+    weight: 1.0
+    required: true
+    config:
+      pattern: "CircuitBreaker|circuit_breaker|@circuit|pybreaker|CircuitBreakerPolicy"
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

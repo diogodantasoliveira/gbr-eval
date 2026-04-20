@@ -1,0 +1,24 @@
+task_id: eng.atom.sensitive_data_filter
+category: classification
+component: atom-back-end
+layer: engineering
+tier: gate
+description: "API responses must not leak sensitive fields (password, secret, api_key, token)"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "app/api/**/*.py"
+expected:
+  convention: sensitive_data_filtered
+graders:
+  - type: pattern_forbidden
+    field: no_sensitive_in_response
+    weight: 1.0
+    required: true
+    config:
+      pattern: "\\.password\\s*[,\\}]|\\.secret\\s*[,\\}]|\\.api_key\\s*[,\\}]|\\.token\\s*[,\\}]"
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

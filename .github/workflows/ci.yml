@@ -1,0 +1,144 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    name: Lint, Type Check, Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Lint (ruff)
+        run: uv run ruff check .
+
+      - name: Type check (mypy)
+        run: uv run mypy src/
+
+      - name: Tests with coverage
+        run: |
+          uv run pytest \
+            --cov=src/gbr_eval \
+            --cov-report=term-missing \
+            --cov-fail-under=80 \
+            --junitxml=test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.xml
+
+      - name: Publish test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: dorny/test-reporter@3eeb9fc888e82e8be2fb356bbeec2750231672bc  # v1
+        with:
+          name: Test Results
+          path: test-results.xml
+          reporter: java-junit
+
+  eval-gate:
+    name: Eval Gate (Self-Eval)
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Download baseline from last main run
+        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11  # v6
+        with:
+          name: eval-baseline
+          branch: main
+          workflow: ci.yml
+          path: baseline/
+          if_no_artifact_found: warn
+        continue-on-error: true
+
+      - name: Run self-eval (gate tier)
+        run: |
+          BASELINE_FLAG=""
+          if [ -f baseline/eval-report.json ]; then
+            BASELINE_FLAG="--baseline-run baseline/eval-report.json"
+            echo "::notice::Comparing against baseline from previous main run"
+          fi
+          uv run gbr-eval run \
+            --suite tasks/product/ \
+            --golden-dir golden/ \
+            --self-eval \
+            --tier gate \
+            --output-format json \
+            --output-file eval-report.json \
+            $BASELINE_FLAG
+
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval-report.json
+
+      - name: Save baseline (main merges only)
+        if: github.ref == 'refs/heads/main' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-baseline
+          path: eval-report.json
+          retention-days: 90
+          overwrite: true
+
+      - name: Post to frontend webhook
+        if: github.ref == 'refs/heads/main' && success()
+        env:
+          WEBHOOK_URL: ${{ secrets.EVAL_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.EVAL_WEBHOOK_TOKEN }}
+        run: |
+          if [ -n "$WEBHOOK_URL" ]; then
+            python3 -c "
+          import json
+          with open('eval-report.json') as f:
+              report = json.load(f)
+          for tr in report.get('task_results', []):
+              for gr in tr.get('grader_results', []):
+                  gr.pop('details', None)
+          with open('eval-report-safe.json', 'w') as f:
+              json.dump(report, f)
+          "
+            curl -sf -X POST "$WEBHOOK_URL" \
+              -H "Authorization: Bearer $WEBHOOK_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d @eval-report-safe.json \
+              && echo "::notice::Eval report posted to frontend (PII-safe)" \
+              || echo "::warning::Failed to post eval report to frontend"
+          else
+            echo "::notice::EVAL_WEBHOOK_URL not configured — skipping webhook"
+          fi

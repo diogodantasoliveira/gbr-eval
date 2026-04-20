@@ -1,0 +1,73 @@
+{
+  "case_number": 5,
+  "document_hash": "sha256:PENDING_COMPUTE",
+  "tags": ["seed", "pj", "positiva", "trt2", "cliente_a", "com_nome", "16_processos", "numeros_processo"],
+  "annotator": "diogo.dantas",
+  "reviewed_by": "claude_assistant",
+  "created_at": "2026-04-18T22:45:00Z",
+  "document_source": "internal:certidao_trabalhista:005",
+  "notes": "Certidao POSITIVA de distribuicao de acoes trabalhistas. PJ com razao social identificada (BANCO EXEMPLO S/A). TRT 2a Regiao (SP). CONSTAM 16 acoes trabalhistas com numeros individuais de processo e varas identificadas. Diferencial: lista numeros de processo individuais (nao apenas contagem por vara como case_004). Sem prazo de validade. Certidao eletronica PJe.",
+  "expected_output": {
+    "document_type": "certidao_trabalhista",
+    "titular": "BANCO EXEMPLO S/A",
+    "titular_cpf_cnpj": "NAO INFORMADO NO DOCUMENTO (raiz CNPJ XX.XXX.175)",
+    "resultado": "positiva",
+    "processos": [
+      {"vara": "2a Vara do Trabalho de Santo Andre", "numero": "1000508-38.2025.5.02.0432"},
+      {"vara": "3a Vara do Trabalho de Sao Paulo", "numero": "0000132-47.2015.5.02.0003"},
+      {"vara": "22a Vara do Trabalho de Sao Paulo", "numero": "1001289-68.2021.5.02.0022"},
+      {"vara": "24a Vara do Trabalho de Sao Paulo", "numero": "1000346-40.2024.5.02.0024"},
+      {"vara": "24a Vara do Trabalho de Sao Paulo", "numero": "1001664-24.2025.5.02.0024"},
+      {"vara": "25a Vara do Trabalho de Sao Paulo", "numero": "1000316-52.2017.5.02.0702"},
+      {"vara": "26a Vara do Trabalho de Sao Paulo", "numero": "1001444-64.2018.5.02.0026"},
+      {"vara": "32a Vara do Trabalho de Sao Paulo", "numero": "1001930-02.2016.5.02.0032"},
+      {"vara": "38a Vara do Trabalho de Sao Paulo", "numero": "1001578-89.2017.5.02.0038"},
+      {"vara": "47a Vara do Trabalho de Sao Paulo", "numero": "1000872-69.2023.5.02.0047"},
+      {"vara": "57a Vara do Trabalho de Sao Paulo", "numero": "1000092-75.2018.5.02.0057"},
+      {"vara": "57a Vara do Trabalho de Sao Paulo", "numero": "1000697-89.2016.5.02.0057"},
+      {"vara": "58a Vara do Trabalho de Sao Paulo", "numero": "1001859-38.2024.5.02.0058"},
+      {"vara": "75a Vara do Trabalho de Sao Paulo", "numero": "1000684-21.2025.5.02.0463"},
+      {"vara": "83a Vara do Trabalho de Sao Paulo", "numero": "1001565-08.2024.5.02.0083"},
+      {"vara": "84a Vara do Trabalho de Sao Paulo", "numero": "1000823-53.2019.5.02.0084"}
+    ],
+    "orgao_emissor": "Tribunal Regional do Trabalho da 2a Regiao (TRT-2)",
+    "abrangencia": "PJe 1o e 2o grau — polo passivo e polo ativo. Nao contempla processos fisicos, arquivados definitivamente, nem debitos no BNDT. Pesquisa por raiz do CNPJ.",
+    "validade": null,
+    "data_emissao": "29/09/2025",
+    "codigo_verificacao": "149.564.034.836"
+  },
+  "citation": {
+    "titular": {
+      "page": 1,
+      "excerpt": "BANCO EXEMPLO S/A"
+    },
+    "titular_cpf_cnpj": {
+      "page": 1,
+      "excerpt": "Raiz do CNPJ: XX.XXX.175"
+    },
+    "resultado": {
+      "page": 1,
+      "excerpt": "A certidao atesta a EXISTENCIA de acoes trabalhistas distribuidas em face da empresa. Foram identificadas 16 acoes"
+    },
+    "processos": {
+      "page": 1,
+      "excerpt": "2a Vara do Trabalho de Santo Andre: processo 1000508-38.2025.5.02.0432; 3a Vara do Trabalho de Sao Paulo: processo 0000132-47.2015.5.02.0003; ..."
+    },
+    "orgao_emissor": {
+      "page": 1,
+      "excerpt": "Tribunal Regional do Trabalho da 2a Regiao (TRT-2)"
+    },
+    "abrangencia": {
+      "page": 1,
+      "excerpt": "Acoes em tramitacao ou arquivadas provisoriamente no ambito do TRT da 2a Regiao"
+    },
+    "data_emissao": {
+      "page": 1,
+      "excerpt": "29/09/2025 as 10:34"
+    },
+    "codigo_verificacao": {
+      "page": 1,
+      "excerpt": "Codigo de Autenticidade: 149.564.034.836"
+    }
+  }
+}

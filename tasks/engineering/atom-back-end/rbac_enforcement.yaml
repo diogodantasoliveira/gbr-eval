@@ -1,0 +1,24 @@
+task_id: eng.atom.rbac_enforcement
+category: classification
+component: atom-back-end
+layer: engineering
+tier: gate
+description: "Every API endpoint must enforce RBAC"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "app/api/**/*.py"
+expected:
+  convention: rbac_required
+graders:
+  - type: pattern_required
+    field: rbac_decorator
+    weight: 1.0
+    required: true
+    config:
+      pattern: "@require_role|@require_permission|Depends\\(.*auth|Depends\\(.*rbac"
+      file_key: content
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr
