@@ -108,14 +108,20 @@ ok "Dependencias Node instaladas"
 
 # Criar .env.local para desenvolvimento
 if [ ! -f .env.local ]; then
-  cat > .env.local <<'ENVEOF'
-# gbr-eval frontend — desenvolvimento local
+  # Gerar WEBHOOK_SECRET aleatorio para importacao de runs via webhook.
+  # Usa openssl quando disponivel, senao python3.
+  WEBHOOK_SECRET_VALUE=$(openssl rand -hex 32 2>/dev/null || python3 -c "import secrets; print(secrets.token_hex(32))")
+  cat > .env.local <<ENVEOF
+# gbr-eval frontend — desenvolvimento local (gerado por setup-local.sh)
+PORT=3002
 DATABASE_URL=./gbr-eval.db
 DISABLE_AUTH=true
+RATE_LIMIT_MAX=100
+WEBHOOK_SECRET=$WEBHOOK_SECRET_VALUE
 ENVEOF
-  ok "Criado .env.local (auth desabilitado para dev)"
+  ok "Criado .env.local (auth desabilitado para dev, WEBHOOK_SECRET gerado)"
 else
-  warn ".env.local ja existe — mantendo"
+  warn ".env.local ja existe — mantendo (verifique que WEBHOOK_SECRET esta definido se for importar runs)"
 fi
 
 # ============================================================================
@@ -156,6 +162,48 @@ cd "$WORK_DIR/gbr-eval"
 uv run python tools/sync_frontend.py --base-url http://localhost:3002 2>&1 | grep -E "(CREATE|IMPORT|imported|EXISTS|SYNC|OK)" | head -30
 ok "Dados sincronizados com frontend"
 
+# Importar as 18 regras de convention pre-definidas (gbr-engines CLAUDE.md)
+info "Importando convention rules..."
+CONV_RESULT=$(curl -sS -X POST http://localhost:3002/api/conventions/import-claude-md \
+  -H 'Content-Type: application/json' -d '{}' 2>/dev/null || echo '{}')
+CONV_CREATED=$(echo "$CONV_RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('created', 0))" 2>/dev/null || echo 0)
+ok "Conventions: $CONV_CREATED regras importadas"
+
+# Importar runs historicos (runs/*.json) via webhook
+# O sync_frontend.py acima ja rodou uma self-eval fresca e importou-a.
+# Aqui importamos as outras runs gravadas — uteis para trends/regression.
+WEBHOOK_SECRET_VAL=$(grep -E '^WEBHOOK_SECRET=' "$WORK_DIR/gbr-eval-frontend/.env.local" | cut -d= -f2- || true)
+if [ -n "$WEBHOOK_SECRET_VAL" ]; then
+  info "Importando runs historicos (runs/*.json)..."
+  IMPORTED_COUNT=0
+  for run_json in "$WORK_DIR/gbr-eval/runs"/*.json; do
+    [ -f "$run_json" ] || continue
+    # Strip null optionals (tier, finished_at, gate_result) — zod schema rejects null.
+    PAYLOAD=$(python3 -c "
+import json, sys
+try:
+    d = json.load(open('$run_json'))
+    for k in ('tier', 'finished_at', 'gate_result'):
+        if d.get(k) is None: d.pop(k, None)
+    if d.get('baseline_run_id') is None: d.pop('baseline_run_id', None)
+    print(json.dumps(d))
+except Exception as e:
+    print(f'ERROR: {e}', file=sys.stderr)
+    sys.exit(1)
+")
+    STATUS=$(echo "$PAYLOAD" | curl -sS -X POST http://localhost:3002/api/runs/webhook \
+      -H "Authorization: Bearer $WEBHOOK_SECRET_VAL" \
+      -H 'Content-Type: application/json' \
+      --data-binary @- -w '%{http_code}' -o /dev/null 2>/dev/null || echo 000)
+    if [ "$STATUS" = "201" ]; then
+      IMPORTED_COUNT=$((IMPORTED_COUNT + 1))
+    fi
+  done
+  ok "Runs historicos: $IMPORTED_COUNT importados (duplicatas ignoradas pelo DB)"
+else
+  warn "WEBHOOK_SECRET nao encontrado em .env.local — pulando import de runs historicos"
+fi
+
 # Parar o servidor de sync
 kill $FRONTEND_PID 2>/dev/null || true
 wait $FRONTEND_PID 2>/dev/null || true
@@ -177,11 +225,12 @@ echo "  Frontend (Next.js):"
 echo "    cd $WORK_DIR/gbr-eval-frontend"
 echo "    pnpm dev                         # http://localhost:3002"
 echo ""
-echo "  Dashboard: http://localhost:3002"
-echo "  Golden Sets: http://localhost:3002/golden-sets"
-echo "  Runs: http://localhost:3002/runs"
-echo "  Tasks: http://localhost:3002/tasks"
-echo "  Skills: http://localhost:3002/skills"
+echo "  Dashboard:   http://localhost:3002"
+echo "  Skills:      http://localhost:3002/skills         (5 P0 skills)"
+echo "  Golden Sets: http://localhost:3002/golden-sets    (5 sets x 8 cases = 40)"
+echo "  Tasks:       http://localhost:3002/tasks          (22 engineering tasks)"
+echo "  Runs:        http://localhost:3002/runs           (historicos + self-eval fresh)"
+echo "  Conventions: http://localhost:3002/conventions    (18 regras CLAUDE.md)"
 echo ""
 echo "  Para re-sincronizar dados apos mudancas:"
 echo "    cd $WORK_DIR/gbr-eval"
