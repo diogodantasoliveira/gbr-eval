@@ -1,0 +1,3061 @@
+{
+  "run_id": "a4f7e1ed-4782-4da7-9420-bdfc13713a18",
+  "started_at": "2026-04-18T23:01:30.501866Z",
+  "finished_at": "2026-04-18T23:01:30.526241Z",
+  "layer": "product",
+  "tier": null,
+  "tasks_total": 23,
+  "tasks_passed": 17,
+  "tasks_failed": 6,
+  "task_results": [
+    {
+      "task_id": "citation.balanco.linking",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.ativo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.passivo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.patrimonio_liquido",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.03954092971980572,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "citation.certidao_trabalhista.linking",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.data_emissao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.data_emissao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.data_emissao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.data_emissao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.data_emissao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.055042095482349396,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj",
+        "negativa",
+        "trt2",
+        "cliente_a",
+        "raiz_cnpj"
+      ]
+    },
+    {
+      "task_id": "citation.cnd.linking",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.03645906690508127,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj",
+        "positiva_com_efeitos_negativa",
+        "rfb_pgfn",
+        "debitos_suspensa_exigibilidade"
+      ]
+    },
+    {
+      "task_id": "citation.contrato_social.linking",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.socios",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.socios",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.socios",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.socios",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.socios",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.0398330157622695,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "socio_unico",
+        "ltda",
+        "representacao_comercial",
+        "on_abertura_contas"
+      ]
+    },
+    {
+      "task_id": "citation.matricula.linking",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.area_total",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.area_total",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.area_total",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.area_total",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.area_total",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "present",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.046876026317477226,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj_owner",
+        "sem_onus",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "citation.procuracao.linking",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "present",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.03445812035351992,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pf_para_pj",
+        "veiculo",
+        "prazo_determinado",
+        "substabelecimento",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "classification.balanco",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.007334048859775066,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.certidao_trabalhista",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='certidao_trabalhista', got='certidao_trabalhista'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='certidao_trabalhista', got='certidao_trabalhista'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='certidao_trabalhista', got='certidao_trabalhista'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='certidao_trabalhista', got='certidao_trabalhista'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='certidao_trabalhista', got='certidao_trabalhista'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.01858314499258995,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj",
+        "negativa",
+        "trt2",
+        "cliente_a",
+        "raiz_cnpj"
+      ]
+    },
+    {
+      "task_id": "classification.cnd",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.019416678696870804,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj",
+        "positiva_com_efeitos_negativa",
+        "rfb_pgfn",
+        "debitos_suspensa_exigibilidade"
+      ]
+    },
+    {
+      "task_id": "classification.confuser.certidao_not_cnd",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='cnd', got='cnd'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.012666918337345123,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj",
+        "positiva_com_efeitos_negativa",
+        "rfb_pgfn",
+        "debitos_suspensa_exigibilidade"
+      ]
+    },
+    {
+      "task_id": "classification.confuser.iptu_not_matricula",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.012707896530628204,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj_owner",
+        "sem_onus",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "classification.contrato_social",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='contrato_social', got='contrato_social'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='contrato_social', got='contrato_social'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='contrato_social', got='contrato_social'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='contrato_social', got='contrato_social'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='contrato_social', got='contrato_social'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.013791024684906006,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "socio_unico",
+        "ltda",
+        "representacao_comercial",
+        "on_abertura_contas"
+      ]
+    },
+    {
+      "task_id": "classification.matricula",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='matricula', got='matricula'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.01291616354137659,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj_owner",
+        "sem_onus",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "classification.procuracao",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='procuracao', got='procuracao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='procuracao', got='procuracao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='procuracao', got='procuracao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='procuracao', got='procuracao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "expected='procuracao', got='procuracao'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.01312396489083767,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pf_para_pj",
+        "veiculo",
+        "prazo_determinado",
+        "substabelecimento",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "cost.journey.limit",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "numeric_range",
+          "field": "cost_brl",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'cost_brl' not found in output",
+          "error": null,
+          "severity": null
+        }
+      ],
+      "duration_ms": 0.0032919924706220627,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "decision.score.aprovado",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "decision",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'decision' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "score",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'score' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "decision",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'decision' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "score",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'score' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "decision",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'decision' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "score",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'score' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "decision",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'decision' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "score",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'score' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "decision",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'decision' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "score",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'score' not found in output",
+          "error": null,
+          "severity": null
+        }
+      ],
+      "duration_ms": 0.018917140550911427,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj_owner",
+        "sem_onus",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "extraction.balanco.fields",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "numeric_range",
+          "field": "ativo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'ativo_total' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "passivo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'passivo_total' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "patrimonio_liquido",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'patrimonio_liquido' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "divida_liquida",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'divida_liquida' not found in output",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "liquidez_corrente",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'liquidez_corrente' not found in output",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.014791963621973991,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "extraction.certidao_trabalhista.fields",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "field_f1",
+          "field": "titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='negativa', got='negativa'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "processos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular_cpf_cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected=None, got=None",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='negativa', got='negativa'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "processos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular_cpf_cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected=None, got=None",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=10, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='negativa', got='negativa'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "processos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=10, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular_cpf_cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=10, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=10, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='25/01/2026', got='25/01/2026'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='positiva', got='positiva'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "processos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular_cpf_cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected=None, got=None",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "resultado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='positiva', got='positiva'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "processos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular_cpf_cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected=None, got=None",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 8.816791116259992,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj",
+        "negativa",
+        "trt2",
+        "cliente_a",
+        "raiz_cnpj"
+      ]
+    },
+    {
+      "task_id": "extraction.cnd.fields",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='Certidao Positiva com Efeitos de Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao', got='Certidao Positiva com Efeitos de Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='1F53.7F14.12B9.B7B2', got='1F53.7F14.12B9.B7B2'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)', got='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='07/10/2026', got='07/10/2026'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "status",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='positiva_com_efeitos_de_negativa', got='positiva_com_efeitos_de_negativa'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao', got='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='FC2A.672E.82B4.4A5D', got='FC2A.672E.82B4.4A5D'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)', got='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='07/10/2026', got='07/10/2026'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "status",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='negativa', got='negativa'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao', got='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='C9BD.53B2.7415.2C85', got='C9BD.53B2.7415.2C85'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)', got='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='07/10/2026', got='07/10/2026'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "status",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='negativa', got='negativa'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao', got='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='7411.092A.2848.DBC3', got='7411.092A.2848.DBC3'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)', got='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='07/10/2026', got='07/10/2026'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "status",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='negativa', got='negativa'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "tipo_certidao",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao', got='Certidao Negativa de Debitos Relativos aos Tributos Federais e a Divida Ativa da Uniao'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='1094.01E1.A61B.E6AB', got='1094.01E1.A61B.E6AB'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "orgao_emissor",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)', got='Secretaria da Receita Federal do Brasil (RFB) e Procuradoria-Geral da Fazenda Nacional (PGFN)'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='07/10/2026', got='07/10/2026'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "status",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='negativa', got='negativa'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.07295818068087101,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj",
+        "positiva_com_efeitos_negativa",
+        "rfb_pgfn",
+        "debitos_suspensa_exigibilidade"
+      ]
+    },
+    {
+      "task_id": "extraction.contrato_social.fields",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-88', got='00.000.000/0001-88'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "socios_percentual",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "capital_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "1000.0 within [None, None]",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-86', got='00.000.000/0001-86'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=6, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "socios_percentual",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=6, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "capital_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Both null",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=6, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-48', got='00.000.000/0001-48'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "socios_percentual",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "capital_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "10000.0 within [None, None]",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-29', got='00.000.000/0001-29'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "socios_percentual",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "capital_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "150000.0 within [None, None]",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "cnpj",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-30', got='00.000.000/0001-30'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "razao_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "socios_percentual",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "capital_social",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "14823000.0 within [None, None]",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 4.728915868327022,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "socio_unico",
+        "ltda",
+        "representacao_comercial",
+        "on_abertura_contas"
+      ]
+    },
+    {
+      "task_id": "extraction.matricula.cpf_proprietario",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-55', got='00.000.000/0001-55'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='999.001', got='999.001'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='000.000.000-77', got='000.000.000-77'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='999.002', got='999.002'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-12', got='00.000.000/0001-12'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='999.003', got='999.003'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='00.000.000/0001-50', got='00.000.000/0001-50'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='999.004', got='999.004'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "proprietario_cpf",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='000.000.000-05', got='000.000.000-05'",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero_matricula",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "expected='999.005', got='999.005'",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.031125149689614773,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pj_owner",
+        "sem_onus",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "extraction.procuracao.fields",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "field_f1",
+          "field": "outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='23/11/2024', got='23/11/2024'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='indeterminado', got='indeterminado'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='17/11/2026', got='17/11/2026'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='15/05/2026', got='15/05/2026'",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgante",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgado",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes_especificos",
+          "passed": true,
+          "score": 1.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=1.000 (P=1.000, R=1.000), TP=9, FP=0, FN=0, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": true,
+          "score": 1.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "expected='10/09/2025', got='10/09/2025'",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 3.588999854400754,
+      "error": null,
+      "golden_set_tags": [
+        "seed",
+        "pf_para_pj",
+        "veiculo",
+        "prazo_determinado",
+        "substabelecimento",
+        "cliente_a"
+      ]
+    },
+    {
+      "task_id": "latency.sla.p95",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "numeric_range",
+          "field": "p95_ms",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'p95_ms' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.005041947588324547,
+      "error": null,
+      "golden_set_tags": null
+    }
+  ],
+  "overall_score": 0.7391304347826086,
+  "metadata": {},
+  "gate_result": "no_go",
+  "baseline_run_id": null
+}

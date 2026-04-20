@@ -32,8 +32,8 @@ coverage.xml
 .omc/
 
 results/
-runs/
 *.jsonl
 !tasks/**/*.jsonl
+!runs/*.json
 
 frontend/

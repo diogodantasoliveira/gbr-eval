@@ -1,0 +1,884 @@
+{
+  "run_id": "8cc3c449-7f21-4fd7-af1e-e28f106a832e",
+  "started_at": "2026-04-18T21:50:29.623424Z",
+  "finished_at": "2026-04-18T21:50:29.623897Z",
+  "layer": "product",
+  "tier": null,
+  "tasks_total": 23,
+  "tasks_passed": 0,
+  "tasks_failed": 23,
+  "task_results": [
+    {
+      "task_id": "citation.balanco.linking",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.ativo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.passivo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.patrimonio_liquido",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.046999950427562,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "citation.certidao_trabalhista.linking",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.titular",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.resultado",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.orgao_emissor",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.data_emissao",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.01066701952368021,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "citation.cnd.linking",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.tipo_certidao",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero_certidao",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.data_validade",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.008707982487976551,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "citation.contrato_social.linking",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.cnpj",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.razao_social",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.socios_percentual",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "field missing",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.006916990969330072,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "citation.matricula.linking",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.proprietario_cpf",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.numero_matricula",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.area",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "field missing",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.007458031177520752,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "citation.procuracao.linking",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgante",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.outorgado",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_not_empty",
+          "field": "citation.poderes_especificos",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "field missing",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.00604201341047883,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.balanco",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.004500034265220165,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.certidao_trabalhista",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.0037499703466892242,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.cnd",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.0026249908842146397,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.confuser.certidao_not_cnd",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.0024589826352894306,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.confuser.iptu_not_matricula",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.0022500171326100826,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.contrato_social",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.002291053533554077,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.matricula",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.0035410048440098763,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "classification.procuracao",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "document_type",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "Field 'document_type' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.0025830231606960297,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "cost.journey.limit",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "numeric_range",
+          "field": "cost_brl",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'cost_brl' not found in output",
+          "error": null,
+          "severity": null
+        }
+      ],
+      "duration_ms": 0.002374988980591297,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "decision.score.aprovado",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "decision",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'decision' not found in output",
+          "error": null,
+          "severity": null
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "score",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'score' not found in output",
+          "error": null,
+          "severity": null
+        }
+      ],
+      "duration_ms": 0.0038329744711518288,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "extraction.balanco.fields",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "numeric_range",
+          "field": "ativo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'ativo_total' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "passivo_total",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'passivo_total' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "patrimonio_liquido",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'patrimonio_liquido' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "divida_liquida",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'divida_liquida' not found in output",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "liquidez_corrente",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'liquidez_corrente' not found in output",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.010541989468038082,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "extraction.certidao_trabalhista.fields",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_f1",
+          "field": "titular",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=4, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "resultado",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'resultado' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "processos",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=4, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "titular_cpf_cnpj",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=4, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "orgao_emissor",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=4, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'validade' not found in output",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.028916983865201473,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "extraction.cnd.fields",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "tipo_certidao",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'tipo_certidao' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'numero' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "orgao_emissor",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'orgao_emissor' not found in output",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'validade' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "status",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'status' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.012000033166259527,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "extraction.contrato_social.fields",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "cnpj",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'cnpj' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "razao_social",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=5, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "socios_percentual",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=5, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "numeric_range",
+          "field": "capital_social",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'capital_social' not found in output",
+          "error": null,
+          "severity": "high"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=5, threshold=0.9",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.014416000340133905,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "extraction.matricula.cpf_proprietario",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "exact_match",
+          "field": "proprietario_cpf",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'proprietario_cpf' not found in output",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "numero_matricula",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'numero_matricula' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.004165980499237776,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "extraction.procuracao.fields",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "field_f1",
+          "field": "outorgante",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=4, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "outorgado",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=4, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "field_f1",
+          "field": "poderes_especificos",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "F1=0.000 (P=0.000, R=0.000), TP=0, FP=0, FN=4, threshold=0.9",
+          "error": null,
+          "severity": "critical"
+        },
+        {
+          "grader_type": "exact_match",
+          "field": "validade",
+          "passed": false,
+          "score": 0.0,
+          "weight": 2.0,
+          "required": false,
+          "details": "Field 'validade' not found in output",
+          "error": null,
+          "severity": "high"
+        }
+      ],
+      "duration_ms": 0.011750031262636185,
+      "error": null,
+      "golden_set_tags": null
+    },
+    {
+      "task_id": "latency.sla.p95",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "numeric_range",
+          "field": "p95_ms",
+          "passed": false,
+          "score": 0.0,
+          "weight": 3.0,
+          "required": true,
+          "details": "Field 'p95_ms' not found in output",
+          "error": null,
+          "severity": "critical"
+        }
+      ],
+      "duration_ms": 0.0020840088836848736,
+      "error": null,
+      "golden_set_tags": null
+    }
+  ],
+  "overall_score": 0.0,
+  "metadata": {},
+  "gate_result": "no_go",
+  "baseline_run_id": null
+}
