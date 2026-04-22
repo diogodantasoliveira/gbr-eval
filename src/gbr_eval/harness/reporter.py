@@ -92,6 +92,28 @@ def console_report(run: EvalRun, delta: RegressionDelta | None = None) -> str:
             lines.append(f"  \u2191 Newly passing: {task_id} ({score_delta:+.1f})")
         lines.append("")
 
+    # Funnel stats — only shown when funnel was active
+    funnel = run.metadata.get("funnel_stats")
+    if isinstance(funnel, dict) and funnel.get("total_llm_grader_results"):
+        total_llm = funnel["total_llm_grader_results"]
+        skipped = funnel.get("funnel_skipped", 0)
+        reviewed = funnel.get("opus_reviewed", 0)
+        skip_pct = (skipped / total_llm * 100) if total_llm else 0
+        lines.append("  ── Funnel Stats ──")
+        lines.append(f"  LLM grader evals: {total_llm}  |  Skipped: {skipped}  |  Opus reviewed: {reviewed}")
+        lines.append(f"  Skip rate: {skip_pct:.0f}%")
+        lines.append("")
+
+    # Cache stats — only shown when cache metadata present
+    cache_stats = run.metadata.get("cache_stats")
+    if isinstance(cache_stats, dict) and cache_stats.get("total", 0) > 0:
+        lines.append("  ── Cache Stats ──")
+        lines.append(
+            f"  Hits: {cache_stats.get('hits', 0)}  |  Misses: {cache_stats.get('misses', 0)}  "
+            f"|  Hit rate: {cache_stats.get('hit_rate', 0):.0%}"
+        )
+        lines.append("")
+
     lines.extend([
         f"{'='*60}",
         f"  Total: {run.tasks_total}  |  Pass: {run.tasks_passed}  |  Fail: {run.tasks_failed}",

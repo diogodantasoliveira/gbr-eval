@@ -5,12 +5,10 @@ from __future__ import annotations
 import time
 import uuid
 import warnings
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 from gbr_eval.graders.base import grade
 from gbr_eval.harness.aggregator import aggregate_files_for_prompt
@@ -27,6 +25,11 @@ from gbr_eval.harness.models import (
 )
 from gbr_eval.harness.regression import classify_gate
 from gbr_eval.harness.runner import load_tasks_from_dir
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+ProgressCallback = Callable[[str, int, int, float, bool], None]
 
 _MAX_FILE_SIZE = 1_000_000  # 1 MB
 _MAX_FILES = 10_000
@@ -249,6 +252,7 @@ def run_task_against_code(
     cache: GraderCache | None = None,
     changed_files: set[str] | None = None,
     use_funnel: bool = False,
+    on_progress: ProgressCallback | None = None,
 ) -> TaskResult:
     """Run a task against actual code files from target repo.
 
@@ -256,6 +260,7 @@ def run_task_against_code(
     Otherwise uses per-file mode where score = conforming_files / total_files.
     When *use_funnel* is True, routes per-file evaluation through the 3-stage
     grading funnel (deterministic → Haiku triage → Opus deep review).
+    *on_progress* is called after each file: ``(file_path, idx, total, score, cached)``.
     """
     if task.evaluation_mode == EvaluationMode.HOLISTIC:
         return run_task_holistic(task, code_dir, cache=cache, changed_files=changed_files)
@@ -292,10 +297,10 @@ def run_task_against_code(
         )
 
     has_llm = any(s.type in LLM_GRADER_TYPES for s in task.graders)
+    total = len(files)
 
     all_grader_results: list[GraderResult] = []
     conforming_count = 0
-
     if use_funnel and has_llm:
         from gbr_eval.harness.funnel import FunnelStats, run_file_through_funnel
 
@@ -303,7 +308,7 @@ def run_task_against_code(
         llm_specs = [s for s in task.graders if s.type in LLM_GRADER_TYPES]
         funnel_stats = FunnelStats()
 
-        for rel_path, content in files:
+        for idx, (rel_path, content) in enumerate(files, 1):
             fr = run_file_through_funnel(
                 rel_path, content,
                 det_specs=det_specs, llm_specs=llm_specs,
@@ -312,12 +317,19 @@ def run_task_against_code(
             all_grader_results.extend(fr.grader_results)
             if fr.conforming:
                 conforming_count += 1
+            is_cached = any("[cached]" in r.details for r in fr.grader_results)
+            if on_progress:
+                on_progress(rel_path, idx, total, fr.grader_results[-1].score if fr.grader_results else 0.0, is_cached)
     else:
-        for rel_path, content in files:
+        for idx, (rel_path, content) in enumerate(files, 1):
             file_result = evaluate_file(task, rel_path, content, cache=cache)
             all_grader_results.extend(file_result.grader_results)
             if file_result.conforming:
                 conforming_count += 1
+            is_cached = any("[cached]" in r.details for r in file_result.grader_results)
+            if on_progress:
+                last_score = file_result.grader_results[-1].score if file_result.grader_results else 0.0
+                on_progress(rel_path, idx, total, last_score, is_cached)
 
     duration_ms = (time.monotonic() - start) * 1000
     score = conforming_count / len(files)
@@ -343,6 +355,7 @@ def run_engineering_suite(
     cache: GraderCache | None = None,
     changed_files: set[str] | None = None,
     use_funnel: bool = False,
+    on_progress: ProgressCallback | None = None,
 ) -> EvalRun:
     """Run engineering tasks against code from target repos.
 
@@ -361,7 +374,8 @@ def run_engineering_suite(
 
     for task in tasks:
         result = run_task_against_code(
-            task, code_dir, cache=cache, changed_files=changed_files, use_funnel=use_funnel,
+            task, code_dir, cache=cache, changed_files=changed_files,
+            use_funnel=use_funnel, on_progress=on_progress,
         )
         run.task_results.append(result)
         if result.passed:
@@ -372,6 +386,24 @@ def run_engineering_suite(
     run.finished_at = datetime.now(UTC)
     if run.task_results:
         run.overall_score = sum(tr.score for tr in run.task_results) / len(run.task_results)
+
+    # Collect funnel stats from grader results.
+    if use_funnel:
+        skipped = sum(
+            1 for tr in run.task_results
+            for gr in tr.grader_results
+            if "[funnel:skipped]" in gr.details
+        )
+        total_llm = sum(
+            1 for tr in run.task_results
+            for gr in tr.grader_results
+            if gr.grader_type in LLM_GRADER_TYPES or "[funnel:skipped]" in gr.details
+        )
+        run.metadata["funnel_stats"] = {
+            "total_llm_grader_results": total_llm,
+            "funnel_skipped": skipped,
+            "opus_reviewed": total_llm - skipped,
+        }
 
     run.gate_result = classify_gate(run)
 

@@ -609,6 +609,14 @@ def _setup_client_recorder(
     return client, recorder
 
 
+def _make_progress_callback() -> Any:
+    """Create a progress callback that logs to stderr via click."""
+    def _on_progress(file_path: str, idx: int, total: int, score: float, cached: bool) -> None:
+        tag = " [cached]" if cached else ""
+        click.echo(f"  [{idx}/{total}] {file_path} — score={score:.2f}{tag}", err=True)
+    return _on_progress
+
+
 def _run_code_eval(
     suite: Path | None,
     task_path: Path | None,
@@ -619,14 +627,19 @@ def _run_code_eval(
     cache: Any | None = None,
     changed_files: set[str] | None = None,
     use_funnel: bool = False,
+    progress: bool = True,
 ) -> EvalRun:
     """Handle --code-dir branch: engineering layer eval against a repo on disk."""
     from gbr_eval.harness.code_loader import run_engineering_suite, run_task_against_code
 
+    on_progress = _make_progress_callback() if progress else None
+
     if task_path:
         task = load_task(task_path)
+        click.echo(f"[eval] {task.task_id}", err=True)
         result = run_task_against_code(
-            task, code_dir, cache=cache, changed_files=changed_files, use_funnel=use_funnel,
+            task, code_dir, cache=cache, changed_files=changed_files,
+            use_funnel=use_funnel, on_progress=on_progress,
         )
         return EvalRun(
             run_id=str(uuid.uuid4()),
@@ -643,6 +656,7 @@ def _run_code_eval(
     return run_engineering_suite(
         suite, code_dir, layer=layer_enum, tier=tier_enum,
         cache=cache, changed_files=changed_files, use_funnel=use_funnel,
+        on_progress=on_progress,
     )
 
 
@@ -785,6 +799,8 @@ def _finalize_and_report(
               help="Base branch for --changed-only (default: main)")
 @click.option("--no-funnel", "no_funnel", is_flag=True, default=False,
               help="Disable the 3-stage grading funnel (run all graders on all files)")
+@click.option("--yes", "-y", "auto_confirm", is_flag=True, default=False,
+              help="Skip confirmation prompts (e.g. large LLM file count warning)")
 def run(
     suite: Path | None,
     task_path: Path | None,
@@ -808,6 +824,7 @@ def run(
     changed_only: bool,
     base_branch: str,
     no_funnel: bool,
+    auto_confirm: bool,
 ) -> None:
     """Run eval tasks and report results."""
     from gbr_eval.harness.cache import GraderCache
@@ -853,6 +870,9 @@ def run(
         critical = [i for i in issues if i.startswith("[CRITICAL]")]
         if critical:
             click.echo("[preflight] Aborting due to critical issues.", err=True)
+            raise SystemExit(EXIT_RUNTIME_ERROR)
+        cost_warnings = [i for i in issues if "files will be sent to LLM" in i]
+        if cost_warnings and not auto_confirm and not click.confirm("[preflight] Proceed anyway?", err=True):
             raise SystemExit(EXIT_RUNTIME_ERROR)
     except SystemExit:
         raise
@@ -913,6 +933,14 @@ def run(
             f"skipped_errors={stats.skipped_errors} hit_rate={stats.hit_rate:.0%}",
             err=True,
         )
+        eval_run.metadata["cache_stats"] = {
+            "hits": stats.hits,
+            "misses": stats.misses,
+            "puts": stats.puts,
+            "skipped_errors": stats.skipped_errors,
+            "total": stats.total,
+            "hit_rate": stats.hit_rate,
+        }
     grader_cache.close()
 
     _finalize_and_report(eval_run, baseline_run, output_format, output_file)

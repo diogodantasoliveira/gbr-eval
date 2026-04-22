@@ -457,3 +457,60 @@ class TestSeverityInJsonReport:
         run = _make_eval_run(gate_result=GateResult.GO)
         data = json_mod.loads(json_report(run))
         assert data["gate_result"] == "go"
+
+
+class TestConsoleReportFunnelStats:
+    def test_funnel_stats_shown_when_present(self) -> None:
+        run = _make_eval_run()
+        run.metadata["funnel_stats"] = {
+            "total_llm_grader_results": 100,
+            "funnel_skipped": 80,
+            "opus_reviewed": 20,
+        }
+        report = console_report(run)
+        assert "Funnel Stats" in report
+        assert "Skipped: 80" in report
+        assert "Opus reviewed: 20" in report
+        assert "Skip rate: 80%" in report
+
+    def test_funnel_stats_not_shown_when_absent(self) -> None:
+        run = _make_eval_run()
+        report = console_report(run)
+        assert "Funnel Stats" not in report
+
+    def test_funnel_stats_not_shown_when_zero_total(self) -> None:
+        run = _make_eval_run()
+        run.metadata["funnel_stats"] = {
+            "total_llm_grader_results": 0,
+            "funnel_skipped": 0,
+            "opus_reviewed": 0,
+        }
+        report = console_report(run)
+        assert "Funnel Stats" not in report
+
+
+class TestConsoleReportCacheStats:
+    def test_cache_stats_shown_when_present(self) -> None:
+        run = _make_eval_run()
+        run.metadata["cache_stats"] = {
+            "hits": 15,
+            "misses": 5,
+            "total": 20,
+            "hit_rate": 0.75,
+        }
+        report = console_report(run)
+        assert "Cache Stats" in report
+        assert "Hits: 15" in report
+        assert "Misses: 5" in report
+        assert "Hit rate: 75%" in report
+
+    def test_cache_stats_not_shown_when_absent(self) -> None:
+        run = _make_eval_run()
+        report = console_report(run)
+        assert "Cache Stats" not in report
+
+    def test_cache_stats_not_shown_when_zero_total(self) -> None:
+        run = _make_eval_run()
+        run.metadata["cache_stats"] = {"hits": 0, "misses": 0, "total": 0, "hit_rate": 0.0}
+        report = console_report(run)
+        assert "Cache Stats" not in report
