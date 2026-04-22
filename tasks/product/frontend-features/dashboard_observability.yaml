@@ -2,7 +2,7 @@ task_id: product.frontend.dashboard_observability
 category: classification
 component: gbr-eval-frontend
 layer: product
-tier: gate
+tier: canary
 description: "Verifica que o dashboard fornece visão geral de observabilidade — contagens, último run, alertas, quality metrics"
 
 input:

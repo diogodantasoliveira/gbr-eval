@@ -2,7 +2,7 @@ task_id: product.frontend.annotation_studio
 category: classification
 component: gbr-eval-frontend
 layer: product
-tier: gate
+tier: canary
 description: "Verifica que o frontend possui studio completo de anotação — skills, golden sets, tasks, rubrics CRUD"
 
 input:

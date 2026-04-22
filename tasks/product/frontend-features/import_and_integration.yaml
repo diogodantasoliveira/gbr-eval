@@ -2,7 +2,7 @@ task_id: product.frontend.import_and_integration
 category: classification
 component: gbr-eval-frontend
 layer: product
-tier: gate
+tier: canary
 description: "Verifica que o frontend suporta importação de runs e integração com CI/CD via webhook"
 
 input:

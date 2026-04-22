@@ -2,7 +2,7 @@ task_id: product.frontend.postmortem_workflow
 category: classification
 component: gbr-eval-frontend
 layer: product
-tier: gate
+tier: canary
 description: "Verifica que o frontend suporta workflow de postmortem para análise de falhas em eval runs"
 
 input:

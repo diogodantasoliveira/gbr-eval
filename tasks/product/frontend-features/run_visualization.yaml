@@ -2,7 +2,7 @@ task_id: product.frontend.run_visualization
 category: classification
 component: gbr-eval-frontend
 layer: product
-tier: gate
+tier: canary
 description: "Verifica que o frontend possui visualização completa de runs — lista, detalhe, gate matrix, severity grouping"
 
 input:

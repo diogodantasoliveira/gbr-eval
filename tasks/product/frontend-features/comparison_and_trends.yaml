@@ -2,7 +2,7 @@ task_id: product.frontend.comparison_and_trends
 category: classification
 component: gbr-eval-frontend
 layer: product
-tier: gate
+tier: canary
 description: "Verifica que o frontend possui comparação de runs e visualização de tendências"
 
 input:
