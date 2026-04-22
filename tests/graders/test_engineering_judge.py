@@ -14,10 +14,9 @@ import anthropic
 import pytest
 
 import gbr_eval.graders.engineering_judge  # noqa: F401 — trigger registration
+from gbr_eval.graders._shared import _extract_json, _strip_markdown_fence
 from gbr_eval.graders.engineering_judge import (
     EngineeringJudge,
-    _extract_json,
-    _strip_markdown_fence,
     _truncate_code,
 )
 from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec

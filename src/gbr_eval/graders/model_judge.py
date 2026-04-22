@@ -14,6 +14,7 @@ from typing import Any
 
 import anthropic
 
+from gbr_eval.graders._shared import _extract_json
 from gbr_eval.graders.base import register_grader
 from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec, GraderStatus
 
@@ -219,7 +220,7 @@ class LLMJudge:
             text_blocks = [b for b in response.content if isinstance(b, TextBlock)]
             if not text_blocks:
                 raise ValueError("No text block in LLM response")
-            response_text = text_blocks[0].text
+            response_text = _extract_json(text_blocks[0].text)
             result = json.loads(response_text)
 
             if result.get("escape_hatch_unknown"):

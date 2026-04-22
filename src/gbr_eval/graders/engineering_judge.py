@@ -13,6 +13,7 @@ from typing import Any
 
 import anthropic
 
+from gbr_eval.graders._shared import _extract_json
 from gbr_eval.graders.base import register_grader
 from gbr_eval.graders.model_judge import _sanitize_pii_str
 from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec, GraderStatus
@@ -61,40 +62,6 @@ def _truncate_code(code: str, max_chars: int = _MAX_CODE_CHARS) -> str:
     if len(code) <= max_chars:
         return code
     return code[:max_chars] + f"\n\n... [truncated at {max_chars} chars, {len(code)} total]"
-
-
-def _strip_markdown_fence(text: str) -> str:
-    """Remove markdown code fences wrapping a JSON response."""
-    stripped = text.strip()
-    if stripped.startswith("```"):
-        lines = stripped.split("\n")
-        lines = lines[1:]  # drop opening fence
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        return "\n".join(lines)
-    return text
-
-
-def _extract_json(text: str) -> str:
-    """Extract JSON object from LLM response text, handling mixed prose+JSON."""
-    cleaned = _strip_markdown_fence(text)
-    try:
-        json.loads(cleaned)
-        return cleaned
-    except (json.JSONDecodeError, ValueError):
-        pass
-    brace_start = cleaned.find("{")
-    if brace_start == -1:
-        return cleaned
-    depth = 0
-    for i in range(brace_start, len(cleaned)):
-        if cleaned[i] == "{":
-            depth += 1
-        elif cleaned[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return cleaned[brace_start : i + 1]
-    return cleaned[brace_start:]
 
 
 def _call_with_retry(
