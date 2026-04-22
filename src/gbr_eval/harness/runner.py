@@ -121,8 +121,8 @@ def _preflight_check(
 ) -> list[str]:
     """Return list of warnings before running. Empty means ready.
 
-    Critical issues (missing API key for LLM graders) are prefixed with
-    ``[CRITICAL]`` so the caller can decide to abort.
+    Issues prefixed with ``[CRITICAL]`` cause the caller to abort.
+    Non-critical issues are displayed as warnings but do not block execution.
     """
     issues: list[str] = []
 
@@ -131,7 +131,7 @@ def _preflight_check(
     )
     if has_llm and not os.environ.get("ANTHROPIC_API_KEY"):
         issues.append(
-            "[CRITICAL] ANTHROPIC_API_KEY not set — LLM graders will all score 0"
+            "ANTHROPIC_API_KEY not set — LLM graders will all score 0"
         )
 
     if code_dir:
