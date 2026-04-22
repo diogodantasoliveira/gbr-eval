@@ -379,3 +379,343 @@ class TestCatastrophicRegexGuard:
         )
         result = grade("pattern_required", {"content": code_with_tenant}, {}, spec)
         assert result.passed
+
+
+# ---------------------------------------------------------------------------
+# decimal_usage grader
+# ---------------------------------------------------------------------------
+
+financial_code_with_decimal = '''
+from decimal import Decimal
+
+def calculate_fee(amount: Decimal) -> Decimal:
+    markup = Decimal("0.05")
+    return amount * markup
+'''
+
+financial_code_with_float = '''
+def calculate_fee(amount: float) -> float:
+    markup = 0.05
+    return amount * markup
+'''
+
+financial_code_with_float_cast = '''
+def process_payment(data: dict):
+    price = float(data["price"])
+    total = float(data["amount"]) * 1.1
+'''
+
+non_financial_code = '''
+import os
+def parse_config(path: str) -> dict:
+    ratio: float = 0.5  # This float is fine - not financial
+    return {"ratio": ratio}
+'''
+
+mixed_code_decimal_and_int = '''
+from decimal import Decimal
+
+def get_total(price: Decimal, quantity: int) -> Decimal:
+    return price * quantity
+'''
+
+code_with_int_billing = '''
+def emit_usage_event(search_element_id: str):
+    quantity = 1  # Always 1 - no Decimal needed
+    return {"quantity": quantity}
+'''
+
+
+class TestDecimalUsage:
+    def test_decimal_usage_financial_with_decimal_passes(self):
+        """Decimal used properly in financial code → pass."""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": financial_code_with_decimal}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+
+    def test_decimal_usage_financial_with_float_fails(self):
+        """float type annotation in financial code → fail."""
+        # financial_code_with_float has `amount: float` but no financial term on the
+        # same line. However it has `fee` in the function name which is a financial term,
+        # and the function signature line contains `: float` — that triggers the
+        # forbidden annotation pattern `:\s*float\b`.
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": financial_code_with_float}, {}, spec)
+        assert not result.passed
+        assert result.score == 0.0
+        assert "float" in result.details.lower()
+
+    def test_decimal_usage_financial_with_float_cast_fails(self):
+        """Explicit float() cast in financial code → fail."""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": financial_code_with_float_cast}, {}, spec)
+        assert not result.passed
+        assert result.score == 0.0
+        assert "float" in result.details.lower()
+
+    def test_decimal_usage_non_financial_skipped(self):
+        """Non-financial code → auto-pass (skipped)."""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": non_financial_code}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+        assert "skipped" in result.details.lower()
+
+    def test_decimal_usage_skip_disabled_non_financial_float_annotation_fails(self):
+        """skip_if_no_context=False: non-financial file with float annotation still checked."""
+        spec = GraderSpec(type="decimal_usage", config={"skip_if_no_context": False})
+        result = grade("decimal_usage", {"content": non_financial_code}, {}, spec)
+        # non_financial_code has `ratio: float` → forbidden annotation fires
+        assert not result.passed
+        assert result.score == 0.0
+
+    def test_decimal_usage_mixed_decimal_and_int_passes(self):
+        """Decimal + int in financial code → pass."""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": mixed_code_decimal_and_int}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+
+    def test_decimal_usage_int_only_billing_passes(self):
+        """int quantity, no float, no Decimal, but financial term (billing) → pass."""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": code_with_int_billing}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+
+    def test_decimal_usage_empty_content(self):
+        """Empty content → no financial context → auto-pass."""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": ""}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+        assert "skipped" in result.details.lower()
+
+    def test_decimal_usage_custom_financial_terms(self):
+        """Override financial_terms: only match 'tarifa' — non-matching code auto-passes."""
+        spec = GraderSpec(
+            type="decimal_usage",
+            config={"financial_terms": r"tarifa"},
+        )
+        # financial_code_with_float uses 'fee' but not 'tarifa' → auto-pass
+        result = grade("decimal_usage", {"content": financial_code_with_float}, {}, spec)
+        assert result.passed
+        assert "skipped" in result.details.lower()
+
+    def test_decimal_usage_custom_financial_terms_hits(self):
+        """Override financial_terms: matching 'tarifa' triggers check and float fails."""
+        tarifa_float_code = """
+def calcular_tarifa(valor: float) -> float:
+    return valor * 0.02
+"""
+        spec = GraderSpec(
+            type="decimal_usage",
+            config={"financial_terms": r"tarifa"},
+        )
+        result = grade("decimal_usage", {"content": tarifa_float_code}, {}, spec)
+        assert not result.passed
+        assert result.score == 0.0
+
+    def test_decimal_usage_catastrophic_regex_rejected_financial_terms(self):
+        """Catastrophic regex in financial_terms → fail with rejection message."""
+        spec = GraderSpec(
+            type="decimal_usage",
+            config={"financial_terms": "(a+)+$"},
+        )
+        result = grade("decimal_usage", {"content": "some content"}, {}, spec)
+        assert not result.passed
+        assert "catastrophic" in result.details.lower()
+
+    def test_decimal_usage_catastrophic_regex_rejected_forbidden_patterns(self):
+        """Catastrophic regex in forbidden_float_patterns → fail with rejection message."""
+        spec = GraderSpec(
+            type="decimal_usage",
+            config={
+                "financial_terms": r"price",
+                "forbidden_float_patterns": ["(x+)+y"],
+            },
+        )
+        result = grade("decimal_usage", {"content": "price = 10"}, {}, spec)
+        assert not result.passed
+        assert "catastrophic" in result.details.lower()
+
+    def test_decimal_usage_no_pattern_in_config_uses_defaults(self):
+        """No explicit config → uses all defaults, financial code with Decimal passes."""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": financial_code_with_decimal}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+
+    def test_decimal_usage_float_literal_on_financial_line_fails(self):
+        """Float literal assignment on a line that also contains a financial term → fail."""
+        code = "markup = 0.05  # fee calculation\n"
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": code}, {}, spec)
+        assert not result.passed
+        assert "Float literal" in result.details
+
+    def test_decimal_usage_float_literal_on_non_financial_line_passes(self):
+        """Float literal assignment on a line without a financial term is allowed (with financial context elsewhere)."""
+        code = """
+from decimal import Decimal
+
+RATIO_MULTIPLIER = 1.0  # generic ratio — no financial term on this line
+
+def get_amount(value: Decimal) -> Decimal:
+    return value * Decimal("1.1")
+"""
+        spec = GraderSpec(type="decimal_usage", config={})
+        result = grade("decimal_usage", {"content": code}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+
+
+# ---------------------------------------------------------------------------
+# pattern_forbidden context filtering (exclude_context / require_context)
+# ---------------------------------------------------------------------------
+
+
+class TestPatternForbiddenContextFiltering:
+    def test_exclude_context_skips_matching_lines(self):
+        """err.message inside console.error() is safe logging — should NOT be flagged."""
+        code = 'console.error("Failed:", err.message);\n'
+        spec = GraderSpec(
+            type="pattern_forbidden",
+            config={
+                "pattern": r"err\.message",
+                "exclude_context": r"console\.(error|warn|log)",
+            },
+        )
+        result = grade("pattern_forbidden", {"content": code}, {}, spec)
+        assert result.passed
+        assert result.score == 1.0
+
+    def test_exclude_context_flags_non_matching_lines(self):
+        """err.message NOT inside console.error() should still be flagged."""
+        code = 'return NextResponse.json({ error: err.message });\n'
+        spec = GraderSpec(
+            type="pattern_forbidden",
+            config={
+                "pattern": r"err\.message",
+                "exclude_context": r"console\.(error|warn|log)",
+            },
+        )
+        result = grade("pattern_forbidden", {"content": code}, {}, spec)
+        assert not result.passed
+        assert result.score == 0.0
+
+    def test_require_context_only_flags_matching_lines(self):
+        """err.message should only be flagged when on a line with NextResponse.json."""
+        code = (
+            'console.error("Fail:", err.message);\n'
+            'return NextResponse.json({ error: err.message });\n'
+        )
+        spec = GraderSpec(
+            type="pattern_forbidden",
+            config={
+                "pattern": r"err\.message",
+                "require_context": r"NextResponse\.json",
+            },
+        )
+        result = grade("pattern_forbidden", {"content": code}, {}, spec)
+        assert not result.passed
+        assert "1 matches" in result.details
+
+    def test_require_context_passes_when_no_context_match(self):
+        """err.message on lines without NextResponse.json should pass."""
+        code = 'console.error("Fail:", err.message);\n'
+        spec = GraderSpec(
+            type="pattern_forbidden",
+            config={
+                "pattern": r"err\.message",
+                "require_context": r"NextResponse\.json",
+            },
+        )
+        result = grade("pattern_forbidden", {"content": code}, {}, spec)
+        assert result.passed
+
+    def test_both_exclude_and_require_context(self):
+        """Both filters can be combined."""
+        code = (
+            'console.error("Fail:", err.message);\n'                      # excluded
+            'return NextResponse.json({ error: err.message });\n'          # flagged
+            'const msg = err.message;\n'                                   # no require_context
+        )
+        spec = GraderSpec(
+            type="pattern_forbidden",
+            config={
+                "pattern": r"err\.message",
+                "exclude_context": r"console\.(error|warn|log)",
+                "require_context": r"NextResponse\.json|\.json\(",
+            },
+        )
+        result = grade("pattern_forbidden", {"content": code}, {}, spec)
+        assert not result.passed
+        assert "1 matches" in result.details
+
+    def test_no_context_filters_backward_compatible(self):
+        """Without context filters, behavior is identical to before."""
+        code = 'err.message appears here\n'
+        spec = GraderSpec(
+            type="pattern_forbidden",
+            config={"pattern": r"err\.message"},
+        )
+        result = grade("pattern_forbidden", {"content": code}, {}, spec)
+        assert not result.passed
+
+    def test_context_filters_with_no_matches_at_all(self):
+        """Pattern not present at all — passes regardless of context filters."""
+        code = 'clean code with no issues\n'
+        spec = GraderSpec(
+            type="pattern_forbidden",
+            config={
+                "pattern": r"err\.message",
+                "exclude_context": r"console\.",
+                "require_context": r"NextResponse",
+            },
+        )
+        result = grade("pattern_forbidden", {"content": code}, {}, spec)
+        assert result.passed
+
+
+# ---------------------------------------------------------------------------
+# pattern_required context filtering
+# ---------------------------------------------------------------------------
+
+
+class TestPatternRequiredContextFiltering:
+    def test_require_context_narrows_matches(self):
+        """Only count pattern matches on lines also matching require_context."""
+        code = (
+            'import { useState } from "react";\n'
+            'const [x, setX] = useState(0);\n'
+            'let y = 42;\n'
+        )
+        spec = GraderSpec(
+            type="pattern_required",
+            config={
+                "pattern": r"useState",
+                "require_context": r"const\s+\[",
+            },
+        )
+        result = grade("pattern_required", {"content": code}, {}, spec)
+        assert result.passed
+        assert "1 matches" in result.details
+
+    def test_exclude_context_removes_matches(self):
+        """Exclude pattern matches on lines matching exclude_context."""
+        code = (
+            '// useState import\n'
+            'import { useState } from "react";\n'
+        )
+        spec = GraderSpec(
+            type="pattern_required",
+            config={
+                "pattern": r"useState",
+                "exclude_context": r"^import\s",
+            },
+        )
+        result = grade("pattern_required", {"content": code}, {}, spec)
+        # "useState" on comment line survives, import line excluded
+        assert result.passed

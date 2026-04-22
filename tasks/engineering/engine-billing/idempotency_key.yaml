@@ -3,20 +3,22 @@ category: classification
 component: engine-billing
 layer: engineering
 tier: gate
-description: "Every financial operation must have an idempotency key"
+description: "Every financial mutation endpoint must have an idempotency key"
 input:
   payload:
-    repo: engine-billing
-    scan_target: "**/*.py"
+    repo: atom-back-end
+    scan_target: "src/infrastructure/adapters/inbound/*_router.py"
 expected:
   convention: idempotency_required
 graders:
-  - type: pattern_required
+  - type: scope_check
     field: idempotency_key
     weight: 1.0
     required: true
     config:
-      pattern: "idempotency_key|idempotent|dedup_key"
+      decorator_pattern: "@router\\.(post|put|delete|patch)"
+      required_param: "idempotency_key|idempotent_key|dedup_key"
+      skip_if_no_matches: true
       file_key: content
 scoring_mode: binary
 pass_threshold: 1.0

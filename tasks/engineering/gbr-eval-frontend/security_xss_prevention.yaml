@@ -1,0 +1,47 @@
+task_id: eng.frontend.security_xss_prevention
+category: classification
+component: gbr-eval-frontend
+layer: engineering
+tier: gate
+description: "Verifica que componentes React não usam dangerouslySetInnerHTML ou eval patterns"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/**/*.tsx"
+
+expected:
+  convention: no_xss_vectors
+
+graders:
+  - type: pattern_forbidden
+    field: no_dangerous_html
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'dangerouslySetInnerHTML'
+      file_key: content
+      severity: critical
+
+  - type: pattern_forbidden
+    field: no_eval
+    weight: 1.0
+    required: true
+    config:
+      pattern: '(?<!\w)(?<!\.)eval\('
+      file_key: content
+      severity: critical
+
+  - type: pattern_forbidden
+    field: no_innerhtml_assignment
+    weight: 1.0
+    required: true
+    config:
+      pattern: '\.innerHTML\s*='
+      file_key: content
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

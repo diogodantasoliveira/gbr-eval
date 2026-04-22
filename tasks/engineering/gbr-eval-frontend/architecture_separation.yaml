@@ -1,0 +1,38 @@
+task_id: eng.frontend.architecture_separation
+category: classification
+component: gbr-eval-frontend
+layer: engineering
+tier: gate
+description: "Verifica separação arquitetural — server components não importam hooks client, API routes não importam componentes UI"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/app/api/**/route.ts"
+
+expected:
+  convention: clean_architecture
+
+graders:
+  - type: pattern_forbidden
+    field: no_react_in_api
+    weight: 1.0
+    required: true
+    config:
+      pattern: "from ['\"]react['\"]|from ['\"]@/components"
+      file_key: content
+      severity: critical
+
+  - type: pattern_forbidden
+    field: no_client_hooks_in_api
+    weight: 1.0
+    required: true
+    config:
+      pattern: '\b(useState|useEffect|useRef|useCallback|useMemo)\b'
+      file_key: content
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

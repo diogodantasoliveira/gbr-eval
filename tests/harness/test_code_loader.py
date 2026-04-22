@@ -9,15 +9,20 @@ import pytest
 if TYPE_CHECKING:
     from pathlib import Path
 
+from unittest.mock import patch
+
 from gbr_eval.harness.code_loader import (
     FileResult,
     evaluate_file,
     load_code_files,
     run_engineering_suite,
     run_task_against_code,
+    run_task_holistic,
 )
 from gbr_eval.harness.models import (
     Category,
+    EvaluationMode,
+    GraderResult,
     GraderSpec,
     Layer,
     Task,
@@ -510,3 +515,419 @@ class TestEdgeCases:
         )
         result = run_task_against_code(task, tmp_path)
         assert str(tmp_path) not in (result.error or "")
+
+
+# ---------------------------------------------------------------------------
+# Holistic evaluation mode tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture()
+def holistic_code_dir(tmp_path: Path) -> Path:
+    """Create a fake frontend repo for holistic evaluation testing."""
+    repo = tmp_path / "my-frontend"
+    repo.mkdir()
+
+    src = repo / "src" / "app"
+    src.mkdir(parents=True)
+    (src / "page.tsx").write_text(
+        "export default function Dashboard() {\n"
+        "  return <div>Summary cards, alerts, latest run</div>;\n"
+        "}\n"
+    )
+
+    comp = repo / "src" / "components"
+    comp.mkdir(parents=True)
+    (comp / "run-list.tsx").write_text(
+        "export function RunList() {\n"
+        "  return <table>Runs</table>;\n"
+        "}\n"
+    )
+
+    api = repo / "src" / "app" / "api"
+    api.mkdir(parents=True)
+    (api / "route.ts").write_text(
+        "export async function POST(req: Request) {\n"
+        "  // webhook handler\n"
+        "  return Response.json({ ok: true });\n"
+        "}\n"
+    )
+
+    return tmp_path
+
+
+def _make_holistic_task(
+    *,
+    graders: list[GraderSpec] | None = None,
+    evaluation_mode: EvaluationMode = EvaluationMode.HOLISTIC,
+    pass_threshold: float = 0.5,
+) -> Task:
+    """Helper to build a holistic task for testing."""
+    if graders is None:
+        graders = [
+            GraderSpec(
+                type="pattern_required",
+                config={"pattern": "webhook", "file_key": "content"},
+            ),
+        ]
+    return Task(
+        task_id="product.test.holistic",
+        category=Category.CLASSIFICATION,
+        component="my-frontend",
+        layer=Layer.PRODUCT,
+        input=TaskInput(
+            payload={"repo": "my-frontend", "scan_target": "src/**/*.tsx"},
+        ),
+        graders=graders,
+        evaluation_mode=evaluation_mode,
+        pass_threshold=pass_threshold,
+    )
+
+
+class TestRunTaskAgainstCodeDispatch:
+    """Verify run_task_against_code dispatches correctly based on evaluation_mode."""
+
+    def test_per_file_mode_works_as_before(self, holistic_code_dir: Path) -> None:
+        """PER_FILE mode should use the original per-file scoring."""
+        task = _make_holistic_task(
+            evaluation_mode=EvaluationMode.PER_FILE,
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "export"}),
+            ],
+        )
+        result = run_task_against_code(task, holistic_code_dir)
+        # All .tsx files have "export", so score = 2/2 = 1.0
+        assert result.score == 1.0
+        assert result.passed is True
+
+    def test_holistic_mode_dispatches_to_holistic(self, holistic_code_dir: Path) -> None:
+        """HOLISTIC mode should call run_task_holistic."""
+        task = _make_holistic_task(
+            evaluation_mode=EvaluationMode.HOLISTIC,
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "export"}),
+            ],
+        )
+        with patch(
+            "gbr_eval.harness.code_loader.run_task_holistic",
+            wraps=run_task_holistic,
+        ) as mock_holistic:
+            result = run_task_against_code(task, holistic_code_dir)
+            mock_holistic.assert_called_once()
+        assert result.score > 0
+
+
+class TestRunTaskHolistic:
+    """Tests for the holistic evaluation path."""
+
+    def test_missing_repo_returns_error(self, tmp_path: Path) -> None:
+        task = _make_holistic_task()
+        task.input.payload = {}  # no repo
+        result = run_task_holistic(task, tmp_path)
+        assert result.passed is False
+        assert result.error == "Task missing input.payload.repo"
+
+    def test_no_files_found_returns_error(self, tmp_path: Path) -> None:
+        repo = tmp_path / "my-frontend"
+        repo.mkdir()
+        task = _make_holistic_task()
+        result = run_task_holistic(task, tmp_path)
+        assert result.passed is False
+        assert "No files found" in (result.error or "")
+
+    def test_deterministic_graders_run_per_file(self, holistic_code_dir: Path) -> None:
+        """Deterministic graders should produce one result per file."""
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "export"}),
+            ],
+        )
+        result = run_task_holistic(task, holistic_code_dir)
+        # Should have one grader result per .tsx file
+        assert len(result.grader_results) == 2  # page.tsx + run-list.tsx
+        file_paths = {r.file_path for r in result.grader_results}
+        assert "src/app/page.tsx" in file_paths
+        assert "src/components/run-list.tsx" in file_paths
+
+    def test_deterministic_only_holistic_uses_conformance_ratio(
+        self, holistic_code_dir: Path,
+    ) -> None:
+        """Without LLM graders, holistic falls back to deterministic conformance ratio."""
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "Dashboard"}),
+            ],
+            pass_threshold=0.0,
+        )
+        result = run_task_holistic(task, holistic_code_dir)
+        # Only page.tsx has "Dashboard", run-list.tsx does not.
+        # Score = 1 pass / 2 total = 0.5
+        assert result.score == pytest.approx(0.5)
+
+    def test_required_deterministic_failure_vetoes(self, holistic_code_dir: Path) -> None:
+        """A required deterministic grader failure should veto the holistic score."""
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(
+                    type="pattern_required",
+                    required=True,
+                    config={"pattern": "NONEXISTENT_PATTERN"},
+                ),
+            ],
+            pass_threshold=0.0,
+        )
+        result = run_task_holistic(task, holistic_code_dir)
+        assert result.passed is False
+
+    def test_llm_grader_called_once_with_aggregated_content(
+        self, holistic_code_dir: Path,
+    ) -> None:
+        """LLM grader should be called once with aggregated content, not per-file."""
+        mock_result = GraderResult(
+            grader_type="engineering_judge",
+            field="test_review",
+            passed=True,
+            score=0.75,
+            weight=1.0,
+            details="score=4/5: Good implementation",
+        )
+
+        call_count = 0
+        call_outputs: list[dict] = []
+
+        def mock_grade(
+            grader_name: str,
+            output: dict,
+            expected: dict,
+            spec: GraderSpec,
+            context: object = None,
+        ) -> GraderResult:
+            nonlocal call_count
+            if grader_name == "engineering_judge":
+                call_count += 1
+                call_outputs.append(output)
+                return mock_result
+            # For deterministic graders, use the real grade function.
+            from gbr_eval.graders.base import grade as real_grade
+
+            return real_grade(grader_name, output, expected, spec, context=context)
+
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "export"}),
+                GraderSpec(
+                    type="engineering_judge",
+                    field="test_review",
+                    required=True,
+                    config={
+                        "rubric": "Test rubric",
+                        "min_score": 3.0,
+                        "file_key": "content",
+                    },
+                ),
+            ],
+            pass_threshold=0.5,
+        )
+
+        with patch("gbr_eval.harness.code_loader.grade", side_effect=mock_grade):
+            run_task_holistic(task, holistic_code_dir)
+
+        # LLM grader should be called exactly once.
+        assert call_count == 1
+        # The aggregated content should contain file listings.
+        aggregated = call_outputs[0]["content"]
+        assert "Codebase Overview" in aggregated
+        assert "src/app/page.tsx" in aggregated
+
+    def test_holistic_score_uses_llm_score(self, holistic_code_dir: Path) -> None:
+        """In holistic mode, the primary score should come from the LLM grader."""
+        mock_result = GraderResult(
+            grader_type="engineering_judge",
+            field="test_review",
+            passed=True,
+            score=0.75,
+            weight=1.0,
+            details="score=4/5: Good",
+        )
+
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(
+                    type="engineering_judge",
+                    field="test_review",
+                    config={
+                        "rubric": "Test rubric",
+                        "min_score": 3.0,
+                        "file_key": "content",
+                    },
+                ),
+            ],
+            pass_threshold=0.5,
+        )
+
+        with patch(
+            "gbr_eval.harness.code_loader.grade",
+            return_value=mock_result,
+        ):
+            result = run_task_holistic(task, holistic_code_dir)
+
+        assert result.score == 0.75
+        assert result.passed is True
+
+    def test_holistic_llm_result_has_holistic_file_path(
+        self, holistic_code_dir: Path,
+    ) -> None:
+        """LLM grader results in holistic mode should have file_path='[holistic]'."""
+        mock_result = GraderResult(
+            grader_type="engineering_judge",
+            field="test_review",
+            passed=True,
+            score=0.75,
+            weight=1.0,
+            details="score=4/5",
+        )
+
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(
+                    type="engineering_judge",
+                    field="test_review",
+                    config={
+                        "rubric": "Test rubric",
+                        "file_key": "content",
+                    },
+                ),
+            ],
+        )
+
+        with patch(
+            "gbr_eval.harness.code_loader.grade",
+            return_value=mock_result,
+        ):
+            result = run_task_holistic(task, holistic_code_dir)
+
+        llm_results = [r for r in result.grader_results if r.grader_type == "engineering_judge"]
+        assert len(llm_results) == 1
+        assert llm_results[0].file_path == "[holistic]"
+
+    def test_deterministic_context_passed_to_llm(self, holistic_code_dir: Path) -> None:
+        """Deterministic grader results should be passed as context to the LLM grader."""
+        captured_context = []
+
+        def mock_grade(
+            grader_name: str,
+            output: dict,
+            expected: dict,
+            spec: GraderSpec,
+            context: object = None,
+        ) -> GraderResult:
+            if grader_name == "engineering_judge":
+                captured_context.append(context)
+                return GraderResult(
+                    grader_type="engineering_judge",
+                    field="review",
+                    passed=True,
+                    score=0.75,
+                    weight=1.0,
+                    details="score=4/5",
+                )
+            from gbr_eval.graders.base import grade as real_grade
+
+            return real_grade(grader_name, output, expected, spec, context=context)
+
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "export"}),
+                GraderSpec(
+                    type="engineering_judge",
+                    field="review",
+                    config={"rubric": "Test", "file_key": "content"},
+                ),
+            ],
+        )
+
+        with patch("gbr_eval.harness.code_loader.grade", side_effect=mock_grade):
+            run_task_holistic(task, holistic_code_dir)
+
+        assert len(captured_context) == 1
+        ctx = captured_context[0]
+        assert ctx is not None
+        assert len(ctx.previous_results) == 2  # 2 .tsx files each graded by pattern_required
+
+    def test_duration_tracked(self, holistic_code_dir: Path) -> None:
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "export"}),
+            ],
+        )
+        result = run_task_holistic(task, holistic_code_dir)
+        assert result.duration_ms > 0
+
+    def test_mixed_graders_required_llm_failure_vetoes(
+        self, holistic_code_dir: Path,
+    ) -> None:
+        """A required LLM grader that fails should veto the holistic pass."""
+        mock_result = GraderResult(
+            grader_type="engineering_judge",
+            field="review",
+            passed=False,
+            score=0.0,
+            weight=1.0,
+            required=True,
+            details="score=1/5: Critical failures",
+        )
+
+        task = _make_holistic_task(
+            graders=[
+                GraderSpec(
+                    type="engineering_judge",
+                    field="review",
+                    required=True,
+                    config={"rubric": "Test", "file_key": "content"},
+                ),
+            ],
+            pass_threshold=0.0,
+        )
+
+        with patch(
+            "gbr_eval.harness.code_loader.grade",
+            return_value=mock_result,
+        ):
+            result = run_task_holistic(task, holistic_code_dir)
+
+        assert result.passed is False
+
+
+class TestEvaluationModeBackwardCompatibility:
+    """Verify that existing tasks without evaluation_mode work identically."""
+
+    def test_default_evaluation_mode_is_per_file(self) -> None:
+        task = Task(
+            task_id="eng.test.default",
+            category=Category.CODE_QUALITY,
+            component="test",
+            layer=Layer.ENGINEERING,
+            input=TaskInput(payload={"repo": "test", "scan_target": "**/*.py"}),
+            graders=[GraderSpec(type="pattern_required", config={"pattern": "x"})],
+            pass_threshold=0.95,
+        )
+        assert task.evaluation_mode == EvaluationMode.PER_FILE
+
+    def test_per_file_scoring_unchanged(self, code_dir: Path) -> None:
+        """The original per-file scoring should be completely unchanged."""
+        task = Task(
+            task_id="eng.test.unchanged",
+            category=Category.CODE_QUALITY,
+            component="test",
+            layer=Layer.ENGINEERING,
+            input=TaskInput(
+                payload={"repo": "atom-back-end", "scan_target": "**/*.py"},
+            ),
+            graders=[
+                GraderSpec(type="pattern_required", config={"pattern": "def "}),
+            ],
+            pass_threshold=0.95,
+        )
+        result = run_task_against_code(task, code_dir)
+        assert result.score == 1.0
+        assert result.passed is True

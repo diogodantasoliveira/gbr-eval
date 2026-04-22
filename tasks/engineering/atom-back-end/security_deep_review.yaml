@@ -1,0 +1,43 @@
+task_id: eng.atom.security_deep_review
+category: classification
+component: atom-back-end
+layer: engineering
+tier: gate
+description: "LLM deep security review of API endpoints — beyond pattern matching"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "src/infrastructure/adapters/inbound/*_router.py"
+expected:
+  convention: secure_endpoints
+graders:
+  - type: pattern_forbidden
+    field: no_hardcoded_secrets
+    weight: 1.0
+    required: true
+    config:
+      pattern: '(?i)(api_key|secret_key|password)\s*=\s*["\x27][^"\x27]{8,}'
+      file_key: content
+  - type: engineering_judge
+    field: security_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review this API endpoint code for security vulnerabilities in a multi-tenant fintech context.
+        Evaluate ALL of the following:
+        1. INPUT VALIDATION: Are path params, query params, and request bodies validated before use? Are types enforced?
+        2. INJECTION: Any raw SQL, unparameterized queries, or string interpolation in queries?
+        3. TENANT ISOLATION: Can a user access or mutate another tenant's data? Is tenant_id checked on every data access?
+        4. AUTH BYPASS: Can any code path skip authentication or authorization checks? Are there unprotected mutation endpoints?
+        5. SENSITIVE DATA EXPOSURE: Do error responses, logs, or comments leak internal details (stack traces, DB schemas, secrets)?
+        6. IDOR: Can a user enumerate or access resources by guessing IDs without ownership verification?
+        7. MASS ASSIGNMENT: Are request bodies filtered to prevent updating forbidden fields (role, tenant_id, is_admin)?
+        Score 5 only if ALL checks pass with zero findings.
+      min_score: 3.0
+      file_key: content
+      language: python
+scoring_mode: binary
+pass_threshold: 0.7
+eval_owner: diogo.dantas
+eval_cadence: per-pr

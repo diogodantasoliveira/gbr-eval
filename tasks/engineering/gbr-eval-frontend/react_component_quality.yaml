@@ -1,0 +1,39 @@
+task_id: eng.frontend.react_component_quality
+category: classification
+component: gbr-eval-frontend
+layer: engineering
+tier: gate
+description: "LLM review de qualidade de componentes React — separação client/server, hooks, acessibilidade"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/components/**/*.tsx"
+
+expected:
+  convention: react_best_practices
+
+graders:
+  - type: engineering_judge
+    field: component_review
+    weight: 1.0
+    required: true
+    config:
+      rubric: |
+        Review this React component for quality in a Next.js 16 application.
+        Evaluate:
+        1. CLIENT/SERVER BOUNDARY: If the file uses "use client", does it actually need client-side features (hooks, event handlers, browser APIs)? Are server-only imports avoided in client components?
+        2. HOOK USAGE: Are hooks (useState, useEffect, useMemo) used correctly? No hooks inside conditionals? Dependencies arrays correct? No unnecessary state that could be derived?
+        3. ACCESSIBILITY: Do interactive elements have proper ARIA attributes? Are buttons type="button" where needed? Do images have alt text? Are form inputs labeled?
+        4. PROP TYPES: Are component props properly typed with TypeScript interfaces? No implicit any?
+        5. RENDERING: Any potential infinite re-renders? Missing keys on list items? Unnecessary re-renders from inline object/function creation?
+        6. ERROR STATES: Do components that fetch data handle loading, error, and empty states?
+        Score 5 only if the component follows all React best practices.
+      min_score: 3.0
+      file_key: content
+      language: typescript
+
+scoring_mode: weighted
+pass_threshold: 0.6
+eval_owner: diogo.dantas
+eval_cadence: per-pr

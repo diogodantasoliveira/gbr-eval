@@ -1,0 +1,44 @@
+task_id: product.frontend.dashboard_observability
+category: classification
+component: gbr-eval-frontend
+layer: product
+tier: gate
+description: "Verifica que o dashboard fornece visão geral de observabilidade — contagens, último run, alertas, quality metrics"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/app/page.tsx"
+
+expected:
+  convention: dashboard_observability
+
+graders:
+  - type: engineering_judge
+    field: dashboard_review
+    weight: 1.0
+    required: true
+    config:
+      rubric: |
+        Review this dashboard page to evaluate observability and at-a-glance quality for an eval framework.
+        Expected features:
+
+        1. SUMMARY CARDS: Counts for key entities (skills, golden sets, tasks, runs, contracts, conventions) with links to detail pages.
+        2. LATEST RUN SCORE: Overall score of the most recent run prominently displayed.
+        3. ENGINEERING QUALITY: Separate metrics for LLM-based vs deterministic grader pass rates.
+        4. RECENT RUNS LIST: Last 5 runs with score, gate result, pass/fail counts, and date.
+        5. ACTIVE ALERTS: Score drops, regressions, or trend declines highlighted.
+        6. GATE RESULT BADGES: Color-coded badges for GO / CONDITIONAL / NO-GO.
+        7. QUICK LINKS: Navigation shortcuts to key areas.
+        8. RESPONSIVE: Grid layout adapts to screen sizes.
+
+        Score: 5 = all 8 present and polished, 4 = 6-7, 3 = 4-5, 2 = 2-3, 1 = 0-1.
+      min_score: 3.0
+      file_key: content
+      language: typescript
+
+evaluation_mode: holistic
+scoring_mode: weighted
+pass_threshold: 0.6
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -34,6 +34,11 @@ class Category(StrEnum):
     CONVENTION = "convention"
 
 
+class EvaluationMode(StrEnum):
+    PER_FILE = "per_file"
+    HOLISTIC = "holistic"
+
+
 class ScoringMode(StrEnum):
     WEIGHTED = "weighted"
     BINARY = "binary"
@@ -53,6 +58,13 @@ class Severity(StrEnum):
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
+
+
+class GraderStatus(StrEnum):
+    GRADED = "graded"
+    ERROR = "error"
+    SKIPPED = "skipped"
+    NOT_APPLICABLE = "n/a"
 
 
 class GateResult(StrEnum):
@@ -103,6 +115,7 @@ class Task(BaseModel):
     golden_set_tags: list[str] | None = None
     epochs: int = Field(default=1, ge=1, le=100)
     reducers: list[ScoreReducer] = Field(default_factory=lambda: [ScoreReducer.MEAN])
+    evaluation_mode: EvaluationMode = EvaluationMode.PER_FILE
     primary_reducer: ScoreReducer = ScoreReducer.MEAN
 
     @model_validator(mode="after")
@@ -129,6 +142,7 @@ class GraderResult(BaseModel):
     error: str | None = None
     severity: Severity | None = None
     file_path: str | None = None
+    status: GraderStatus = GraderStatus.GRADED
 
 
 class TaskResult(BaseModel):

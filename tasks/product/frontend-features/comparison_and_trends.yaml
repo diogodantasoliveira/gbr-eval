@@ -1,0 +1,42 @@
+task_id: product.frontend.comparison_and_trends
+category: classification
+component: gbr-eval-frontend
+layer: product
+tier: gate
+description: "Verifica que o frontend possui comparação de runs e visualização de tendências"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/**/runs/**/*.tsx"
+
+expected:
+  convention: comparison_trends_features
+
+graders:
+  - type: engineering_judge
+    field: comparison_review
+    weight: 1.0
+    required: true
+    config:
+      rubric: |
+        Review the codebase to evaluate comparison and trend analysis features for an eval framework frontend.
+        Expected features:
+
+        1. RUN COMPARISON: Side-by-side comparison of two runs showing score deltas, new failures, resolved failures.
+        2. REGRESSION DETECTION: Visual indication of new_failure vs stable_fail vs new_pass vs stable_pass for each task.
+        3. TREND CHARTS: Line charts or sparklines showing score evolution over time per task or overall.
+        4. TREND ANALYSIS: Statistical indicators (slope, moving average) showing whether quality is improving or declining.
+        5. BASELINE SELECTION: Ability to select a baseline run for comparison.
+        6. ALERTING: Visual alerts for score drops, regressions, or trend declines on the dashboard.
+
+        Score based on completeness: 5 = all 6 present, 4 = 4-5, 3 = 3, 2 = 1-2, 1 = none.
+      min_score: 2.0
+      file_key: content
+      language: typescript
+
+evaluation_mode: holistic
+scoring_mode: weighted
+pass_threshold: 0.5
+eval_owner: diogo.dantas
+eval_cadence: per-pr

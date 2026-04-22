@@ -3,11 +3,11 @@ category: classification
 component: atom-back-end
 layer: engineering
 tier: gate
-description: "Every database query must filter by tenant_id"
+description: "Every database query/repository must filter by tenant_id or use RLS context"
 input:
   payload:
     repo: atom-back-end
-    scan_target: "**/*.py"
+    scan_target: "src/infrastructure/adapters/outbound/**/*.py"
 expected:
   convention: tenant_id_required
 graders:
@@ -16,14 +16,14 @@ graders:
     weight: 1.0
     required: true
     config:
-      pattern: '\.filter\(.*tenant_id|\.where\(.*tenant_id|tenant_id\s*=|filter_by\(.*tenant_id'
+      pattern: 'tenant_id|current_tenant_id|set_tenant_context|RLS|row.level.security|has_tenant_access'
       file_key: content
   - type: pattern_forbidden
     field: no_unfiltered_queries
     weight: 1.0
     required: true
     config:
-      pattern: '\.query\([A-Za-z_][A-Za-z0-9_.]*\)\s*\.all\(\)|\.query\([A-Za-z_][A-Za-z0-9_.]*\)\s*\.first\(\)|\.query\([A-Za-z_][A-Za-z0-9_.]*\)\s*\.one\(\)'
+      pattern: '\.query\([A-Za-z_]\w*\)\s*\.all\(\)|\.query\([A-Za-z_]\w*\)\s*\.first\(\)|select\([^)]+\)(?!.*(?:where|filter|tenant))'
       file_key: content
 scoring_mode: binary
 pass_threshold: 1.0

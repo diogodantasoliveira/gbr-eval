@@ -3,20 +3,22 @@ category: classification
 component: atom-back-end
 layer: engineering
 tier: gate
-description: "Every API endpoint must enforce RBAC"
+description: "Every API endpoint must enforce RBAC via require_permission or auth dependency"
 input:
   payload:
     repo: atom-back-end
-    scan_target: "app/api/**/*.py"
+    scan_target: "src/infrastructure/adapters/inbound/*_router.py"
 expected:
   convention: rbac_required
 graders:
-  - type: pattern_required
-    field: rbac_decorator
+  - type: scope_check
+    field: rbac_on_mutations
     weight: 1.0
     required: true
     config:
-      pattern: "@require_role|@require_permission|Depends\\(.*auth|Depends\\(.*rbac"
+      decorator_pattern: "@router\\.(post|put|delete|patch)"
+      required_param: "require_permission|current_user|Depends\\(.*auth|Depends\\(.*rbac"
+      skip_if_no_matches: true
       file_key: content
 scoring_mode: binary
 pass_threshold: 1.0

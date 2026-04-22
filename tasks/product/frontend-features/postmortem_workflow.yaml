@@ -1,0 +1,41 @@
+task_id: product.frontend.postmortem_workflow
+category: classification
+component: gbr-eval-frontend
+layer: product
+tier: gate
+description: "Verifica que o frontend suporta workflow de postmortem para análise de falhas em eval runs"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/**/runs/**/*"
+
+expected:
+  convention: postmortem_features
+
+graders:
+  - type: engineering_judge
+    field: postmortem_review
+    weight: 1.0
+    required: true
+    config:
+      rubric: |
+        Review the codebase to evaluate whether postmortem/root-cause analysis workflow is implemented.
+        Expected features:
+
+        1. POSTMORTEM CREATION: Form to create a postmortem for a failed run or specific task, with structured fields (what happened, root cause, impact, fix, prevention).
+        2. POSTMORTEM DISPLAY: Postmortems shown on run detail page with proper formatting and metadata (author, date).
+        3. POSTMORTEM API: Backend API routes for CRUD operations on postmortems with proper validation.
+        4. LINKAGE: Postmortems linked to specific runs and optionally to specific tasks within a run.
+        5. HISTORY: Multiple postmortems per run supported, ordered by creation date.
+
+        Score: 5 = all 5 features complete, 4 = 4, 3 = 3, 2 = 1-2, 1 = none.
+      min_score: 2.0
+      file_key: content
+      language: typescript
+
+evaluation_mode: holistic
+scoring_mode: weighted
+pass_threshold: 0.5
+eval_owner: diogo.dantas
+eval_cadence: per-pr

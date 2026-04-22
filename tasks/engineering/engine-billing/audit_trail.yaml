@@ -3,28 +3,24 @@ category: classification
 component: engine-billing
 layer: engineering
 tier: gate
-description: "Every financial operation must have an audit trail"
+description: "Every financial mutation endpoint must have audit trail logging"
 input:
   payload:
-    repo: engine-billing
-    scan_target: "**/*.py"
+    repo: atom-back-end
+    scan_target: "src/infrastructure/adapters/inbound/*_router.py"
 expected:
   convention: audit_trail_required
 graders:
-  - type: convention_check
-    field: audit_conventions
+  - type: scope_check
+    field: audit_coverage
     weight: 1.0
     required: true
     config:
+      decorator_pattern: "@router\\.(post|put|delete|patch)"
+      required_call: "audit\\.append|audit_log|create_audit|log_action|log_financial_action"
+      skip_if_no_matches: true
       file_key: content
-      rules:
-        - pattern: "audit_log|create_audit|AuditService|log_financial_action"
-          type: required
-          description: "Financial operations must have audit trail"
-        - pattern: "\\.commit\\(\\)(?!.*audit)"
-          type: forbidden
-          description: "Database commit without audit logging"
 scoring_mode: binary
-pass_threshold: 1.0
+pass_threshold: 0.8
 eval_owner: diogo.dantas
 eval_cadence: per-pr

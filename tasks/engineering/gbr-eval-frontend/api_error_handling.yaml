@@ -1,0 +1,58 @@
+task_id: eng.frontend.api_error_handling
+category: classification
+component: gbr-eval-frontend
+layer: engineering
+tier: gate
+description: "Verifica que API routes têm try/catch adequado, não vazam stack traces, e retornam HTTP status corretos"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/app/api/**/route.ts"
+
+expected:
+  convention: robust_error_handling
+
+graders:
+  - type: pattern_required
+    field: has_try_catch
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'try\s*\{'
+      file_key: content
+      severity: high
+
+  - type: pattern_forbidden
+    field: no_stack_trace_leak
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'err\.message|stackTrace|\.stack\b'
+      exclude_context: 'console\.(error|warn|log)'
+      require_context: 'NextResponse\.json|\.json\('
+      file_key: content
+      severity: high
+
+  - type: engineering_judge
+    field: error_handling_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review this Next.js API route for error handling quality.
+        Evaluate:
+        1. TRY/CATCH: Does every exported handler (GET, POST, PUT, DELETE) have proper error handling?
+        2. ERROR RESPONSES: Do error responses use appropriate HTTP status codes (400 for validation, 401 for auth, 404 for not found, 500 for internal)?
+        3. INFO LEAK: Do error messages exposed to clients avoid leaking internal details (stack traces, DB errors, file paths)?
+        4. LOGGING: Are errors logged server-side with enough context to debug (without logging sensitive data)?
+        5. EDGE CASES: Are empty bodies, malformed JSON, and missing required fields handled gracefully?
+        Score 5 only if all handlers have comprehensive error handling with no info leaks.
+      min_score: 3.0
+      file_key: content
+      language: typescript
+
+scoring_mode: hybrid
+pass_threshold: 0.7
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -13,8 +13,12 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 from gbr_eval.graders.base import grade
+from gbr_eval.harness.aggregator import aggregate_files_for_prompt
+from gbr_eval.harness.cache import LLM_GRADER_TYPES, GraderCache
 from gbr_eval.harness.models import (
     EvalRun,
+    EvaluationMode,
+    GraderContext,
     GraderResult,
     Layer,
     Task,
@@ -81,7 +85,13 @@ def load_code_files(code_dir: Path, repo: str, scan_target: str) -> list[tuple[s
     return files
 
 
-def evaluate_file(task: Task, file_path: str, content: str) -> FileResult:
+def evaluate_file(
+    task: Task,
+    file_path: str,
+    content: str,
+    *,
+    cache: GraderCache | None = None,
+) -> FileResult:
     """Evaluate a single file against all graders in a task."""
     if not task.graders:
         error_result = GraderResult(
@@ -97,18 +107,41 @@ def evaluate_file(task: Task, file_path: str, content: str) -> FileResult:
     for spec in task.graders:
         file_key = spec.config.get("file_key", "content")
         output: dict[str, Any] = {file_key: content}
-        result = grade(spec.type, output, task.expected, spec)
-        result.file_path = file_path
-        grader_results.append(result)
+        ctx = GraderContext(metadata={}, previous_results=list(grader_results)) if grader_results else None
+
+        # Cache lookup for LLM graders only.
+        cached_result: GraderResult | None = None
+        cache_key = ""
+        if cache is not None and spec.type in LLM_GRADER_TYPES:
+            cache_key = GraderCache.make_key(content, spec)
+            cached_result = cache.get(cache_key)
+
+        if cached_result is not None:
+            cached_result.file_path = file_path
+            grader_results.append(cached_result)
+        else:
+            result = grade(spec.type, output, task.expected, spec, context=ctx)
+            result.file_path = file_path
+            if cache is not None and spec.type in LLM_GRADER_TYPES and cache_key:
+                cache.put(cache_key, result)
+            grader_results.append(result)
 
     conforming = all(r.passed for r in grader_results)
     return FileResult(file_path=file_path, conforming=conforming, grader_results=grader_results)
 
 
-def run_task_against_code(task: Task, code_dir: Path) -> TaskResult:
-    """Run an engineering task against actual code files from target repo.
+def run_task_holistic(
+    task: Task,
+    code_dir: Path,
+    *,
+    cache: GraderCache | None = None,
+    changed_files: set[str] | None = None,
+) -> TaskResult:
+    """Run a holistic task — aggregate files, grade once with LLM.
 
-    Score = conforming_files / total_files
+    Deterministic graders still run per-file (fast, per-file makes sense).
+    LLM graders run once against the aggregated content.
+    Score = LLM's normalized score (not conforming_files/total_files).
     """
     repo = task.input.payload.get("repo", "")
     scan_target = task.input.payload.get("scan_target", "**/*.py")
@@ -126,6 +159,9 @@ def run_task_against_code(task: Task, code_dir: Path) -> TaskResult:
 
     start = time.monotonic()
     files = load_code_files(code_dir, repo, scan_target)
+    if changed_files is not None:
+        from gbr_eval.harness.git_diff import filter_changed_files
+        files = filter_changed_files(files, changed_files)
 
     if not files:
         return TaskResult(
@@ -138,14 +174,150 @@ def run_task_against_code(task: Task, code_dir: Path) -> TaskResult:
             error=f"No files found in repo '{repo}' with pattern '{scan_target}'",
         )
 
+    # Split graders into deterministic and LLM.
+    det_specs = [s for s in task.graders if s.type not in LLM_GRADER_TYPES]
+    llm_specs = [s for s in task.graders if s.type in LLM_GRADER_TYPES]
+
+    # --- Stage 1: Run deterministic graders per-file ---
+    det_results: list[GraderResult] = []
+    for rel_path, content in files:
+        for spec in det_specs:
+            file_key = spec.config.get("file_key", "content")
+            output: dict[str, Any] = {file_key: content}
+            result = grade(spec.type, output, task.expected, spec)
+            result.file_path = rel_path
+            det_results.append(result)
+
+    # --- Stage 2: Aggregate files and run LLM graders once ---
+    llm_results: list[GraderResult] = []
+    if llm_specs:
+        aggregated = aggregate_files_for_prompt(files)
+
+        # Build context with deterministic results for the LLM.
+        ctx = GraderContext(metadata={}, previous_results=list(det_results)) if det_results else None
+
+        for spec in llm_specs:
+            file_key = spec.config.get("file_key", "content")
+            output_dict: dict[str, Any] = {file_key: aggregated}
+
+            cached_result: GraderResult | None = None
+            cache_key = ""
+            if cache is not None:
+                cache_key = GraderCache.make_key(aggregated, spec)
+                cached_result = cache.get(cache_key)
+
+            if cached_result is not None:
+                cached_result.file_path = "[holistic]"
+                llm_results.append(cached_result)
+            else:
+                result = grade(spec.type, output_dict, task.expected, spec, context=ctx)
+                result.file_path = "[holistic]"
+                if cache is not None and cache_key:
+                    cache.put(cache_key, result)
+                llm_results.append(result)
+
+    # --- Scoring ---
+    all_results = det_results + llm_results
+    duration_ms = (time.monotonic() - start) * 1000
+
+    # LLM score is the primary score for holistic mode.
+    if llm_results:
+        score = llm_results[0].score
+    else:
+        # No LLM graders -- fall back to deterministic conformance ratio.
+        score = sum(1.0 for r in det_results if r.passed) / len(det_results) if det_results else 0.0
+
+    # Required deterministic failure vetoes the holistic score.
+    any_required_det_failed = any(r.required and not r.passed for r in det_results)
+    any_required_llm_failed = any(r.required and not r.passed for r in llm_results)
+    passed = score >= task.pass_threshold and not any_required_det_failed and not any_required_llm_failed
+
+    return TaskResult(
+        task_id=task.task_id,
+        passed=passed,
+        score=score,
+        grader_results=all_results,
+        duration_ms=duration_ms,
+        pass_threshold=task.pass_threshold,
+    )
+
+
+def run_task_against_code(
+    task: Task,
+    code_dir: Path,
+    *,
+    cache: GraderCache | None = None,
+    changed_files: set[str] | None = None,
+    use_funnel: bool = False,
+) -> TaskResult:
+    """Run a task against actual code files from target repo.
+
+    Dispatches to holistic mode when ``task.evaluation_mode`` is ``HOLISTIC``.
+    Otherwise uses per-file mode where score = conforming_files / total_files.
+    When *use_funnel* is True, routes per-file evaluation through the 3-stage
+    grading funnel (deterministic → Haiku triage → Opus deep review).
+    """
+    if task.evaluation_mode == EvaluationMode.HOLISTIC:
+        return run_task_holistic(task, code_dir, cache=cache, changed_files=changed_files)
+
+    repo = task.input.payload.get("repo", "")
+    scan_target = task.input.payload.get("scan_target", "**/*.py")
+
+    if not repo:
+        return TaskResult(
+            task_id=task.task_id,
+            passed=False,
+            score=0.0,
+            grader_results=[],
+            duration_ms=0.0,
+            pass_threshold=task.pass_threshold,
+            error="Task missing input.payload.repo",
+        )
+
+    start = time.monotonic()
+    files = load_code_files(code_dir, repo, scan_target)
+    if changed_files is not None:
+        from gbr_eval.harness.git_diff import filter_changed_files
+        files = filter_changed_files(files, changed_files)
+
+    if not files:
+        return TaskResult(
+            task_id=task.task_id,
+            passed=False,
+            score=0.0,
+            grader_results=[],
+            duration_ms=(time.monotonic() - start) * 1000,
+            pass_threshold=task.pass_threshold,
+            error=f"No files found in repo '{repo}' with pattern '{scan_target}'",
+        )
+
+    has_llm = any(s.type in LLM_GRADER_TYPES for s in task.graders)
+
     all_grader_results: list[GraderResult] = []
     conforming_count = 0
 
-    for rel_path, content in files:
-        file_result = evaluate_file(task, rel_path, content)
-        all_grader_results.extend(file_result.grader_results)
-        if file_result.conforming:
-            conforming_count += 1
+    if use_funnel and has_llm:
+        from gbr_eval.harness.funnel import FunnelStats, run_file_through_funnel
+
+        det_specs = [s for s in task.graders if s.type not in LLM_GRADER_TYPES]
+        llm_specs = [s for s in task.graders if s.type in LLM_GRADER_TYPES]
+        funnel_stats = FunnelStats()
+
+        for rel_path, content in files:
+            fr = run_file_through_funnel(
+                rel_path, content,
+                det_specs=det_specs, llm_specs=llm_specs,
+                expected=task.expected, cache=cache, stats=funnel_stats,
+            )
+            all_grader_results.extend(fr.grader_results)
+            if fr.conforming:
+                conforming_count += 1
+    else:
+        for rel_path, content in files:
+            file_result = evaluate_file(task, rel_path, content, cache=cache)
+            all_grader_results.extend(file_result.grader_results)
+            if file_result.conforming:
+                conforming_count += 1
 
     duration_ms = (time.monotonic() - start) * 1000
     score = conforming_count / len(files)
@@ -167,6 +339,10 @@ def run_engineering_suite(
     code_dir: Path,
     layer: Layer | None = None,
     tier: Tier | None = None,
+    *,
+    cache: GraderCache | None = None,
+    changed_files: set[str] | None = None,
+    use_funnel: bool = False,
 ) -> EvalRun:
     """Run engineering tasks against code from target repos.
 
@@ -184,7 +360,9 @@ def run_engineering_suite(
     )
 
     for task in tasks:
-        result = run_task_against_code(task, code_dir)
+        result = run_task_against_code(
+            task, code_dir, cache=cache, changed_files=changed_files, use_funnel=use_funnel,
+        )
         run.task_results.append(result)
         if result.passed:
             run.tasks_passed += 1

@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextlib
 import copy
 import json as json_mod
+import os
 import time
 import uuid
 import warnings
@@ -24,6 +25,7 @@ from gbr_eval.harness.client import EvalClientError
 from gbr_eval.harness.models import (
     Category,
     EvalRun,
+    EvaluationMode,
     GateResult,
     GraderContext,
     GraderResult,
@@ -71,6 +73,7 @@ def load_task(path: Path) -> Task:
         eval_owner=raw.get("eval_owner"),
         eval_cadence=raw.get("eval_cadence"),
         golden_set_tags=raw.get("golden_set_tags"),
+        evaluation_mode=EvaluationMode(raw.get("evaluation_mode", "per_file")),
         epochs=int(raw.get("epochs", 1)),
         reducers=[ScoreReducer(r) for r in raw.get("reducers", ["mean"])],
         primary_reducer=ScoreReducer(raw.get("primary_reducer", "mean")),
@@ -100,10 +103,67 @@ def load_tasks_from_dir(directory: Path, layer: Layer | None = None, tier: Tier 
 
 
 _NON_DETERMINISTIC_GRADERS: frozenset[str] = frozenset({"llm_judge"})
+_LLM_GRADER_TYPES: frozenset[str] = frozenset({"llm_judge", "engineering_judge"})
+
+# Exit code semantics — let CI distinguish gate-fail from runtime crash.
+EXIT_GO = 0
+EXIT_NO_GO = 1
+EXIT_RUNTIME_ERROR = 2
 
 
 def _all_graders_deterministic(task: Task) -> bool:
     return all(g.type not in _NON_DETERMINISTIC_GRADERS for g in task.graders)
+
+
+def _preflight_check(
+    tasks: list[Task],
+    code_dir: Path | None,
+) -> list[str]:
+    """Return list of warnings before running. Empty means ready.
+
+    Critical issues (missing API key for LLM graders) are prefixed with
+    ``[CRITICAL]`` so the caller can decide to abort.
+    """
+    issues: list[str] = []
+
+    has_llm = any(
+        s.type in _LLM_GRADER_TYPES for t in tasks for s in t.graders
+    )
+    if has_llm and not os.environ.get("ANTHROPIC_API_KEY"):
+        issues.append(
+            "[CRITICAL] ANTHROPIC_API_KEY not set — LLM graders will all score 0"
+        )
+
+    if code_dir:
+        repos: set[str] = {
+            str(r) for t in tasks
+            if (r := t.input.payload.get("repo")) and isinstance(r, str)
+        }
+        for repo in sorted(repos):
+            if not (code_dir / repo).is_dir():
+                issues.append(f"Repo '{repo}' not found in {code_dir}")
+
+    # Estimate LLM file count when code_dir is provided.
+    if code_dir:
+        llm_file_count = 0
+        for t in tasks:
+            if not any(s.type in _LLM_GRADER_TYPES for s in t.graders):
+                continue
+            repo = t.input.payload.get("repo", "")
+            scan_target = t.input.payload.get("scan_target", "")
+            if repo and scan_target:
+                repo_path = code_dir / repo
+                if repo_path.is_dir():
+                    llm_file_count += sum(
+                        1 for _ in repo_path.glob(scan_target)
+                    )
+        if llm_file_count > 100:
+            issues.append(
+                f"~{llm_file_count} files will be sent to LLM graders. "
+                "Consider narrowing scan_target or using --changed-only"
+            )
+
+    return issues
 
 
 def _reduce_scores(scores: list[float], reducer: ScoreReducer, threshold: float) -> float:
@@ -555,13 +615,19 @@ def _run_code_eval(
     code_dir: Path,
     layer_enum: Layer | None,
     tier_enum: Tier | None,
+    *,
+    cache: Any | None = None,
+    changed_files: set[str] | None = None,
+    use_funnel: bool = False,
 ) -> EvalRun:
     """Handle --code-dir branch: engineering layer eval against a repo on disk."""
     from gbr_eval.harness.code_loader import run_engineering_suite, run_task_against_code
 
     if task_path:
         task = load_task(task_path)
-        result = run_task_against_code(task, code_dir)
+        result = run_task_against_code(
+            task, code_dir, cache=cache, changed_files=changed_files, use_funnel=use_funnel,
+        )
         return EvalRun(
             run_id=str(uuid.uuid4()),
             layer=task.layer,
@@ -574,7 +640,10 @@ def _run_code_eval(
             finished_at=datetime.now(UTC),
         )
     assert suite is not None
-    return run_engineering_suite(suite, code_dir, layer=layer_enum, tier=tier_enum)
+    return run_engineering_suite(
+        suite, code_dir, layer=layer_enum, tier=tier_enum,
+        cache=cache, changed_files=changed_files, use_funnel=use_funnel,
+    )
 
 
 def _run_single_task_eval(
@@ -671,10 +740,8 @@ def _finalize_and_report(
         click.echo(console_report(eval_run, delta=delta))
         click.echo(ci_summary(eval_run))
 
-    if eval_run.gate_result == GateResult.NO_GO:
-        raise SystemExit(1)
-    elif eval_run.gate_result == GateResult.NO_GO_ABSOLUTE:
-        raise SystemExit(2)
+    if eval_run.gate_result in (GateResult.NO_GO, GateResult.NO_GO_ABSOLUTE):
+        raise SystemExit(EXIT_NO_GO)
 
 
 @cli.command()
@@ -708,6 +775,16 @@ def _finalize_and_report(
 @click.option("--parallel", is_flag=True, default=False,
               help="Run suite tasks in parallel using asyncio (max 5 concurrent tasks). "
                    "Only applies to --suite without --golden-dir or --code-dir.")
+@click.option("--no-cache", "no_cache", is_flag=True, default=False,
+              help="Disable content-hash cache for LLM graders")
+@click.option("--clear-cache", "clear_cache", is_flag=True, default=False,
+              help="Clear the LLM grader cache before running")
+@click.option("--changed-only", is_flag=True, default=False,
+              help="Only grade files changed vs base branch (requires --code-dir)")
+@click.option("--base-branch", default="main",
+              help="Base branch for --changed-only (default: main)")
+@click.option("--no-funnel", "no_funnel", is_flag=True, default=False,
+              help="Disable the 3-stage grading funnel (run all graders on all files)")
 def run(
     suite: Path | None,
     task_path: Path | None,
@@ -726,9 +803,25 @@ def run(
     code_dir: Path | None,
     model_role_pairs: tuple[str, ...],
     parallel: bool,
+    no_cache: bool,
+    clear_cache: bool,
+    changed_only: bool,
+    base_branch: str,
+    no_funnel: bool,
 ) -> None:
     """Run eval tasks and report results."""
+    from gbr_eval.harness.cache import GraderCache
+
     model_roles = _parse_model_roles(model_role_pairs)
+
+    # --- Cache setup ---
+    cache_dir = Path(".gbr-eval-cache")
+    cache_enabled = not no_cache and code_dir is not None
+    grader_cache = GraderCache(cache_dir, enabled=cache_enabled)
+
+    if clear_cache:
+        deleted = grader_cache.clear()
+        click.echo(f"[cache] Cleared {deleted} cached entries.", err=True)
 
     if not suite and not task_path:
         raise click.UsageError("Provide --suite or --task")
@@ -738,36 +831,89 @@ def run(
         raise click.UsageError("--code-dir and --golden-dir are mutually exclusive")
     if parallel and (task_path or golden_dir or code_dir):
         raise click.UsageError("--parallel only applies to --suite without --golden-dir or --code-dir")
+    if changed_only and not code_dir:
+        raise click.UsageError("--changed-only requires --code-dir")
 
     client, recorder = _setup_client_recorder(endpoint, allow_internal, tenant, record_dir, replay_dir)
 
     layer_enum = Layer(layer) if layer else None
     tier_enum = Tier(tier) if tier else None
 
-    if code_dir:
-        eval_run = _run_code_eval(suite, task_path, code_dir, layer_enum, tier_enum)
-    elif task_path:
-        eval_run = _run_single_task_eval(task_path, golden_dir, self_eval, client, recorder, model_roles)
-    elif golden_dir:
-        assert suite is not None
-        eval_run = _run_golden_suite_eval(
-            suite, golden_dir, self_eval, layer_enum, tier_enum, client, recorder, model_roles
-        )
-    elif parallel:
-        import asyncio
+    # --- Pre-flight validation ---
+    try:
+        preflight_tasks: list[Task] = []
+        if task_path:
+            preflight_tasks = [load_task(task_path)]
+        elif suite:
+            preflight_tasks = load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum)
 
-        from gbr_eval.harness.async_suite_runner import run_eval_run_async
+        issues = _preflight_check(preflight_tasks, code_dir)
+        for issue in issues:
+            click.echo(f"[preflight] {issue}", err=True)
+        critical = [i for i in issues if i.startswith("[CRITICAL]")]
+        if critical:
+            click.echo("[preflight] Aborting due to critical issues.", err=True)
+            raise SystemExit(EXIT_RUNTIME_ERROR)
+    except SystemExit:
+        raise
+    except Exception as exc:
+        click.echo(f"[preflight] Warning: preflight check failed: {exc}", err=True)
 
-        assert suite is not None
-        tasks = load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum)
-        if model_roles:
-            _warn_unused_model_roles(tasks, model_roles)
-        eval_run = asyncio.run(
-            run_eval_run_async(tasks, {}, layer=layer_enum, model_roles=model_roles)
+    # --- Resolve changed files ---
+    changed: set[str] | None = None
+    if changed_only and code_dir:
+        from gbr_eval.harness.git_diff import get_changed_files
+        try:
+            changed = get_changed_files(code_dir, base_branch)
+            click.echo(f"[git-diff] {len(changed)} files changed vs {base_branch}", err=True)
+        except (RuntimeError, ValueError) as exc:
+            click.echo(f"[git-diff] Failed: {exc}", err=True)
+            raise SystemExit(EXIT_RUNTIME_ERROR) from exc
+
+    # --- Run evaluation ---
+    try:
+        if code_dir:
+            eval_run = _run_code_eval(
+                suite, task_path, code_dir, layer_enum, tier_enum,
+                cache=grader_cache, changed_files=changed, use_funnel=not no_funnel,
+            )
+        elif task_path:
+            eval_run = _run_single_task_eval(task_path, golden_dir, self_eval, client, recorder, model_roles)
+        elif golden_dir:
+            assert suite is not None
+            eval_run = _run_golden_suite_eval(
+                suite, golden_dir, self_eval, layer_enum, tier_enum, client, recorder, model_roles
+            )
+        elif parallel:
+            import asyncio
+
+            from gbr_eval.harness.async_suite_runner import run_eval_run_async
+
+            assert suite is not None
+            tasks = load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum)
+            if model_roles:
+                _warn_unused_model_roles(tasks, model_roles)
+            eval_run = asyncio.run(
+                run_eval_run_async(tasks, {}, layer=layer_enum, model_roles=model_roles)
+            )
+        else:
+            assert suite is not None
+            eval_run = _run_plain_suite_eval(suite, layer_enum, tier_enum, model_roles)
+    except SystemExit:
+        raise
+    except Exception as exc:
+        click.echo(f"Runtime error: {type(exc).__name__}: {exc}", err=True)
+        raise SystemExit(EXIT_RUNTIME_ERROR) from exc
+
+    # --- Cache stats ---
+    stats = grader_cache.stats
+    if stats.total > 0:
+        click.echo(
+            f"[cache] hits={stats.hits} misses={stats.misses} puts={stats.puts} "
+            f"skipped_errors={stats.skipped_errors} hit_rate={stats.hit_rate:.0%}",
+            err=True,
         )
-    else:
-        assert suite is not None
-        eval_run = _run_plain_suite_eval(suite, layer_enum, tier_enum, model_roles)
+    grader_cache.close()
 
     _finalize_and_report(eval_run, baseline_run, output_format, output_file)
 

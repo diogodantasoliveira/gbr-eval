@@ -15,6 +15,14 @@
       "title": "Category",
       "type": "string"
     },
+    "EvaluationMode": {
+      "enum": [
+        "per_file",
+        "holistic"
+      ],
+      "title": "EvaluationMode",
+      "type": "string"
+    },
     "GraderSpec": {
       "properties": {
         "type": {
@@ -287,6 +295,10 @@
       },
       "title": "Reducers",
       "type": "array"
+    },
+    "evaluation_mode": {
+      "$ref": "#/$defs/EvaluationMode",
+      "default": "per_file"
     },
     "primary_reducer": {
       "$ref": "#/$defs/ScoreReducer",

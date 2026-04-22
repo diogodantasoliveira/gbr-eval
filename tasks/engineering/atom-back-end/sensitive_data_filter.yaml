@@ -7,7 +7,7 @@ description: "API responses must not leak sensitive fields (password, secret, ap
 input:
   payload:
     repo: atom-back-end
-    scan_target: "app/api/**/*.py"
+    scan_target: "src/infrastructure/adapters/inbound/**/*.py"
 expected:
   convention: sensitive_data_filtered
 graders:

@@ -1,0 +1,45 @@
+task_id: product.frontend.annotation_studio
+category: classification
+component: gbr-eval-frontend
+layer: product
+tier: gate
+description: "Verifica que o frontend possui studio completo de anotação — skills, golden sets, tasks, rubrics CRUD"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/app/**/*.tsx"
+
+expected:
+  convention: annotation_studio_features
+
+graders:
+  - type: engineering_judge
+    field: studio_review
+    weight: 1.0
+    required: true
+    config:
+      rubric: |
+        Review the codebase to evaluate whether the annotation studio (eval configuration UI) is complete.
+        This is a Next.js frontend for managing evaluation definitions. Expected CRUD features:
+
+        1. SKILLS: List, create, edit skills (named capabilities being evaluated).
+        2. GOLDEN SETS: List, create golden sets. Add/edit/delete cases within a golden set. Import cases in bulk.
+        3. TASKS: List, create, edit task definitions with grader configuration (picker for grader types, config forms).
+        4. RUBRICS: List, create, edit rubrics with scoring criteria. Version history.
+        5. CONTRACTS: List, view API contract/schema snapshots.
+        6. CONVENTIONS: List, create, edit convention rules for code quality standards.
+        7. CALIBRATION: Inter-annotator agreement (kappa) sessions for consistency measurement.
+        8. FORM VALIDATION: All create/edit forms validate inputs with clear error messages (Zod schemas).
+        9. NAVIGATION: Sidebar with all entities, search functionality.
+
+        Score based on completeness: 5 = all 9 features with working CRUD, 4 = 7-8, 3 = 5-6, 2 = 3-4, 1 = 0-2.
+      min_score: 3.0
+      file_key: content
+      language: typescript
+
+evaluation_mode: holistic
+scoring_mode: weighted
+pass_threshold: 0.6
+eval_owner: diogo.dantas
+eval_cadence: per-pr

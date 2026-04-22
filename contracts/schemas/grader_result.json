@@ -1,5 +1,15 @@
 {
   "$defs": {
+    "GraderStatus": {
+      "enum": [
+        "graded",
+        "error",
+        "skipped",
+        "n/a"
+      ],
+      "title": "GraderStatus",
+      "type": "string"
+    },
     "Severity": {
       "enum": [
         "critical",
@@ -87,6 +97,10 @@
       ],
       "default": null,
       "title": "File Path"
+    },
+    "status": {
+      "$ref": "#/$defs/GraderStatus",
+      "default": "graded"
     }
   },
   "required": [

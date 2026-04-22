@@ -1,0 +1,49 @@
+task_id: eng.atom.error_handling_quality
+category: classification
+component: atom-back-end
+layer: engineering
+tier: canary
+description: "LLM review of error handling quality in services and routers"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "src/domain/services/*_service.py"
+expected:
+  convention: proper_error_handling
+graders:
+  - type: pattern_forbidden
+    field: no_bare_except
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'except\s*:'
+      file_key: content
+  - type: engineering_judge
+    field: error_handling_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review error handling quality in this service-layer Python file for a fintech platform.
+        Evaluate:
+        1. GRANULARITY: Are exceptions caught at the appropriate level? Broad catches (except Exception)
+           should be rare and justified. Specific exception types are preferred.
+        2. BUSINESS vs INFRA ERRORS: Are business logic errors (invalid state, validation failures)
+           clearly distinguished from infrastructure errors (DB timeout, network failure)?
+           Business errors should use custom domain exceptions, not generic ones.
+        3. ERROR PROPAGATION: Do errors propagate correctly up the call stack? Are they swallowed silently?
+           Critical failures (financial operations, tenant data) must never be silently caught.
+        4. LOGGING: Are errors logged with enough context for debugging? Are sensitive data (PII, secrets)
+           excluded from error messages and logs?
+        5. RECOVERY: For retryable operations (external API calls, DB transactions), is there retry logic
+           with backoff? Are non-retryable errors distinguished from transient ones?
+        6. FINANCIAL SAFETY: For operations involving money or billing, are partial failures handled
+           atomically? Can a crash leave data in an inconsistent state?
+        Score 5 only if error handling is comprehensive, specific, and financially safe.
+      min_score: 3.0
+      file_key: content
+      language: python
+scoring_mode: binary
+pass_threshold: 0.5
+eval_owner: diogo.dantas
+eval_cadence: per-pr

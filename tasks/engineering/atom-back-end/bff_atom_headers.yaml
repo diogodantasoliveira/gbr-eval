@@ -7,16 +7,23 @@ description: "BFF routes must use atomHeaders(), never serviceAuthKey()"
 input:
   payload:
     repo: atom-back-end
-    scan_target: "**/*.py"
+    scan_target: "src/infrastructure/adapters/inbound/**/*.py"
 expected:
   convention: bff_atom_headers
 graders:
-  - type: pattern_required
-    field: bff_atom_headers
+  - type: pattern_forbidden
+    field: no_service_auth_key
     weight: 1.0
     required: true
     config:
       pattern: "serviceAuthKey\\("
+      file_key: content
+  - type: pattern_required
+    field: atom_headers_used
+    weight: 1.0
+    required: false
+    config:
+      pattern: "atomHeaders\\(|atom_headers\\("
       file_key: content
 scoring_mode: binary
 pass_threshold: 1.0

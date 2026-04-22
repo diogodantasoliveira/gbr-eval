@@ -15,7 +15,7 @@ from typing import Any
 import anthropic
 
 from gbr_eval.graders.base import register_grader
-from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec
+from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec, GraderStatus
 
 _DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
 _API_TIMEOUT = 30.0
@@ -256,4 +256,5 @@ class LLMJudge:
                 weight=spec.weight,
                 required=spec.required,
                 error=f"LLM judge error: {type(exc).__name__}: {_sanitize_pii_str(str(exc))}",
+                status=GraderStatus.ERROR,
             )

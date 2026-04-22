@@ -1,0 +1,44 @@
+task_id: product.frontend.run_visualization
+category: classification
+component: gbr-eval-frontend
+layer: product
+tier: gate
+description: "Verifica que o frontend possui visualização completa de runs — lista, detalhe, gate matrix, severity grouping"
+
+input:
+  payload:
+    repo: gbr-eval-frontend
+    scan_target: "src/**/runs/**/*.tsx"
+
+expected:
+  convention: complete_run_visualization
+
+graders:
+  - type: engineering_judge
+    field: run_features_review
+    weight: 1.0
+    required: true
+    config:
+      rubric: |
+        Review the codebase holistically to evaluate whether the eval run visualization is complete and production-ready.
+        This is a Next.js frontend for an eval framework. It should provide:
+
+        1. RUN LIST: A page listing all eval runs with sortable columns (score, date, gate result, layer), pagination, and filtering.
+        2. RUN DETAIL: A detail page showing overall score, gate result, metadata (git SHA, branch, duration), and task-level breakdown.
+        3. GATE MATRIX: Visual gate decision display showing pass/fail per category (deterministic vs LLM graders).
+        4. TASK RESULTS TABLE: Expandable rows showing per-task scores, grader details, severity indicators, regression status.
+        5. SEVERITY GROUPING: Tasks grouped or filterable by severity (critical, high, medium, low) with appropriate color coding.
+        6. ENGINEERING FINDINGS: LLM engineering judge results displayed with findings organized by severity, file path references.
+        7. SCORE VISUALIZATION: Progress bars, percentage displays, or charts showing score distribution.
+        8. DARK MODE: All visualizations support dark mode with proper contrast.
+
+        Score based on completeness: 5 = all 8 features present and well-implemented, 4 = 6-7 features, 3 = 4-5 features, 2 = 2-3 features, 1 = 0-1 features.
+      min_score: 3.0
+      file_key: content
+      language: typescript
+
+evaluation_mode: holistic
+scoring_mode: weighted
+pass_threshold: 0.6
+eval_owner: diogo.dantas
+eval_cadence: per-pr

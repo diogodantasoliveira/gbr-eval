@@ -1,0 +1,50 @@
+task_id: eng.atom.architecture_compliance
+category: classification
+component: atom-back-end
+layer: engineering
+tier: gate
+description: "LLM review of hexagonal architecture compliance — clean boundaries and separation of concerns"
+input:
+  payload:
+    repo: atom-back-end
+    scan_target: "src/domain/**/*.py"
+expected:
+  convention: hexagonal_architecture
+graders:
+  - type: pattern_forbidden
+    field: no_infra_imports_in_domain
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'from\s+(?:sqlalchemy|fastapi|starlette|uvicorn|alembic|boto3|botocore|redis|celery|httpx|requests)\b'
+      file_key: content
+  - type: engineering_judge
+    field: architecture_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review this domain-layer Python file for hexagonal architecture compliance.
+        The project follows hexagonal (ports & adapters) architecture where:
+        - Domain layer contains business logic, entities, value objects, and port interfaces
+        - Domain MUST NOT depend on infrastructure (no DB, HTTP, file I/O, external services)
+        - Domain MUST NOT import from infrastructure adapters (inbound or outbound)
+        - Each file should have a single clear responsibility (SRP)
+        - Business rules must be expressed in domain terms, not technical terms
+
+        Evaluate:
+        1. IMPORT BOUNDARIES: Does the file import from infrastructure, frameworks, or external libs?
+           Only stdlib and domain-internal imports are acceptable.
+        2. SEPARATION OF CONCERNS: Does each class/function have a single responsibility?
+           Are business rules mixed with I/O, serialization, or transport concerns?
+        3. DOMAIN PURITY: Are business entities free of ORM annotations, HTTP concerns, and serialization logic?
+        4. ABSTRACTIONS: Are dependencies on external services expressed as abstract ports (Protocol/ABC)?
+        5. NAMING: Do names reflect the ubiquitous language of the guarantee/collateral domain?
+        Score 5 only if the file is pure domain code with zero infrastructure leakage.
+      min_score: 3.0
+      file_key: content
+      language: python
+scoring_mode: binary
+pass_threshold: 0.7
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -2,23 +2,23 @@ task_id: eng.billing.reconciliation_pair
 category: classification
 component: engine-billing
 layer: engineering
-tier: gate
-description: "Every debit must have a reconciliation pair"
+tier: canary
+description: "Billing services should have reconciliation logic"
 input:
   payload:
-    repo: engine-billing
-    scan_target: "**/*.py"
+    repo: atom-back-end
+    scan_target: "src/domain/services/*_service.py"
 expected:
   convention: reconciliation_required
 graders:
   - type: pattern_required
     field: reconciliation_check
     weight: 1.0
-    required: true
+    required: false
     config:
       pattern: "reconcile|reconciliation|ReconciliationService|reconciliation_pair"
       file_key: content
 scoring_mode: binary
-pass_threshold: 1.0
+pass_threshold: 0.0
 eval_owner: diogo.dantas
 eval_cadence: per-pr

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 from gbr_eval.harness.models import EvalRun, GraderResult, Layer, TaskResult
-from gbr_eval.harness.runner import cli
+from gbr_eval.harness.runner import EXIT_NO_GO, cli
 
 
 def _make_eval_run(
@@ -456,3 +456,95 @@ class TestCliAnalyze:
         data = json.loads(result.output)
         # weakest_tasks is limited to --top N
         assert len(data["weakest_tasks"]) <= 2
+
+
+# ---------------------------------------------------------------------------
+# Exit code semantics
+# ---------------------------------------------------------------------------
+
+
+class TestExitCodes:
+    def test_exit_code_0_for_passing_suite(self, tmp_path: Path):
+        """Passing eval run returns exit code 0 (EXIT_GO)."""
+        suite_dir = tmp_path / "suite"
+        suite_dir.mkdir()
+        _write_task_yaml(suite_dir, task_id="pass.task")
+        runner = CliRunner()
+        result = runner.invoke(cli, ["run", "--suite", str(suite_dir)])
+        assert result.exit_code == 0
+
+    def test_exit_code_1_for_no_go(self, tmp_path: Path):
+        """Failing eval run returns exit code 1 (EXIT_NO_GO)."""
+        suite_dir = tmp_path / "suite"
+        suite_dir.mkdir()
+        # Task with pass_threshold=0.99 and a pattern that won't match => fail
+        yaml_content = """
+task_id: fail.task
+category: extraction
+component: test
+layer: product
+tier: gate
+
+input:
+  endpoint: /api/v1/extract
+
+expected:
+  cpf: "123.456.789-09"
+
+graders:
+  - type: exact_match
+    field: cpf
+    weight: 1.0
+    required: true
+
+scoring_mode: weighted
+pass_threshold: 0.99
+"""
+        (suite_dir / "fail.yaml").write_text(yaml_content)
+        runner = CliRunner()
+        result = runner.invoke(cli, ["run", "--suite", str(suite_dir)])
+        assert result.exit_code == EXIT_NO_GO
+
+
+# ---------------------------------------------------------------------------
+# Pre-flight validation
+# ---------------------------------------------------------------------------
+
+
+class TestPreflightCheck:
+    def test_preflight_warns_missing_repo(self, tmp_path: Path):
+        """Pre-flight check warns when a repo directory doesn't exist."""
+        suite_dir = tmp_path / "suite"
+        suite_dir.mkdir()
+        yaml_content = """
+task_id: eng.test.check
+category: code_quality
+component: test-repo
+layer: engineering
+tier: gate
+
+input:
+  payload:
+    repo: nonexistent-repo
+    scan_target: "**/*.py"
+
+expected: {}
+
+graders:
+  - type: pattern_required
+    config:
+      pattern: 'import'
+
+scoring_mode: weighted
+pass_threshold: 0.50
+"""
+        (suite_dir / "test.yaml").write_text(yaml_content)
+        code_dir = tmp_path / "code"
+        code_dir.mkdir()
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            ["run", "--suite", str(suite_dir), "--code-dir", str(code_dir)],
+        )
+        # Preflight warning goes to stderr which Click merges into output
+        assert "nonexistent-repo" in result.output
