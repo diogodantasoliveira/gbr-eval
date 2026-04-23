@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from typing import Any
 
@@ -56,6 +57,30 @@ Return ONLY a JSON object with these exact keys:
 
 If the code is not relevant to the rubric (generated file, empty, config-only), \
 set escape_hatch_unknown to true and explain in summary."""
+
+
+_REGEX_SCORE = re.compile(r'"?score"?\s*:\s*(\d+(?:\.\d+)?)')
+_REGEX_SUMMARY = re.compile(r'"?summary"?\s*:\s*"([^"]{1,500})"', re.DOTALL)
+_REGEX_ESCAPE = re.compile(r'"?escape_hatch_unknown"?\s*:\s*(true|false)', re.IGNORECASE)
+
+
+def _regex_fallback_parse(text: str) -> dict[str, Any]:
+    """Last-resort extraction of score/summary via regex when JSON parsing fails."""
+    score_m = _REGEX_SCORE.search(text)
+    if not score_m:
+        raise json.JSONDecodeError("No score found in LLM response", text[:200], 0)
+    result: dict[str, Any] = {"score": float(score_m.group(1)), "findings": []}
+    summary_m = _REGEX_SUMMARY.search(text)
+    if summary_m:
+        result["summary"] = summary_m.group(1)
+    else:
+        result["summary"] = "[parsed via regex fallback]"
+    escape_m = _REGEX_ESCAPE.search(text)
+    if escape_m:
+        result["escape_hatch_unknown"] = escape_m.group(1).lower() == "true"
+    else:
+        result["escape_hatch_unknown"] = False
+    return result
 
 
 def _truncate_code(code: str, max_chars: int = _MAX_CODE_CHARS) -> str:
@@ -218,8 +243,12 @@ class EngineeringJudge:
             if not text_blocks:
                 raise ValueError("No text block in LLM response")
 
-            response_text = _extract_json(text_blocks[0].text)
-            result = json.loads(response_text)
+            raw_response = text_blocks[0].text
+            response_text = _extract_json(raw_response)
+            try:
+                result = json.loads(response_text)
+            except json.JSONDecodeError:
+                result = _regex_fallback_parse(raw_response)
 
             if result.get("escape_hatch_unknown"):
                 return GraderResult(

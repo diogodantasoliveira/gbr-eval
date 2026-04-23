@@ -528,3 +528,51 @@ class TestExtractJson:
         parsed = json.loads(result)
         assert "first" in parsed
         assert "second" not in parsed
+
+    def test_extract_json_targeted_score_key(self):
+        """When prose contains non-score braces, targeted {"score" search finds the right object."""
+        text = 'The code uses patterns like {color: "red"} for styling.\n\n{"score": 4, "summary": "ok", "findings": []}'
+        result = _extract_json(text)
+        parsed = json.loads(result)
+        assert parsed["score"] == 4
+
+    def test_extract_json_unquoted_keys_after_score_search(self):
+        """Targeted search + repair: {score: 4} preceded by prose with braces."""
+        text = 'Uses {display: flex} CSS.\n\n{"score": 3, "summary": "decent", "findings": []}'
+        result = _extract_json(text)
+        parsed = json.loads(result)
+        assert parsed["score"] == 3
+
+
+# ---------------------------------------------------------------------------
+# Regex fallback parsing
+# ---------------------------------------------------------------------------
+
+
+class TestRegexFallbackParse:
+    def test_regex_fallback_on_malformed_json(self):
+        """When JSON parsing fails, regex fallback extracts score from raw text."""
+        from anthropic.types import TextBlock
+
+        spec = _make_spec(config={"min_score": 3.0})
+        malformed = 'Here is my review:\n{score: 4, summary: "Good code", findings: [], escape_hatch_unknown: false}'
+        message = MagicMock()
+        message.content = [TextBlock(type="text", text=malformed)]
+        result, _ = _mock_grade(
+            EngineeringJudge(), {"content": "x"}, {}, spec, message
+        )
+        assert result.passed
+        assert result.score == pytest.approx(0.75)
+
+    def test_regex_fallback_no_score_errors(self):
+        """If not even regex can find a score, error is raised."""
+        from anthropic.types import TextBlock
+
+        spec = _make_spec()
+        message = MagicMock()
+        message.content = [TextBlock(type="text", text="Totally invalid response with no numbers")]
+        result, _ = _mock_grade(
+            EngineeringJudge(), {"content": "x"}, {}, spec, message
+        )
+        assert not result.passed
+        assert result.error is not None

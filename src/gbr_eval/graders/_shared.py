@@ -126,13 +126,17 @@ def _repair_json(text: str) -> str:
     return text
 
 
+_SCORE_KEY_RE = re.compile(r'\{\s*"score"')
+
+
 def _extract_json(text: str) -> str:
     """Extract JSON object from LLM response text, handling mixed prose+JSON.
 
     Strategies attempted in order:
     1. Direct parse after stripping markdown fences.
-    2. String-aware brace matching to locate the outermost object.
-    3. JSON repair (unquoted keys, single quotes, trailing commas).
+    2. Targeted search for ``{"score"`` — the expected LLM response pattern.
+    3. String-aware brace matching to locate the outermost object.
+    4. JSON repair (unquoted keys, single quotes, trailing commas).
     """
     cleaned = _strip_markdown_fence(text)
     try:
@@ -140,6 +144,21 @@ def _extract_json(text: str) -> str:
         return cleaned
     except (json.JSONDecodeError, ValueError):
         pass
+
+    # Targeted: find the JSON object that starts with "score" key.
+    m = _SCORE_KEY_RE.search(cleaned)
+    if m:
+        targeted = _find_json_object(cleaned[m.start():])
+        try:
+            json.loads(targeted)
+            return targeted
+        except (json.JSONDecodeError, ValueError):
+            repaired_t = _repair_json(targeted)
+            try:
+                json.loads(repaired_t)
+                return repaired_t
+            except (json.JSONDecodeError, ValueError):
+                pass
 
     candidate = _find_json_object(cleaned)
     try:

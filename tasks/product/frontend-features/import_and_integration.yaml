@@ -14,30 +14,23 @@ expected:
   convention: import_integration_features
 
 graders:
-  - type: pattern_required
-    field: has_webhook_endpoint
-    weight: 1.0
-    required: true
-    config:
-      pattern: 'webhook'
-      file_key: content
-      severity: high
-
   - type: engineering_judge
     field: integration_review
     weight: 1.0
-    required: false
+    required: true
     config:
       rubric: |
-        Review this API route for CI/CD integration quality in an eval framework.
+        Review these API routes for CI/CD integration and run import quality in an eval framework.
         Evaluate:
-        1. WEBHOOK SECURITY: Is the webhook endpoint authenticated (bearer token, HMAC signature, or similar)?
-        2. PAYLOAD VALIDATION: Is the incoming run payload validated with a schema (Zod) before processing?
-        3. DUPLICATE HANDLING: Does the import logic handle duplicate run_ids gracefully (409 Conflict)?
-        4. ERROR RESPONSES: Are validation errors returned with useful details (400/422 with field-level errors)?
-        5. TRANSACTION SAFETY: Is the run + task_results insertion wrapped in a database transaction?
-        Score 5 if all integration patterns are robust.
-      min_score: 3.0
+        1. WEBHOOK ENDPOINT: Does a dedicated webhook route exist for CI/CD run ingestion?
+        2. WEBHOOK SECURITY: Is the webhook endpoint authenticated (bearer token, HMAC signature, or similar)?
+        3. PAYLOAD VALIDATION: Is the incoming run payload validated with a schema (Zod) before processing?
+        4. DUPLICATE HANDLING: Does the import logic handle duplicate run_ids gracefully (409 Conflict)?
+        5. ERROR RESPONSES: Are validation errors returned with useful details (400/422 with field-level errors)?
+        6. TRANSACTION SAFETY: Is the run + task_results insertion wrapped in a database transaction?
+        7. RUN IMPORT: Can users upload/import JSON eval runs via the UI (not just webhook)?
+        Score 5 if all 7 patterns are robust, 3 if basic import + webhook exist but lack security/validation.
+      min_score: 2.0
       file_key: content
       language: typescript
 

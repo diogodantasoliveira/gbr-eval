@@ -33,6 +33,7 @@ graders:
       file_key: content
       language: typescript
 
+evaluation_mode: holistic
 scoring_mode: weighted
 pass_threshold: 0.6
 eval_owner: diogo.dantas
