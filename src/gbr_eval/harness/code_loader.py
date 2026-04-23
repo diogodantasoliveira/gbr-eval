@@ -36,6 +36,7 @@ _MAX_FILES = 10_000
 _DEFAULT_EXCLUDE_DIRS = frozenset({
     "node_modules", ".next", "dist", "build", "__pycache__",
     ".git", ".venv", "venv", ".tox", "coverage", ".nyc_output",
+    ".claude", ".omc",
 })
 
 

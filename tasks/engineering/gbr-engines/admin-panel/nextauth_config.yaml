@@ -1,0 +1,31 @@
+task_id: eng.gbr_admin_panel.nextauth_security
+category: convention
+component: gbr-admin-panel
+layer: engineering
+tier: gate
+description: "Admin Panel deve usar NextAuth com configuração segura"
+input:
+  payload:
+    repo: services/admin-panel
+    scan_target: "apps/web/src/lib/auth.ts"
+expected:
+  convention: nextauth_secure
+graders:
+  - type: pattern_required
+    field: has_session_strategy
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'strategy.*jwt|jwt.*strategy'
+      file_key: content
+  - type: pattern_required
+    field: has_domain_whitelist
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'garantiabr\.com|allowedDomains|domainWhitelist'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

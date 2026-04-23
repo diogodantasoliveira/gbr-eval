@@ -1,0 +1,31 @@
+task_id: eng.gbr_frontend.permission_gate
+category: convention
+component: gbr-frontend
+layer: engineering
+tier: gate
+description: "Frontend deve implementar PermissionGate component para controle de acesso"
+input:
+  payload:
+    repo: services/frontend
+    scan_target: "apps/web/src/components/providers/permission-gate.tsx"
+expected:
+  convention: permission_gate
+graders:
+  - type: pattern_required
+    field: has_permission_gate
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'PermissionGate'
+      file_key: content
+  - type: pattern_required
+    field: has_permissions_hook
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'usePermissions|hasMinRole|can\('
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

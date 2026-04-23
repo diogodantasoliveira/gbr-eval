@@ -1,0 +1,24 @@
+task_id: eng.gbr_shared.structured_logging
+category: convention
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Serviços devem usar structlog para logging estruturado"
+input:
+  payload:
+    repo: services
+    scan_target: "*/app/main.py"
+expected:
+  convention: structured_logging
+graders:
+  - type: pattern_required
+    field: has_structlog
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'structlog|structured.*log|setup_logging'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

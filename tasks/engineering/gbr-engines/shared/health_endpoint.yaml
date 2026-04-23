@@ -1,0 +1,24 @@
+task_id: eng.gbr_shared.health_endpoint
+category: convention
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Todos os serviços devem expor endpoint /health"
+input:
+  payload:
+    repo: services
+    scan_target: "*/app/main.py"
+expected:
+  convention: health_endpoint
+graders:
+  - type: pattern_required
+    field: has_health_route
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'health|/health'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr
