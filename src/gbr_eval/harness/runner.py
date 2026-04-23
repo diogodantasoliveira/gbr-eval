@@ -650,6 +650,19 @@ def _resolve_git_sha(code_dir: Path, repo: str | None = None) -> str | None:
         return None
 
 
+def _resolve_git_branch(code_dir: Path, repo: str | None = None) -> str | None:
+    target = code_dir / repo if repo else code_dir
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True, text=True, cwd=target,
+        )
+        branch = result.stdout.strip() if result.returncode == 0 else None
+        return branch if branch and branch != "HEAD" else None
+    except OSError:
+        return None
+
+
 def _run_code_eval(
     suite: Path | None,
     task_path: Path | None,
@@ -678,6 +691,12 @@ def _run_code_eval(
             base_branch=base_branch,
             use_funnel=use_funnel, on_progress=on_progress,
         )
+        _branch = _resolve_git_branch(code_dir, repo_name)
+        _meta: dict[str, Any] = {"code_dir": code_dir.name}
+        if repo_name:
+            _meta["repo"] = repo_name
+        if _branch:
+            _meta["branch"] = _branch
         return EvalRun(
             run_id=str(uuid.uuid4()),
             layer=task.layer,
@@ -688,6 +707,7 @@ def _run_code_eval(
             task_results=[result],
             overall_score=result.score,
             finished_at=datetime.now(UTC),
+            metadata=_meta,
             git_sha=_resolve_git_sha(code_dir, repo_name),
         )
     assert suite is not None

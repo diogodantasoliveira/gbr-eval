@@ -24,7 +24,7 @@ from gbr_eval.harness.models import (
     Tier,
 )
 from gbr_eval.harness.regression import classify_gate
-from gbr_eval.harness.runner import _compute_score, _resolve_git_sha, load_tasks_from_dir
+from gbr_eval.harness.runner import _compute_score, _resolve_git_branch, _resolve_git_sha, load_tasks_from_dir
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -416,13 +416,20 @@ def run_engineering_suite(
     }
     first_repo = sorted(repos)[0] if repos else None
     git_sha = _resolve_git_sha(code_dir, first_repo)
+    first_repo_str = first_repo if first_repo else None
+    branch = _resolve_git_branch(code_dir, first_repo_str)
+    meta: dict[str, Any] = {"code_dir": code_dir.name}
+    if first_repo_str:
+        meta["repo"] = first_repo_str
+    if branch:
+        meta["branch"] = branch
 
     run = EvalRun(
         run_id=str(uuid.uuid4()),
         layer=effective_layer,
         tier=tier,
         tasks_total=len(tasks),
-        metadata={"code_dir": code_dir.name},
+        metadata=meta,
         git_sha=git_sha,
     )
 
