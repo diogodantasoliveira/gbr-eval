@@ -1,0 +1,33 @@
+task_id: eng.gbr_atom.no_stack_leak
+category: classification
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "Respostas de erro não devem vazar stack traces ou detalhes internos"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/api/**/*.py"
+expected:
+  convention: no_info_leak
+graders:
+  - type: pattern_forbidden
+    field: no_traceback_in_response
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'traceback\.format_exc\(\)|traceback\.print_exc\(\)'
+      file_key: content
+      severity: critical
+  - type: pattern_forbidden
+    field: no_str_exc_in_response
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'detail\s*=\s*str\((?:exc|err|e|error)\)'
+      file_key: content
+      severity: high
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

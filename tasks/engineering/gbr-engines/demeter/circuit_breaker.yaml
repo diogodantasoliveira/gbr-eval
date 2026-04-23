@@ -1,0 +1,31 @@
+task_id: eng.gbr_demeter.circuit_breaker
+category: convention
+component: gbr-demeter
+layer: engineering
+tier: gate
+description: "Engine client deve ter circuit breaker para resiliência"
+input:
+  payload:
+    repo: services/demeter
+    scan_target: "app/services/engine_client.py"
+expected:
+  convention: circuit_breaker_present
+graders:
+  - type: pattern_required
+    field: has_circuit_breaker
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'CircuitBreaker|circuit_breaker|get_breaker'
+      file_key: content
+  - type: pattern_required
+    field: has_retry
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'retry|backoff|max_retries'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

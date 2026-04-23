@@ -1,0 +1,24 @@
+task_id: eng.gbr_notifications.auth_enforcement
+category: convention
+component: gbr-notifications
+layer: engineering
+tier: gate
+description: "Rotas Notifications devem ter auth dependency"
+input:
+  payload:
+    repo: services/notifications
+    scan_target: "app/api/routes.py"
+expected:
+  convention: auth_enforced
+graders:
+  - type: pattern_required
+    field: has_auth_dep
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'verify_service_key|CurrentUser|AdminUser|require_roles|Depends'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.80
+eval_owner: diogo.dantas
+eval_cadence: per-pr

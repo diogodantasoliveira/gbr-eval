@@ -1,0 +1,24 @@
+task_id: eng.gbr_hitl.rls_tenant_context
+category: tenant_isolation
+component: gbr-hitl
+layer: engineering
+tier: gate
+description: "Dependency de DB deve configurar RLS context com tenant_id"
+input:
+  payload:
+    repo: services/hitl
+    scan_target: "app/core/deps.py"
+expected:
+  convention: rls_context_set
+graders:
+  - type: pattern_required
+    field: sets_tenant_context
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'set_tenant_context'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

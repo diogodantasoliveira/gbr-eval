@@ -1,0 +1,24 @@
+task_id: eng.gbr_billing.no_float_money
+category: convention
+component: gbr-billing
+layer: engineering
+tier: gate
+description: "Billing nunca deve usar float para valores monetários — sempre Decimal"
+input:
+  payload:
+    repo: services/billing
+    scan_target: "app/models/*.py"
+expected:
+  convention: decimal_for_money
+graders:
+  - type: pattern_required
+    field: uses_decimal
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'Decimal|DECIMAL|Numeric'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.70
+eval_owner: diogo.dantas
+eval_cadence: per-pr

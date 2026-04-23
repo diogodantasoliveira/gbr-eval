@@ -1,0 +1,24 @@
+task_id: eng.gbr_atom.route_auth_enforcement
+category: tenant_isolation
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "Toda route de dados deve ter dependency de auth — CurrentUser, AdminUser, AnalystUser, ManagerUser ou verify_service_key"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/api/**/*.py"
+expected:
+  convention: routes_authenticated
+graders:
+  - type: pattern_required
+    field: has_auth_dependency
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'CurrentUser|AdminUser|AnalystUser|ManagerUser|verify_service_key|get_current_user|require_roles'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.70
+eval_owner: diogo.dantas
+eval_cadence: per-pr

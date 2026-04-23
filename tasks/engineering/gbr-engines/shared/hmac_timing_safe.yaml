@@ -1,0 +1,24 @@
+task_id: eng.gbr_shared.hmac_timing_safe
+category: classification
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Comparação de HMAC/signatures deve usar hmac.compare_digest (timing-safe)"
+input:
+  payload:
+    repo: shared
+    scan_target: "auth/service_auth.py"
+expected:
+  convention: timing_safe_comparison
+graders:
+  - type: pattern_required
+    field: uses_compare_digest
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'hmac\.compare_digest'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

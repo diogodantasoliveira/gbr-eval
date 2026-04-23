@@ -1,0 +1,31 @@
+task_id: eng.gbr_ai_engine.llm_retry_backoff
+category: convention
+component: gbr-ai-engine
+layer: engineering
+tier: gate
+description: "LLM client deve ter retry com backoff exponencial para rate limits"
+input:
+  payload:
+    repo: services/ai-engine
+    scan_target: "app/services/llm_client.py"
+expected:
+  convention: retry_with_backoff
+graders:
+  - type: pattern_required
+    field: has_retry_loop
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'max_retries|retry|attempt'
+      file_key: content
+  - type: pattern_required
+    field: has_backoff
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'backoff|2\s*\*\*\s*attempt|exponential'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -1,0 +1,32 @@
+task_id: eng.gbr_atom.pydantic_validation
+category: convention
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "Schemas de request/response devem usar Pydantic BaseModel"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/schemas/*.py"
+expected:
+  convention: pydantic_schemas
+graders:
+  - type: pattern_required
+    field: uses_base_model
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'class\s+\w+\(.*BaseModel'
+      file_key: content
+  - type: pattern_forbidden
+    field: no_raw_dict_schema
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'class\s+\w+\(.*TypedDict'
+      file_key: content
+      severity: medium
+scoring_mode: weighted
+pass_threshold: 0.80
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -1,0 +1,31 @@
+task_id: eng.gbr_integrations.hexagonal_port
+category: convention
+component: gbr-integrations
+layer: engineering
+tier: gate
+description: "Adapters devem implementar IntegrationPort (hexagonal architecture)"
+input:
+  payload:
+    repo: services/integrations
+    scan_target: "app/ports/integration_port.py"
+expected:
+  convention: hexagonal_port_defined
+graders:
+  - type: pattern_required
+    field: has_port_interface
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'class.*Port|Protocol|ABC'
+      file_key: content
+  - type: pattern_required
+    field: has_execute_method
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'def execute|async def execute|def query|async def query'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

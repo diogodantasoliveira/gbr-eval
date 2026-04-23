@@ -1,0 +1,32 @@
+task_id: eng.gbr_shared.rls_parameterized
+category: tenant_isolation
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "RLS usa bind parameters — nunca interpolação de string para tenant_id em SQL"
+input:
+  payload:
+    repo: shared
+    scan_target: "auth/rls.py"
+expected:
+  convention: rls_bind_params
+graders:
+  - type: pattern_required
+    field: uses_bind_param
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'set_config.*:tid|execute\(.*text\(.*:tid'
+      file_key: content
+  - type: pattern_forbidden
+    field: no_fstring_sql
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'f["\x27].*(?:SET\s+LOCAL|set_config).*\{tenant'
+      file_key: content
+      severity: critical
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

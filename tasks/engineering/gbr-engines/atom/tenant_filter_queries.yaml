@@ -1,0 +1,24 @@
+task_id: eng.gbr_atom.tenant_filter_queries
+category: tenant_isolation
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "Queries de dados devem filtrar por tenant_id — isolamento multi-tenant"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/api/**/*.py"
+expected:
+  convention: tenant_filtered_queries
+graders:
+  - type: pattern_required
+    field: has_tenant_filter
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'tenant_id|TenantId|DBPublic'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.70
+eval_owner: diogo.dantas
+eval_cadence: per-pr

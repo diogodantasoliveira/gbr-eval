@@ -1,0 +1,24 @@
+task_id: eng.gbr_billing.auth_enforcement
+category: convention
+component: gbr-billing
+layer: engineering
+tier: gate
+description: "Rotas billing devem usar verify_service_key, CurrentUser ou AdminUser para auth"
+input:
+  payload:
+    repo: services/billing
+    scan_target: "app/api/usage_v2_routes.py"
+expected:
+  convention: auth_enforced
+graders:
+  - type: pattern_required
+    field: has_auth_dep
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'verify_service_key|CurrentUser|AdminUser|require_roles'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

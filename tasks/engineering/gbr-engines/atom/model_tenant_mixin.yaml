@@ -1,0 +1,24 @@
+task_id: eng.gbr_atom.model_tenant_mixin
+category: tenant_isolation
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "Models de dados devem ter tenant_id — via TenantMixin ou campo explícito"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/models/**/*.py"
+expected:
+  convention: tenant_aware_models
+graders:
+  - type: pattern_required
+    field: has_tenant_field
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'TenantMixin|tenant_id'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.70
+eval_owner: diogo.dantas
+eval_cadence: per-pr

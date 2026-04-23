@@ -1,0 +1,25 @@
+task_id: eng.gbr_atom.no_bare_except
+category: code_quality
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "Bare except (sem tipo de exceção) é proibido — captura SystemExit e KeyboardInterrupt"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/**/*.py"
+expected:
+  convention: typed_exceptions
+graders:
+  - type: pattern_forbidden
+    field: no_bare_except
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'except\s*:'
+      file_key: content
+      severity: high
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

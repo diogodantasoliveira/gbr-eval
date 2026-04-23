@@ -1,0 +1,31 @@
+task_id: eng.gbr_integrations.circuit_breaker
+category: convention
+component: gbr-integrations
+layer: engineering
+tier: gate
+description: "Query service deve ter circuit breaker por provider"
+input:
+  payload:
+    repo: services/integrations
+    scan_target: "app/services/query_service.py"
+expected:
+  convention: circuit_breaker_present
+graders:
+  - type: pattern_required
+    field: has_circuit_breaker
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'CircuitBreaker|circuit_breaker|get_breaker'
+      file_key: content
+  - type: pattern_required
+    field: has_cache
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'cache_key|sha256|_cache_key'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

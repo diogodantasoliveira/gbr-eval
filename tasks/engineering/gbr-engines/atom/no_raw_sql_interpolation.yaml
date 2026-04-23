@@ -1,0 +1,41 @@
+task_id: eng.gbr_atom.no_raw_sql_interpolation
+category: classification
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "SQL queries nunca devem usar f-string ou .format() — sempre bind parameters"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/**/*.py"
+expected:
+  convention: parameterized_sql
+graders:
+  - type: pattern_forbidden
+    field: no_fstring_sql
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'f["\x27](?:SELECT|INSERT|UPDATE|DELETE|ALTER|DROP|CREATE)\s'
+      file_key: content
+      severity: critical
+  - type: pattern_forbidden
+    field: no_format_sql
+    weight: 1.0
+    required: false
+    config:
+      pattern: '["\x27](?:SELECT|INSERT|UPDATE|DELETE)\s.*\.format\('
+      file_key: content
+      severity: critical
+  - type: pattern_forbidden
+    field: no_percent_sql
+    weight: 1.0
+    required: false
+    config:
+      pattern: '["\x27](?:SELECT|INSERT|UPDATE|DELETE)\s.*%\s*\('
+      file_key: content
+      severity: critical
+scoring_mode: weighted
+pass_threshold: 0.95
+eval_owner: diogo.dantas
+eval_cadence: per-pr

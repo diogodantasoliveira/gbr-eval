@@ -1,0 +1,31 @@
+task_id: eng.gbr_ai_engine.ssrf_protection
+category: classification
+component: gbr-ai-engine
+layer: engineering
+tier: gate
+description: "Ingest endpoint deve ter proteção SSRF — validar scheme, host, IP ranges"
+input:
+  payload:
+    repo: services/ai-engine
+    scan_target: "app/api/routes_ingest.py"
+expected:
+  convention: ssrf_protected
+graders:
+  - type: pattern_required
+    field: validates_scheme
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'scheme.*https|https.*scheme'
+      file_key: content
+  - type: pattern_required
+    field: validates_ip_ranges
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'is_private|is_loopback|is_link_local|is_reserved'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

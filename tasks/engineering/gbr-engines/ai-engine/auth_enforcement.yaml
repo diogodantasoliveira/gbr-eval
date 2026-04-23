@@ -1,0 +1,24 @@
+task_id: eng.gbr_ai_engine.auth_enforcement
+category: tenant_isolation
+component: gbr-ai-engine
+layer: engineering
+tier: gate
+description: "Todas as routes do ai-engine devem usar verify_service_key (M2M auth)"
+input:
+  payload:
+    repo: services/ai-engine
+    scan_target: "app/api/routes*.py"
+expected:
+  convention: service_auth_enforced
+graders:
+  - type: pattern_required
+    field: has_service_auth
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'verify_service_key|service_auth|CurrentUser|AdminUser'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.70
+eval_owner: diogo.dantas
+eval_cadence: per-pr

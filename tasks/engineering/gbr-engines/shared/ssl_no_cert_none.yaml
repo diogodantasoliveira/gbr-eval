@@ -1,0 +1,33 @@
+task_id: eng.gbr_shared.ssl_no_cert_none
+category: classification
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "SSL nunca deve desabilitar verificação de certificado"
+input:
+  payload:
+    repo: shared
+    scan_target: "**/*.py"
+expected:
+  convention: ssl_cert_verification
+graders:
+  - type: pattern_forbidden
+    field: no_cert_none
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'ssl\.CERT_NONE'
+      file_key: content
+      severity: critical
+  - type: pattern_forbidden
+    field: no_verify_false
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'verify\s*=\s*False'
+      file_key: content
+      severity: high
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

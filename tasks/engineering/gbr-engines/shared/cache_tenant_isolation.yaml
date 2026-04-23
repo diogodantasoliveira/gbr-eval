@@ -1,0 +1,32 @@
+task_id: eng.gbr_shared.cache_tenant_isolation
+category: tenant_isolation
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Cache keys devem incluir tenant_id para isolamento multi-tenant"
+input:
+  payload:
+    repo: shared
+    scan_target: "cache/keys.py"
+expected:
+  convention: cache_tenant_scoped
+graders:
+  - type: pattern_required
+    field: tenant_in_cache_key
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'tenant_id'
+      file_key: content
+  - type: pattern_forbidden
+    field: no_global_cache_key
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'cache_key\s*=\s*f?["\x27][^"\x27]*["\x27]\s*$'
+      file_key: content
+      severity: high
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

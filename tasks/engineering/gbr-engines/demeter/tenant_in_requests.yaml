@@ -1,0 +1,24 @@
+task_id: eng.gbr_demeter.tenant_in_requests
+category: tenant_isolation
+component: gbr-demeter
+layer: engineering
+tier: gate
+description: "Schemas de request Demeter devem incluir tenant_id"
+input:
+  payload:
+    repo: services/demeter
+    scan_target: "app/api/schemas.py"
+expected:
+  convention: tenant_in_requests
+graders:
+  - type: pattern_required
+    field: has_tenant_id
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'tenant_id'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

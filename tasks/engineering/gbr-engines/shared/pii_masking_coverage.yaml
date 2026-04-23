@@ -1,0 +1,45 @@
+task_id: eng.gbr_shared.pii_masking_coverage
+category: convention
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Masking de PII deve cobrir CPF, CNPJ, email, password, token"
+input:
+  payload:
+    repo: shared
+    scan_target: "observability/masking.py"
+expected:
+  convention: pii_masking_complete
+graders:
+  - type: pattern_required
+    field: masks_cpf
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'cpf'
+      file_key: content
+  - type: pattern_required
+    field: masks_cnpj
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'cnpj'
+      file_key: content
+  - type: pattern_required
+    field: masks_password
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'password|senha'
+      file_key: content
+  - type: pattern_required
+    field: masks_token
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'token'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

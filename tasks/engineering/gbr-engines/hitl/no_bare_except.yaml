@@ -1,0 +1,25 @@
+task_id: eng.gbr_hitl.no_bare_except
+category: convention
+component: gbr-hitl
+layer: engineering
+tier: gate
+description: "HITL service não deve usar bare except sem tipo de exceção"
+input:
+  payload:
+    repo: services/hitl
+    scan_target: "app/**/*.py"
+expected:
+  convention: no_bare_except
+graders:
+  - type: pattern_forbidden
+    field: no_bare_except
+    weight: 1.0
+    required: false
+    config:
+      pattern: '^\s*except\s*:'
+      file_key: content
+      severity: warning
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

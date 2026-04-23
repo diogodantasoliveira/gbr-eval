@@ -1,0 +1,24 @@
+task_id: eng.gbr_document_vault.model_tenant_mixin
+category: tenant_isolation
+component: gbr-document-vault
+layer: engineering
+tier: gate
+description: "Modelos ORM devem ter TenantMixin para tenant_id"
+input:
+  payload:
+    repo: services/document-vault
+    scan_target: "app/models/archived_doc_orm.py"
+expected:
+  convention: tenant_mixin_used
+graders:
+  - type: pattern_required
+    field: has_tenant_mixin
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'TenantMixin|tenant_id'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -1,0 +1,25 @@
+task_id: eng.gbr_reporting.no_bare_except
+category: convention
+component: gbr-reporting
+layer: engineering
+tier: gate
+description: "Reporting service não deve usar bare except sem tipo de exceção"
+input:
+  payload:
+    repo: services/reporting
+    scan_target: "app/**/*.py"
+expected:
+  convention: no_bare_except
+graders:
+  - type: pattern_forbidden
+    field: no_bare_except
+    weight: 1.0
+    required: false
+    config:
+      pattern: '^\s*except\s*:'
+      file_key: content
+      severity: warning
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr
