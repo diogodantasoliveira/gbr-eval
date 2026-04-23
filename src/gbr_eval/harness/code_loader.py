@@ -230,11 +230,14 @@ def run_task_holistic(
     all_results = det_results + llm_results
     duration_ms = (time.monotonic() - start) * 1000
 
-    # LLM score is the primary score for holistic mode.
-    if llm_results:
+    if llm_results and det_results:
+        # Holistic combined: aggregate deterministic into one score, average with LLM.
+        det_score = sum(1.0 for r in det_results if r.passed) / len(det_results)
+        llm_score = sum(r.score * r.weight for r in llm_results) / sum(r.weight for r in llm_results)
+        score = (det_score + llm_score) / 2.0
+    elif llm_results:
         score = llm_results[0].score
     else:
-        # No LLM graders -- fall back to deterministic conformance ratio.
         score = sum(1.0 for r in det_results if r.passed) / len(det_results) if det_results else 0.0
 
     # Required deterministic failure vetoes the holistic score.
