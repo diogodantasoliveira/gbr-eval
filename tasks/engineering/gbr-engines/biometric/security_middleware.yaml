@@ -1,0 +1,31 @@
+task_id: eng.gbr_biometric.security_middleware
+category: convention
+component: gbr-biometric
+layer: engineering
+tier: gate
+description: "Biometric service deve ter ErrorHandler e SecurityHeaders middleware"
+input:
+  payload:
+    repo: services/biometric
+    scan_target: "app/main.py"
+expected:
+  convention: middleware_stack
+graders:
+  - type: pattern_required
+    field: has_error_handler
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'ErrorHandlerMiddleware'
+      file_key: content
+  - type: pattern_required
+    field: has_security_headers
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'SecurityHeadersMiddleware'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -38,4 +38,4 @@ results/
 !tasks/**/*.jsonl
 !runs/*.json
 
-frontend/
+/frontend/

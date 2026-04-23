@@ -1,0 +1,24 @@
+task_id: eng.gbr_admin_panel.bff_auth
+category: convention
+component: gbr-admin-panel
+layer: engineering
+tier: gate
+description: "Admin BFF routes devem usar session-aware auth"
+input:
+  payload:
+    repo: services/admin-panel
+    scan_target: "apps/web/src/app/api/**/*.ts"
+expected:
+  convention: bff_auth_enforced
+graders:
+  - type: pattern_required
+    field: has_auth_import
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'bff-auth|getServiceHeaders|auth\(\)|getServerSession'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

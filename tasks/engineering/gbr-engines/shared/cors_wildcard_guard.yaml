@@ -1,0 +1,24 @@
+task_id: eng.gbr_shared.cors_wildcard_guard
+category: convention
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Todos os serviços devem recusar CORS_ORIGINS=* em produção"
+input:
+  payload:
+    repo: services
+    scan_target: "*/app/main.py"
+expected:
+  convention: cors_prod_guard
+graders:
+  - type: pattern_required
+    field: has_cors_wildcard_guard
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'CORS_ORIGINS.*forbidden.*production|forbidden.*production.*CORS'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

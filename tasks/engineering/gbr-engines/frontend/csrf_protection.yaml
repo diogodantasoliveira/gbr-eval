@@ -1,0 +1,24 @@
+task_id: eng.gbr_frontend.csrf_protection
+category: convention
+component: gbr-frontend
+layer: engineering
+tier: gate
+description: "Frontend middleware deve validar Origin/Referer em mutations"
+input:
+  payload:
+    repo: services/frontend
+    scan_target: "apps/web/src/middleware.ts"
+expected:
+  convention: csrf_enforced
+graders:
+  - type: pattern_required
+    field: has_csrf_origin_check
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'origin|referer'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

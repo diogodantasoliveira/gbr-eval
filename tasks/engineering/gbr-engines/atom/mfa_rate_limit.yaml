@@ -1,0 +1,38 @@
+task_id: eng.gbr_atom.mfa_rate_limit
+category: convention
+component: gbr-atom
+layer: engineering
+tier: gate
+description: "Endpoints de MFA e login devem ter rate limiting por endpoint"
+input:
+  payload:
+    repo: services/atom
+    scan_target: "app/main.py"
+expected:
+  convention: mfa_rate_limited
+graders:
+  - type: pattern_required
+    field: has_mfa_validate_limit
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'mfa/validate'
+      file_key: content
+  - type: pattern_required
+    field: has_login_limit
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'auth/login'
+      file_key: content
+  - type: pattern_required
+    field: has_backup_code_limit
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'backup-code'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

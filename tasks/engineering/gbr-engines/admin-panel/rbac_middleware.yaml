@@ -1,0 +1,24 @@
+task_id: eng.gbr_admin_panel.rbac_middleware
+category: convention
+component: gbr-admin-panel
+layer: engineering
+tier: gate
+description: "Admin Panel middleware deve enforçar RBAC por rota"
+input:
+  payload:
+    repo: services/admin-panel
+    scan_target: "apps/web/src/middleware.ts"
+expected:
+  convention: rbac_enforced
+graders:
+  - type: pattern_required
+    field: has_role_check
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'ADMIN_ROUTE_PERMISSIONS|ROUTE_PERMISSIONS|role|weight'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

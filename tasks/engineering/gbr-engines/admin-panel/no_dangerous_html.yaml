@@ -1,0 +1,25 @@
+task_id: eng.gbr_admin_panel.no_dangerous_html
+category: classification
+component: gbr-admin-panel
+layer: engineering
+tier: gate
+description: "Frontend deve minimizar uso de dangerouslySetInnerHTML"
+input:
+  payload:
+    repo: services/admin-panel
+    scan_target: "apps/web/src/components/**/*.tsx"
+expected:
+  convention: no_xss_risk
+graders:
+  - type: pattern_forbidden
+    field: no_dangerous_inner_html
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'dangerouslySetInnerHTML'
+      file_key: content
+      severity: warning
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

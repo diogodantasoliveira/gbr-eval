@@ -1,0 +1,24 @@
+task_id: eng.gbr_frontend.fetch_timeout
+category: convention
+component: gbr-frontend
+layer: engineering
+tier: gate
+description: "BFF routes devem usar AbortSignal.timeout para evitar hanging requests"
+input:
+  payload:
+    repo: services/frontend
+    scan_target: "apps/web/src/lib/api/bff-utils.ts"
+expected:
+  convention: fetch_timeout
+graders:
+  - type: pattern_required
+    field: has_abort_signal
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'AbortSignal|timeout|signal'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr
