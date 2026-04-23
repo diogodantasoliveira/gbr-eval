@@ -1,0 +1,31 @@
+task_id: eng.gbr_athena.http_timeouts
+category: convention
+component: gbr-athena
+layer: engineering
+tier: gate
+description: "Athena HTTP server deve configurar ReadTimeout e WriteTimeout"
+input:
+  payload:
+    repo: services/athena
+    scan_target: "cmd/main.go"
+expected:
+  convention: http_timeouts
+graders:
+  - type: pattern_required
+    field: has_read_timeout
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'ReadTimeout'
+      file_key: content
+  - type: pattern_required
+    field: has_write_timeout
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'WriteTimeout'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

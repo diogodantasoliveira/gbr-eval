@@ -1,0 +1,31 @@
+task_id: eng.gbr_athena.no_panic_unhandled
+category: convention
+component: gbr-athena
+layer: engineering
+tier: gate
+description: "Athena handler deve ter recover para panics e não expor stack traces"
+input:
+  payload:
+    repo: services/athena
+    scan_target: "internal/handler/router.go"
+expected:
+  convention: no_panic_unhandled
+graders:
+  - type: pattern_forbidden
+    field: no_panic_in_handler
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'panic\('
+      file_key: content
+  - type: pattern_forbidden
+    field: no_stack_trace_response
+    weight: 0.5
+    required: false
+    config:
+      pattern: 'debug\.PrintStack|runtime\.Stack'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

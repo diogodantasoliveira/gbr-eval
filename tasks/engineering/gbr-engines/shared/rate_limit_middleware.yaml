@@ -1,0 +1,24 @@
+task_id: eng.gbr_shared.rate_limit_middleware
+category: convention
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Serviços devem usar RateLimitMiddleware para proteção contra abuso"
+input:
+  payload:
+    repo: services
+    scan_target: "*/app/main.py"
+expected:
+  convention: rate_limit_middleware
+graders:
+  - type: pattern_required
+    field: has_rate_limit
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'RateLimitMiddleware|rate_limit'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

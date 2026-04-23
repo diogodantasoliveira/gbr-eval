@@ -1,0 +1,24 @@
+task_id: eng.gbr_athena.test_coverage
+category: convention
+component: gbr-athena
+layer: engineering
+tier: gate
+description: "Athena deve ter testes para evaluator, handler e store"
+input:
+  payload:
+    repo: services/athena
+    scan_target: "internal/**/*_test.go"
+expected:
+  convention: test_coverage
+graders:
+  - type: pattern_required
+    field: has_test_functions
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'func Test'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

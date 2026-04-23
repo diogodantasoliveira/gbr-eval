@@ -1,0 +1,24 @@
+task_id: eng.gbr_shared.security_headers_middleware
+category: convention
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Serviços devem usar SecurityHeadersMiddleware"
+input:
+  payload:
+    repo: services
+    scan_target: "*/app/main.py"
+expected:
+  convention: security_headers_middleware
+graders:
+  - type: pattern_required
+    field: has_security_headers
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'SecurityHeadersMiddleware'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

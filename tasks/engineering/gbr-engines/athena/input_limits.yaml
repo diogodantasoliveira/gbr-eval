@@ -1,0 +1,38 @@
+task_id: eng.gbr_athena.input_limits
+category: convention
+component: gbr-athena
+layer: engineering
+tier: gate
+description: "Athena evaluator deve impor limites de input (nesting depth, tamanho)"
+input:
+  payload:
+    repo: services/athena
+    scan_target: "internal/engine/evaluator.go"
+expected:
+  convention: input_limits
+graders:
+  - type: pattern_required
+    field: has_max_nesting
+    weight: 0.34
+    required: false
+    config:
+      pattern: 'MaxNestingDepth|maxNestingDepth|max_nesting'
+      file_key: content
+  - type: pattern_required
+    field: has_max_bytes
+    weight: 0.33
+    required: false
+    config:
+      pattern: 'MaxConditionBytes|maxConditionBytes|max_condition'
+      file_key: content
+  - type: pattern_required
+    field: has_eval_timeout
+    weight: 0.33
+    required: false
+    config:
+      pattern: 'MaxEvalDuration|maxEvalDuration|deadline|timeout'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -1,0 +1,24 @@
+task_id: eng.gbr_athena.health_endpoint
+category: convention
+component: gbr-athena
+layer: engineering
+tier: gate
+description: "Athena deve expor endpoint /health"
+input:
+  payload:
+    repo: services/athena
+    scan_target: "internal/handler/router.go"
+expected:
+  convention: health_endpoint
+graders:
+  - type: pattern_required
+    field: has_health_route
+    weight: 1.0
+    required: false
+    config:
+      pattern: '/health'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -1,0 +1,24 @@
+task_id: eng.gbr_athena.tenant_validation
+category: convention
+component: gbr-athena
+layer: engineering
+tier: gate
+description: "Athena handler deve validar tenant_id em requests"
+input:
+  payload:
+    repo: services/athena
+    scan_target: "internal/handler/router.go"
+expected:
+  convention: tenant_validation
+graders:
+  - type: pattern_required
+    field: has_tenant_id
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'tenant_id|tenantID|TenantID'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr
