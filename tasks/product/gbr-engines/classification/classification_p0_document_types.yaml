@@ -1,0 +1,27 @@
+task_id: prod.gbr_classification.p0_document_types
+category: classification
+component: gbr-classification
+layer: product
+tier: gate
+description: "Classificador deve reconhecer os 5 tipos P0 de documento"
+input:
+  payload:
+    document_type: "matricula"
+expected:
+  document_type: "matricula"
+graders:
+  - type: set_membership
+    field: document_type
+    weight: 1.0
+    required: false
+    config:
+      valid_values:
+        - matricula
+        - contrato_social
+        - cnd
+        - procuracao
+        - certidao_trabalhista
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

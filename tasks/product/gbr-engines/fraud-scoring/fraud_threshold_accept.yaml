@@ -1,0 +1,23 @@
+task_id: prod.gbr_fraud.threshold_accept
+category: decision
+component: gbr-fraud
+layer: product
+tier: gate
+description: "Fraud score acima do threshold deve resultar em ACCEPT"
+input:
+  payload:
+    computed_score: 0.92
+    threshold: 0.80
+    decision: "ACCEPT"
+expected:
+  decision: "ACCEPT"
+graders:
+  - type: exact_match
+    field: decision
+    weight: 1.0
+    required: false
+    config: {}
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

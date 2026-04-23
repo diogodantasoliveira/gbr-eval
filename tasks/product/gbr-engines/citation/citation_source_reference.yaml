@@ -1,0 +1,34 @@
+task_id: prod.gbr_citation.source_reference
+category: citation
+component: gbr-citation
+layer: product
+tier: gate
+description: "Citações no parecer devem referenciar document_type e page_number"
+input:
+  payload:
+    citation:
+      document_type: "matricula"
+      page_number: 1
+      field_name: "numero_matricula"
+      text: "Matrícula nº 12345"
+expected:
+  citation.document_type_present: true
+  citation.page_number_min: 1
+graders:
+  - type: regex_match
+    field: citation.document_type
+    weight: 0.5
+    required: false
+    config:
+      pattern: '.{3,}'
+  - type: numeric_range
+    field: citation.page_number
+    weight: 0.5
+    required: false
+    config:
+      min: 1
+      max: 9999
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

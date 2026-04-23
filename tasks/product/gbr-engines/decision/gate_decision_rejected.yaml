@@ -1,0 +1,25 @@
+task_id: prod.gbr_decision.gate_decision_rejected
+category: decision
+component: gbr-decision
+layer: product
+tier: gate
+description: "Gate decision: critical non-conforming → REPROVADO independente do score"
+input:
+  payload:
+    score: 0.95
+    critical_nonconforming: 1
+    warnings: 0
+    unverifiable_critical: 0
+    decision: "reprovado"
+expected:
+  decision: "reprovado"
+graders:
+  - type: exact_match
+    field: decision
+    weight: 1.0
+    required: false
+    config: {}
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

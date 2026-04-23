@@ -1,0 +1,43 @@
+task_id: prod.gbr_extraction.cnd_critical_fields
+category: extraction
+component: gbr-extraction
+layer: product
+tier: gate
+description: "Extração de CND deve capturar tipo, número, órgão, validade e status"
+input:
+  payload:
+    campos:
+      tipo: "CND Federal"
+      numero: "ABC12345678"
+      orgao: "Receita Federal"
+      validade: "2026-07-15"
+      status: "NEGATIVA"
+expected:
+  campos.status_valid: true
+  campos.orgao_present: true
+graders:
+  - type: set_membership
+    field: campos.status
+    weight: 0.4
+    required: false
+    config:
+      valid_values:
+        - NEGATIVA
+        - POSITIVA
+        - POSITIVA_COM_EFEITO_NEGATIVA
+  - type: regex_match
+    field: campos.validade
+    weight: 0.3
+    required: false
+    config:
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+  - type: regex_match
+    field: campos.numero
+    weight: 0.3
+    required: false
+    config:
+      pattern: '.{3,}'
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

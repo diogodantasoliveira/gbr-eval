@@ -1,0 +1,46 @@
+task_id: prod.gbr_extraction.procuracao_critical_fields
+category: extraction
+component: gbr-extraction
+layer: product
+tier: gate
+description: "Extração de procuração deve capturar outorgante, outorgado, poderes e validade"
+input:
+  payload:
+    campos:
+      outorgante: "João da Silva"
+      outorgado: "Maria Santos"
+      poderes: "Representar perante órgãos públicos"
+      validade: "2027-01-01"
+      tem_substabelecimento: false
+expected:
+  campos.outorgante_present: true
+  campos.outorgado_present: true
+graders:
+  - type: regex_match
+    field: campos.outorgante
+    weight: 0.3
+    required: false
+    config:
+      pattern: '.{2,}'
+  - type: regex_match
+    field: campos.outorgado
+    weight: 0.3
+    required: false
+    config:
+      pattern: '.{2,}'
+  - type: regex_match
+    field: campos.poderes
+    weight: 0.2
+    required: false
+    config:
+      pattern: '.{5,}'
+  - type: regex_match
+    field: campos.validade
+    weight: 0.2
+    required: false
+    config:
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

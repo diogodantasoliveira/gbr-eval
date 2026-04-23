@@ -1,0 +1,29 @@
+task_id: prod.gbr_data_format.monetary
+category: extraction
+component: gbr-data-format
+layer: product
+tier: gate
+description: "Valores monetários devem ser numéricos (não formatados com R$)"
+input:
+  payload:
+    valor: 1234.56
+    moeda: "BRL"
+expected:
+  moeda: "BRL"
+graders:
+  - type: numeric_range
+    field: valor
+    weight: 0.5
+    required: false
+    config:
+      min: 0
+      max: 999999999999.99
+  - type: exact_match
+    field: moeda
+    weight: 0.5
+    required: false
+    config: {}
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

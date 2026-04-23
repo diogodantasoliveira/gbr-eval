@@ -1,0 +1,28 @@
+task_id: prod.gbr_fraud.score_composition
+category: decision
+component: gbr-fraud
+layer: product
+tier: gate
+description: "Fraud score deve ser soma ponderada de 4 dimensões, determinístico"
+input:
+  payload:
+    face_match: 0.95
+    liveness: 0.80
+    deepfake_detection: 0.92
+    doc_authenticity: 0.88
+    weights: [0.25, 0.25, 0.25, 0.25]
+    computed_score: 0.8875
+expected:
+  computed_score: 0.8875
+graders:
+  - type: numeric_range
+    field: computed_score
+    weight: 1.0
+    required: false
+    config:
+      min: 0.886
+      max: 0.889
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

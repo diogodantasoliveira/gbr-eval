@@ -1,0 +1,23 @@
+task_id: prod.gbr_data_format.date_variants
+category: extraction
+component: gbr-data-format
+layer: product
+tier: gate
+description: "Datas extraídas devem estar em formato ISO ou DD/MM/YYYY"
+input:
+  payload:
+    date_value: "2026-04-23"
+    date_format: "ISO"
+expected:
+  date_format: "ISO"
+graders:
+  - type: regex_match
+    field: date_value
+    weight: 1.0
+    required: false
+    config:
+      pattern: '^\d{4}-\d{2}-\d{2}$|^\d{2}/\d{2}/\d{4}$'
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

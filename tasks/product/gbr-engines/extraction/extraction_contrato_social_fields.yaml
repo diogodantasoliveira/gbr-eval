@@ -1,0 +1,40 @@
+task_id: prod.gbr_extraction.contrato_social_fields
+category: extraction
+component: gbr-extraction
+layer: product
+tier: gate
+description: "Extração de contrato social deve capturar campos críticos obrigatórios"
+input:
+  payload:
+    campos:
+      cnpj: "12345678000199"
+      razao_social: "Empresa Teste Ltda"
+      capital_social: 100000.00
+      poderes: "Administração conjunta"
+expected:
+  campos.cnpj: "12345678000199"
+  campos.razao_social: "Empresa Teste Ltda"
+graders:
+  - type: regex_match
+    field: campos.cnpj
+    weight: 0.35
+    required: false
+    config:
+      pattern: '^\d{14}$'
+  - type: regex_match
+    field: campos.razao_social
+    weight: 0.30
+    required: false
+    config:
+      pattern: '.{2,}'
+  - type: numeric_range
+    field: campos.capital_social
+    weight: 0.35
+    required: false
+    config:
+      min: 0
+      max: 999999999999
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

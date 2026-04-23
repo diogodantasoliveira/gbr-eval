@@ -1,0 +1,25 @@
+task_id: prod.gbr_decision.gate_decision_inconclusive
+category: decision
+component: gbr-decision
+layer: product
+tier: gate
+description: "Gate decision: >= 3 critical fields não verificáveis → INCONCLUSIVO"
+input:
+  payload:
+    score: 0.85
+    critical_nonconforming: 0
+    warnings: 0
+    unverifiable_critical: 3
+    decision: "inconclusivo"
+expected:
+  decision: "inconclusivo"
+graders:
+  - type: exact_match
+    field: decision
+    weight: 1.0
+    required: false
+    config: {}
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

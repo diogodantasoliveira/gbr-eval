@@ -1,0 +1,30 @@
+task_id: prod.gbr_classification.low_confidence_escalation
+category: classification
+component: gbr-classification
+layer: product
+tier: gate
+description: "Classificação com confiança < 0.60 deve escalar para HITL"
+input:
+  payload:
+    document_type: "desconhecido"
+    confidence: 0.45
+    requires_hitl: true
+expected:
+  requires_hitl: true
+graders:
+  - type: exact_match
+    field: requires_hitl
+    weight: 0.5
+    required: false
+    config: {}
+  - type: numeric_range
+    field: confidence
+    weight: 0.5
+    required: false
+    config:
+      min: 0.0
+      max: 0.599
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr
