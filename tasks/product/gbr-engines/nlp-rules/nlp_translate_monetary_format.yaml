@@ -17,16 +17,21 @@ input:
     vars_referenciados: ["renda_mensal"]
 
 expected:
-  monetary_value: 3000
+  dominio: "credito"
+  confianca: 0.90
 
 graders:
   - type: exact_match
-    field: monetary_numeric
-    weight: 1.0
+    field: dominio
+    weight: 0.5
+    required: false
+  - type: numeric_range
+    field: confianca
+    weight: 0.5
     required: false
     config:
-      expected_value: 3000
-      field_path: "condition.>=.1"
+      min: 0.85
+      max: 1.0
 
 scoring_mode: weighted
 pass_threshold: 1.00

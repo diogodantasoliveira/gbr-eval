@@ -17,25 +17,21 @@ input:
     vars_referenciados: ["idade"]
 
 expected:
-  min_confianca: 0.85
-  required_vars: ["idade"]
+  confianca: 0.92
+  vars_referenciados: ["idade"]
 
 graders:
   - type: numeric_range
-    field: confianca_threshold
+    field: confianca
     weight: 0.5
     required: false
     config:
-      field_path: confianca
       min: 0.85
       max: 1.0
-  - type: set_membership
-    field: vars_include_idade
+  - type: exact_match
+    field: vars_referenciados
     weight: 0.5
     required: false
-    config:
-      expected_set: ["idade"]
-      field_path: vars_referenciados
 
 scoring_mode: weighted
 pass_threshold: 1.00

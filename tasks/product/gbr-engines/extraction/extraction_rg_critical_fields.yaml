@@ -24,26 +24,21 @@ expected:
 
 graders:
   - type: exact_match
-    field: nome
+    field: campos.nome
     weight: 0.4
     required: false
-    config:
-      expected_value: "MARIA SILVA SANTOS"
-      field_path: "campos.nome"
   - type: regex_match
-    field: cpf_format
+    field: campos.cpf
     weight: 0.3
     required: false
     config:
       pattern: '^\d{11}$'
-      field_path: "campos.cpf"
   - type: regex_match
-    field: date_format
+    field: campos.data_nascimento
     weight: 0.3
     required: false
     config:
       pattern: '^\d{4}-\d{2}-\d{2}$'
-      field_path: "campos.data_nascimento"
 
 scoring_mode: weighted
 pass_threshold: 0.90

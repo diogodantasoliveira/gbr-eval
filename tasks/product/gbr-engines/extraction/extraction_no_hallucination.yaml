@@ -15,23 +15,19 @@ input:
       passaporte: null
 
 expected:
-  null_fields: ["cnh_numero", "passaporte"]
+  campos:
+    cnh_numero: null
+    passaporte: null
 
 graders:
   - type: exact_match
-    field: cnh_not_hallucinated
+    field: campos.cnh_numero
     weight: 0.5
     required: false
-    config:
-      expected_value: null
-      field_path: "campos.cnh_numero"
   - type: exact_match
-    field: passaporte_not_hallucinated
+    field: campos.passaporte
     weight: 0.5
     required: false
-    config:
-      expected_value: null
-      field_path: "campos.passaporte"
 
 scoring_mode: weighted
 pass_threshold: 1.00

@@ -19,28 +19,22 @@ expected:
   campos:
     numero_matricula: "123456"
     tem_onus: true
+    area_total: "250.00"
 
 graders:
   - type: exact_match
-    field: numero_matricula
+    field: campos.numero_matricula
     weight: 0.4
     required: false
-    config:
-      expected_value: "123456"
-      field_path: "campos.numero_matricula"
   - type: exact_match
-    field: tem_onus
+    field: campos.tem_onus
     weight: 0.3
     required: false
-    config:
-      expected_value: true
-      field_path: "campos.tem_onus"
   - type: numeric_range
-    field: area_total_positive
+    field: campos.area_total
     weight: 0.3
     required: false
     config:
-      field_path: "campos.area_total"
       min: 0.01
       max: 999999999
 

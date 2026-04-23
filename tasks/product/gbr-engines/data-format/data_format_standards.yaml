@@ -12,24 +12,23 @@ input:
       cnpj: "12345678000199"
 
 expected:
-  cpf_format: '^\d{11}$'
-  cnpj_format: '^\d{14}$'
+  campos:
+    cpf: "12345678900"
+    cnpj: "12345678000199"
 
 graders:
   - type: regex_match
-    field: cpf_format
+    field: campos.cpf
     weight: 0.5
     required: false
     config:
       pattern: '^\d{11}$'
-      field_path: "campos.cpf"
   - type: regex_match
-    field: cnpj_format
+    field: campos.cnpj
     weight: 0.5
     required: false
     config:
       pattern: '^\d{14}$'
-      field_path: "campos.cnpj"
 
 scoring_mode: weighted
 pass_threshold: 1.00

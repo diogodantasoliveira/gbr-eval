@@ -19,16 +19,12 @@ graders:
     field: resultado
     weight: 0.5
     required: false
-    config:
-      expected_value: "CONFORME"
-      field_path: resultado
   - type: set_membership
-    field: risco_consistent
+    field: grau_risco
     weight: 0.5
     required: false
     config:
-      expected_set: ["BAIXO", "MEDIO"]
-      field_path: grau_risco
+      valid_values: ["BAIXO", "MEDIO"]
 
 scoring_mode: weighted
 pass_threshold: 1.00

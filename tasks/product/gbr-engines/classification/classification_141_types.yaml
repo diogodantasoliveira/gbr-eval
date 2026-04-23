@@ -10,16 +10,13 @@ input:
     supported_types: ["identidade_rg", "identidade_cnh", "financeiro_contracheque", "patrimonial_matricula", "contrato_social"]
 
 expected:
-  required_types: ["identidade_rg", "identidade_cnh", "financeiro_contracheque", "patrimonial_matricula", "contrato_social"]
+  supported_types: ["identidade_rg", "identidade_cnh", "financeiro_contracheque", "patrimonial_matricula", "contrato_social"]
 
 graders:
-  - type: set_membership
-    field: p0_types_supported
+  - type: exact_match
+    field: supported_types
     weight: 1.0
     required: false
-    config:
-      expected_set: ["identidade_rg", "identidade_cnh", "financeiro_contracheque", "patrimonial_matricula", "contrato_social"]
-      field_path: supported_types
 
 scoring_mode: weighted
 pass_threshold: 1.00

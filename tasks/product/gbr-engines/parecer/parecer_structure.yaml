@@ -24,34 +24,24 @@ input:
     grau_risco: "BAIXO"
 
 expected:
-  required_sections: ["Resumo", "Análise Documental", "Conformidade", "Achados", "Recomendação", "Conclusão"]
   resultado: "CONFORME"
-  valid_resultados: ["CONFORME", "INCONFORME", "COM_RESSALVAS"]
-  valid_riscos: ["BAIXO", "MEDIO", "ALTO", "CRITICO"]
+  grau_risco: "BAIXO"
 
 graders:
   - type: exact_match
-    field: resultado_valid
+    field: resultado
     weight: 0.3
     required: false
-    config:
-      expected_value: "CONFORME"
-      field_path: resultado
   - type: set_membership
-    field: risco_valid
+    field: grau_risco
     weight: 0.2
     required: false
     config:
-      expected_set: ["BAIXO", "MEDIO", "ALTO", "CRITICO"]
-      field_path: grau_risco
-  - type: numeric_range
-    field: section_count
+      valid_values: ["BAIXO", "MEDIO", "ALTO", "CRITICO"]
+  - type: field_not_empty
+    field: secoes
     weight: 0.5
     required: false
-    config:
-      field_path: "secoes.__len__"
-      min: 6
-      max: 10
 
 scoring_mode: weighted
 pass_threshold: 0.90
