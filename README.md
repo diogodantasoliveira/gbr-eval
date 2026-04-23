@@ -37,9 +37,9 @@ chmod +x setup-local.sh
 
 At the end you'll have:
 
-- `gbr-eval/` with `uv sync --all-extras` complete and **533 tests passing**
+- `gbr-eval/` with `uv sync --all-extras` complete and **725+ tests passing**
 - `gbr-eval-frontend/` with `node_modules`, native builds, and a SQLite DB at `./gbr-eval.db`
-- SQLite seeded with: **5 P0 skills**, **5 golden sets (40 cases)**, **22 engineering tasks**, **18 convention rules**, and **4 eval runs** (3 historical + 1 fresh self-eval)
+- SQLite seeded with: **5 P0 skills**, **5 golden sets (40 cases)**, **39 engineering tasks**, **18 convention rules**, and **4 eval runs** (3 historical + 1 fresh self-eval)
 - A generated `.env.local` with a random `WEBHOOK_SECRET`
 
 From there:
@@ -65,7 +65,7 @@ git clone git@github.com:diogodantasoliveira/gbr-eval-frontend.git
 ```bash
 cd gbr-eval
 uv sync --all-extras
-uv run pytest                    # expect: 533 passed
+uv run pytest                    # expect: all passed (725+)
 ```
 
 ### 3. Frontend
@@ -74,7 +74,7 @@ uv run pytest                    # expect: 533 passed
 cd ../gbr-eval-frontend
 cp .env.example .env.local       # edit if needed — defaults are fine for local dev
 pnpm install
-pnpm db:push                     # creates ./gbr-eval.db and 23 tables
+pnpm db:push                     # creates ./gbr-eval.db and 24 tables
 pnpm db:seed                     # inserts 5 P0 skills + 40 field schemas
 pnpm dev                         # http://localhost:3002
 ```
@@ -117,18 +117,18 @@ After setup, open these and confirm the counts:
 | http://localhost:3002 | Dashboard loads, no errors |
 | http://localhost:3002/skills | **5** skills |
 | http://localhost:3002/golden-sets | **5** sets (each with **8** cases) |
-| http://localhost:3002/tasks | **22** engineering tasks |
+| http://localhost:3002/tasks | **39** engineering tasks |
 | http://localhost:3002/runs | **4** runs (gate GO for the recent ones) |
 | http://localhost:3002/conventions | **18** rules |
 
 Backend quality gates (run from `gbr-eval/`):
 
 ```bash
-uv run pytest                                              # 533 passed
+uv run pytest                                              # 725+ passed
 uv run ruff check .                                        # All checks passed!
 uv run mypy src/                                           # no issues
 uv run gbr-eval run --suite tasks/product/ --golden-dir golden/ --self-eval
-# -> Total: 25 | Pass: 25 | Overall: 100.0% | GO
+# -> Total: 31 | Pass: 31 | Overall: ≥90% | GO
 ```
 
 ## Day-to-day commands

@@ -3,7 +3,7 @@
 ## Identidade do projeto
 - **Nome:** gbr-eval
 - **Propósito:** Framework de avaliação eval-first para os produtos GarantiaBR
-- **Repos alvo:** engine-integracao, garantia_ia, notifier, engine-billing, atom-back-end (5 prioritários)
+- **Repos alvo:** engine-integracao, garantia_ia, notifier, engine-billing, atom-back-end, gbr-eval, gbr-eval-frontend (7 repos)
 - **Relação:** Projeto SEPARADO — não vive dentro do monorepo gbr-engines
 - **Owner:** Diogo Dantas (CAIO)
 - **Jira:** https://garantiabr.atlassian.net/jira/software/c/projects/ADA/boards/266 | Projeto: ADA
@@ -28,11 +28,11 @@ gbr-eval é o **backbone centralizado de qualidade** da GarantiaBR. Todas as reg
 | Camada | Nome | O que avalia | Status |
 |--------|------|-------------|--------|
 | **E** | Engineering Quality | Código segue padrões de engenharia e regras de domínio por repo? | Planejado — regras definidas para 5 repos |
-| **P** | Product Quality | Outputs de IA corretos contra golden sets? | Parcial — 34 tasks, 40 golden cases, 12 graders, self-eval operacional |
+| **P** | Product Quality | Outputs de IA corretos contra golden sets? | Parcial — 31 tasks, 40 golden cases, 16 graders, self-eval operacional |
 | **O** | Operational | SLAs, custos, disponibilidade | Futuro |
 | **C** | Compliance | LGPD, BACEN, audit trail, ISO 27001 | Futuro |
 
-### 5 repos alvo (Camada E)
+### 7 repos alvo (Camada E)
 
 | Repo | Domínio | Regras de domínio |
 |------|---------|-------------------|
@@ -41,6 +41,8 @@ gbr-eval é o **backbone centralizado de qualidade** da GarantiaBR. Todas as reg
 | notifier | Notificações | template aprovado, idempotência, LGPD opt-out, rate limiting |
 | engine-billing | Billing | Decimal (nunca float), idempotency key, audit trail, reconciliação par |
 | atom-back-end | Backoffice | tenant_id em toda query, RBAC, audit log, dados sensíveis filtrados |
+| gbr-eval | Eval framework | graders puros, zero tautologia, PII sanitizada, golden sets anonimizados |
+| gbr-eval-frontend | Admin panel | auth proxy, PII redaction, dark mode tokens, SQLite WAL |
 
 ## Regra Zero — Nunca Inferir
 
@@ -139,12 +141,16 @@ cd ../gbr-eval-frontend && pnpm type-check                    # TypeScript check
 ```
 gbr-eval/
 ├── src/gbr_eval/
-│   ├── graders/              # 12 graders + dispatcher context-aware
+│   ├── graders/              # 16 graders + dispatcher context-aware
 │   │   ├── base.py           # Grader + ContextAwareGrader Protocols, _CONTEXT_AWARE registry, grade() dispatcher
 │   │   ├── deterministic.py  # 7 graders puros (exact_match, numeric_range, etc.)
-│   │   ├── engineering.py    # 3 graders de engenharia (pattern_required/forbidden, convention_check) + ReDoS guard
+│   │   ├── engineering.py    # 4 graders de engenharia (pattern_required/forbidden, convention_check, decimal_usage) + ReDoS guard
 │   │   ├── field_f1.py       # F1 por campo com fuzzy matching
-│   │   └── model_judge.py    # LLM-as-judge (Claude Sonnet) — NÃO puro, context_aware=True, PII recursivo
+│   │   ├── model_judge.py    # LLM-as-judge (Claude Sonnet) — NÃO puro, context_aware=True, PII recursivo
+│   │   ├── _shared.py        # Utilitários compartilhados (PII sanitization, single source of truth)
+│   │   ├── engineering_judge.py # LLM-judge para engenharia — context_aware=True, PII sanitizada
+│   │   ├── haiku_triage.py   # Triage rápido via Haiku — context_aware=False, PII sanitizada
+│   │   └── scope.py          # scope_check — verifica escopo de alterações
 │   ├── solvers/              # Solver Protocol (async) + AgentTrace models
 │   │   ├── base.py           # Solver Protocol, registry (@register_solver)
 │   │   ├── models.py         # ToolCall, Message, AgentTrace (Pydantic)
@@ -159,14 +165,19 @@ gbr-eval/
 │   │   ├── reporter.py       # Console, JSON, JUnit XML, CI summary
 │   │   ├── regression.py     # RegressionDelta, classify_gate
 │   │   ├── trends.py         # TrendAlert, detect_trends
-│   │   └── analyzer.py       # Utilitários de análise
+│   │   ├── analyzer.py       # Utilitários de análise
+│   │   ├── aggregator.py     # Agregação de resultados de eval
+│   │   ├── async_suite_runner.py # Runner async para suites completas
+│   │   ├── cache.py          # Cache de resultados de graders
+│   │   ├── funnel.py         # Funnel de avaliação progressiva
+│   │   └── git_diff.py       # Análise de diff para eval incremental
 │   ├── contracts/            # Schema snapshots dos repos alvo
 │   │   └── validator.py      # JSON Schema validation (standalone, sem deps externas)
 │   └── calibration/          # Concordância inter-anotador
 │       └── iaa.py            # Cohen's kappa, concordance tracking
-├── tasks/                    # 47 task YAMLs
-│   ├── product/              # classification(11), extraction(6), citation(5), cost(1), latency(1), decision(1)
-│   └── engineering/          # atom-back-end(5), engine-billing(4), engine-integracao(5), garantia-ia(4), notifier(4)
+├── tasks/                    # 70 task YAMLs
+│   ├── product/              # 31 tasks: classification(11), extraction(6), frontend-features(6), citation(5), cost(1), latency(1), decision(1)
+│   └── engineering/          # 39 tasks: atom-back-end(8), gbr-eval(7), gbr-eval-frontend(7), engine-integracao(5), garantia-ia(4), engine-billing(4), notifier(4)
 ├── golden/                   # Golden sets — ground truth anotado por humano (40 cases)
 │   ├── matricula/            # 8 cases (5 standard + 2 edge + 1 confuser)
 │   ├── contrato_social/      # 8 cases (5 standard + 2 edge + 1 confuser)
@@ -180,7 +191,7 @@ gbr-eval/
 │   ├── generate_all_synthetic.py # Batch generation com env allowlist
 │   ├── compute_hashes.py     # SHA-256 dos PDFs originais
 │   └── sync_frontend.py      # Sincronização frontend com auth token
-├── tests/                    # ~496 testes do framework (pytest)
+├── tests/                    # 725+ testes do framework (pytest)
 │   ├── graders/              # test_deterministic, test_field_f1, test_engineering, test_model_judge
 │   ├── harness/              # test_runner, test_epochs, test_model_roles, test_grader_context, test_async_runner, test_task_helpers, test_client, test_reporter, test_regression, test_trends, test_cli, test_resolve_output, test_analyzer, test_code_loader, test_eval_first_validation, test_golden_set_tags, test_postmortem
 │   ├── solvers/              # test_models, test_base
@@ -380,7 +391,7 @@ O frontend é uma aplicação Next.js 16 com SQLite local que serve como painel 
 `POST /api/runs/webhook` com Bearer token auth permite ingestão de eval runs diretamente do CI pipeline.
 
 ### DB local (SQLite)
-23 tabelas via Drizzle ORM. WAL mode. Foreign keys enforced. PII redaction em endpoints de golden sets e grader data.
+24 tabelas via Drizzle ORM. WAL mode. Foreign keys enforced. PII redaction em endpoints de golden sets e grader data.
 
 ## Relação com gbr-engines
 
