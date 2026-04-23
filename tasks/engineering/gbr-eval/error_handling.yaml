@@ -1,0 +1,57 @@
+task_id: eng.gbr-eval.error_handling
+category: classification
+component: gbr-eval
+layer: engineering
+tier: gate
+description: "Verifica qualidade do error handling no harness — retry, timeout, graceful degradation"
+
+input:
+  payload:
+    repo: gbr-eval
+    scan_target: "src/gbr_eval/harness/*.py"
+
+expected:
+  convention: robust_error_handling
+
+graders:
+  - type: pattern_forbidden
+    field: no_bare_except
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'except\s*:'
+      file_key: content
+      severity: high
+
+  - type: pattern_forbidden
+    field: no_pass_on_exception
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'except\s+\w+.*:\s*\n\s+pass\b'
+      file_key: content
+      severity: high
+
+  - type: engineering_judge
+    field: error_handling_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review error handling quality in these Python harness modules for an eval framework.
+        Evaluate:
+        1. EXCEPTION SPECIFICITY: Are exceptions caught at appropriate granularity? No broad except Exception unless justified.
+        2. GRACEFUL DEGRADATION: When an LLM API call fails, does the system degrade gracefully (skip file, return error result) rather than crash?
+        3. TIMEOUT HANDLING: Are external calls (HTTP, LLM API) properly bounded by timeouts?
+        4. RESOURCE CLEANUP: Are file handles, HTTP clients, DB connections properly closed on error paths?
+        5. ERROR CONTEXT: Do error results include enough context (file path, grader type, task ID) for debugging?
+        Score 5 if error handling is comprehensive with proper cleanup and context.
+      min_score: 3.0
+      file_key: content
+      language: python
+
+evaluation_mode: holistic
+scoring_mode: hybrid
+pass_threshold: 0.6
+eval_owner: diogo.dantas
+eval_cadence: per-pr

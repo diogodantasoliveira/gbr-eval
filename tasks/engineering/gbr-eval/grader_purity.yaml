@@ -1,0 +1,47 @@
+task_id: eng.gbr-eval.grader_purity
+category: classification
+component: gbr-eval
+layer: engineering
+tier: gate
+description: "Verifica que graders determinísticos são funções puras — sem I/O, sem estado, sem side effects"
+
+input:
+  payload:
+    repo: gbr-eval
+    scan_target: "src/gbr_eval/graders/deterministic.py"
+
+expected:
+  convention: pure_graders
+
+graders:
+  - type: pattern_forbidden
+    field: no_file_io
+    weight: 1.0
+    required: true
+    config:
+      pattern: '\bopen\s*\(|os\.path\.|pathlib\.|shutil\.'
+      file_key: content
+      severity: critical
+
+  - type: pattern_forbidden
+    field: no_network_calls
+    weight: 1.0
+    required: true
+    config:
+      pattern: '\brequests\.|httpx\.|urllib\.|aiohttp\.'
+      file_key: content
+      severity: critical
+
+  - type: pattern_forbidden
+    field: no_global_state
+    weight: 1.0
+    required: true
+    config:
+      pattern: '\bglobal\s+\w'
+      file_key: content
+      severity: high
+
+scoring_mode: binary
+pass_threshold: 1.0
+eval_owner: diogo.dantas
+eval_cadence: per-pr

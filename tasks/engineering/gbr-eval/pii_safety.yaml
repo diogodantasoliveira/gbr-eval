@@ -1,0 +1,51 @@
+task_id: eng.gbr-eval.pii_safety
+category: classification
+component: gbr-eval
+layer: engineering
+tier: gate
+description: "Verifica que LLM graders sanitizam PII antes de enviar ao modelo e nos logs"
+
+input:
+  payload:
+    repo: gbr-eval
+    scan_target: "src/gbr_eval/graders/*.py"
+
+expected:
+  convention: pii_sanitization
+
+graders:
+  - type: pattern_forbidden
+    field: no_pii_in_logging
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'logging\.\w+\(.*cpf|logging\.\w+\(.*cnpj'
+      file_key: content
+      severity: critical
+
+  - type: engineering_judge
+    field: pii_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review these Python grader files for PII safety in a fintech eval framework.
+        This code processes financial documents (matrícula, contrato social, certidões).
+        Focus on files that call external LLM APIs (model_judge.py, engineering_judge.py, haiku_triage.py).
+        Deterministic graders (deterministic.py, engineering.py, field_f1.py) don't send data externally
+        and don't need PII sanitization — do NOT penalize them for lacking it.
+        Evaluate:
+        1. PII SANITIZATION: Do the LLM grader files sanitize CPF, CNPJ, RG, phone, email patterns before sending to external APIs?
+        2. ERROR MESSAGES: Do error messages in LLM graders avoid including raw PII from inputs?
+        3. LOGGING: Are log statements free of raw PII? Are document contents not logged at INFO/DEBUG level?
+        4. CACHING: If results are cached, is PII excluded from cache keys or sanitized?
+        Score 5 if PII handling in LLM graders is comprehensive. Score 3 if basic sanitization exists but has gaps.
+      min_score: 3.0
+      file_key: content
+      language: python
+
+evaluation_mode: holistic
+scoring_mode: hybrid
+pass_threshold: 0.7
+eval_owner: diogo.dantas
+eval_cadence: per-pr

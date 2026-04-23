@@ -8,13 +8,12 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import time
 from typing import Any
 
 import anthropic
 
-from gbr_eval.graders._shared import _extract_json, get_anthropic_client
+from gbr_eval.graders._shared import _extract_json, get_anthropic_client, sanitize_pii_str
 from gbr_eval.graders.base import register_grader
 from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec, GraderStatus
 
@@ -57,17 +56,7 @@ _BASE_DELAY = 1.0
 #
 # See also: gbr-eval-frontend/src/lib/pii/patterns.ts
 # ---------------------------------------------------------------------------
-_PII_PATTERNS: list[tuple[str, str]] = [
-    (r"\d{3}\.\d{3}\.\d{3}-\d{2}", "000.000.000-XX"),       # CPF formatted
-    (r"\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}", "00.000.000/0000-XX"),  # CNPJ formatted
-    (r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", "redacted@example.com"),   # Email
-    (r"\(\d{2}\)\s?\d{4,5}-\d{4}", "(00) 00000-0000"),           # Phone (BR)
-    (r"(?<!\d)\d{1,2}\.\d{3}\.\d{3}-[\dXx]", "0.000.000-X"),    # RG
-    (r"\d{3}\.\d{5}\.\d{2}-\d", "000.00000.00-0"),               # PIS/PASEP
-    (r"\b\d{11}\b", "00000000000"),                               # CPF unformatted
-    (r"\b\d{14}\b", "00000000000000"),                            # CNPJ unformatted
-    (r"\b\d{5}-?\d{3}\b", "00000-000"),                           # CEP (Python-only)
-]
+from gbr_eval.graders._shared import _PII_PATTERNS  # noqa: F401, E402 — re-exported for tests
 
 _SYSTEM_PROMPT = """You are an expert evaluator for a document audit system.
 You evaluate AI-generated outputs against a quality rubric.
@@ -88,10 +77,7 @@ Return ONLY a JSON object with these exact keys:
 """
 
 
-def _sanitize_pii_str(text: str) -> str:
-    for pattern, replacement in _PII_PATTERNS:
-        text = re.sub(pattern, replacement, text)
-    return text
+_sanitize_pii_str = sanitize_pii_str
 
 
 def _sanitize_pii(data: dict[str, Any]) -> dict[str, Any]:
@@ -99,9 +85,7 @@ def _sanitize_pii(data: dict[str, Any]) -> dict[str, Any]:
 
     def _redact(value: Any) -> Any:
         if isinstance(value, str):
-            for pattern, replacement in _PII_PATTERNS:
-                value = re.sub(pattern, replacement, value)
-            return value
+            return sanitize_pii_str(value)
         if isinstance(value, dict):
             return {k: _redact(v) for k, v in value.items()}
         if isinstance(value, list):

@@ -34,6 +34,29 @@ def close_anthropic_client() -> None:
         _shared_client = None
 
 
+# ---------------------------------------------------------------------------
+# PII sanitization — shared across all LLM graders.
+# ---------------------------------------------------------------------------
+_PII_PATTERNS: list[tuple[str, str]] = [
+    (r"\d{3}\.\d{3}\.\d{3}-\d{2}", "000.000.000-XX"),
+    (r"\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}", "00.000.000/0000-XX"),
+    (r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", "redacted@example.com"),
+    (r"\(\d{2}\)\s?\d{4,5}-\d{4}", "(00) 00000-0000"),
+    (r"(?<!\d)\d{1,2}\.\d{3}\.\d{3}-[\dXx]", "0.000.000-X"),
+    (r"\d{3}\.\d{5}\.\d{2}-\d", "000.00000.00-0"),
+    (r"\b\d{11}\b", "00000000000"),
+    (r"\b\d{14}\b", "00000000000000"),
+    (r"\b\d{5}-?\d{3}\b", "00000-000"),
+]
+
+
+def sanitize_pii_str(text: str) -> str:
+    """Redact known PII patterns (CPF, CNPJ, email, phone, RG, PIS, CEP) from text."""
+    for pattern, replacement in _PII_PATTERNS:
+        text = re.sub(pattern, replacement, text)
+    return text
+
+
 def _is_catastrophic_pattern(pattern: str) -> bool:
     """Detect obvious catastrophic backtracking patterns like (a+)+."""
     return bool(_CATASTROPHIC_RE.search(pattern))

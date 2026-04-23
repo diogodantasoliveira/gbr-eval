@@ -1,0 +1,51 @@
+task_id: eng.gbr-eval.type_safety
+category: classification
+component: gbr-eval
+layer: engineering
+tier: gate
+description: "Verifica type safety — sem Any desnecessário, Pydantic models com validação, Protocol usage"
+
+input:
+  payload:
+    repo: gbr-eval
+    scan_target: "src/gbr_eval/**/*.py"
+
+expected:
+  convention: strict_typing
+
+graders:
+  - type: pattern_forbidden
+    field: no_untyped_dict
+    weight: 1.0
+    required: false
+    config:
+      pattern: ':\s*dict\s*[=,\)]'
+      file_key: content
+      severity: medium
+
+  - type: engineering_judge
+    field: type_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review these Python files for type safety in an eval framework that processes JSON data.
+        Context: This is an eval framework where graders receive `dict[str, Any]` from JSON-deserialized
+        task outputs. Using `Any` for JSON data boundaries is CORRECT and expected.
+        Focus on:
+        1. Are Pydantic models used for structured data (GraderResult, Task, etc.)?
+        2. Are Protocol classes used for grader interfaces instead of ABCs?
+        3. Are bare `dict` (without type params) avoided in favor of `dict[str, Any]` or typed dicts?
+        4. Are function signatures properly typed (no missing return types, no untyped args)?
+        Do NOT penalize `from typing import Any` — it is necessary for JSON boundary types.
+        Score 5 if typing is thorough and Pydantic/Protocol usage is correct.
+        Score 3 if typing exists but has gaps (missing return types, bare dicts).
+      min_score: 3.0
+      file_key: content
+      language: python
+
+evaluation_mode: holistic
+scoring_mode: hybrid
+pass_threshold: 0.5
+eval_owner: diogo.dantas
+eval_cadence: per-pr

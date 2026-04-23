@@ -1,0 +1,49 @@
+task_id: eng.gbr-eval.architecture_quality
+category: classification
+component: gbr-eval
+layer: engineering
+tier: gate
+description: "LLM review da arquitetura — separação de concerns, Protocol usage, extensibilidade"
+
+input:
+  payload:
+    repo: gbr-eval
+    scan_target: "src/gbr_eval/**/*.py"
+
+expected:
+  convention: clean_architecture
+
+graders:
+  - type: pattern_forbidden
+    field: no_circular_imports
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'if TYPE_CHECKING:.*import.*(?:runner|code_loader).*from gbr_eval\.harness'
+      file_key: content
+      severity: high
+
+  - type: engineering_judge
+    field: architecture_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review the architecture of this Python eval framework codebase.
+        This is gbr-eval, a testing/evaluation framework for AI outputs in a fintech platform.
+        Evaluate:
+        1. SEPARATION OF CONCERNS: Are graders (measurement), harness (orchestration), and models (data) properly separated? Does the harness import graders only through the registry/dispatcher?
+        2. PROTOCOL USAGE: Are interfaces defined via Protocol (structural typing) rather than ABC? Can new graders be added via @register_grader without modifying existing code?
+        3. EXTENSIBILITY: Can new grader types, scoring modes, or output formats be added without touching core harness code?
+        4. DEPENDENCY DIRECTION: Do graders depend on models (GraderSpec, GraderResult) but NOT on harness (runner, cache)? Is the dependency graph clean?
+        5. CONFIGURATION: Are behavioral parameters (thresholds, models, timeouts) configurable via GraderSpec.config rather than hardcoded constants?
+        Score 5 if architecture follows clean separation with Protocol-based extensibility.
+      min_score: 3.0
+      file_key: content
+      language: python
+
+evaluation_mode: holistic
+scoring_mode: hybrid
+pass_threshold: 0.6
+eval_owner: diogo.dantas
+eval_cadence: per-pr

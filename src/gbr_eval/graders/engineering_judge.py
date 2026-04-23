@@ -14,9 +14,8 @@ from typing import Any
 
 import anthropic
 
-from gbr_eval.graders._shared import _extract_json, get_anthropic_client
+from gbr_eval.graders._shared import _extract_json, get_anthropic_client, sanitize_pii_str
 from gbr_eval.graders.base import register_grader
-from gbr_eval.graders.model_judge import _sanitize_pii_str
 from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec, GraderStatus
 
 _DEFAULT_MODEL = "claude-opus-4-20250514"
@@ -188,7 +187,7 @@ class EngineeringJudge:
                 details="Empty file — skipped",
             )
 
-        code = _truncate_code(code)
+        code = sanitize_pii_str(_truncate_code(code))
 
         prompt_parts = [
             f"## Rubric\n{rubric}",
@@ -309,7 +308,7 @@ class EngineeringJudge:
                 required=spec.required,
                 error=(
                     f"Engineering judge error: {type(exc).__name__}: "
-                    f"{_sanitize_pii_str(str(exc))}"
+                    f"{sanitize_pii_str(str(exc))}"
                 ),
                 status=GraderStatus.ERROR,
             )

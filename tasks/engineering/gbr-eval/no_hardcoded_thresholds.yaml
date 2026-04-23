@@ -1,0 +1,38 @@
+task_id: eng.gbr-eval.no_hardcoded_thresholds
+category: classification
+component: gbr-eval
+layer: engineering
+tier: gate
+description: "Verifica que graders não hardcodam thresholds — devem vir via GraderSpec.config"
+
+input:
+  payload:
+    repo: gbr-eval
+    scan_target: "src/gbr_eval/graders/*.py"
+
+expected:
+  convention: configurable_thresholds
+
+graders:
+  - type: pattern_forbidden
+    field: no_magic_threshold
+    weight: 1.0
+    required: true
+    config:
+      pattern: '(?:pass_threshold|threshold|min_score)\s*=\s*0\.\d+'
+      file_key: content
+      severity: high
+
+  - type: pattern_forbidden
+    field: no_hardcoded_model
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'claude-\d+-\d+-\d+(?!.*_DEFAULT_MODEL)'
+      file_key: content
+      severity: medium
+
+scoring_mode: hybrid
+pass_threshold: 0.8
+eval_owner: diogo.dantas
+eval_cadence: per-pr

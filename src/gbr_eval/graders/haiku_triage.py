@@ -12,7 +12,7 @@ from typing import Any
 
 import anthropic
 
-from gbr_eval.graders._shared import get_anthropic_client
+from gbr_eval.graders._shared import get_anthropic_client, sanitize_pii_str
 from gbr_eval.graders.base import register_grader
 from gbr_eval.harness.models import GraderResult, GraderSpec, GraderStatus
 
@@ -78,7 +78,7 @@ class HaikuTriage:
                 status=GraderStatus.GRADED,
             )
 
-        code = _truncate(code)
+        code = sanitize_pii_str(_truncate(code))
         model = spec.config.get("model", _DEFAULT_MODEL)
         prompt = f"## Rubric\n{rubric}\n\n## Code\n```\n{code}\n```\n\nDoes this file need deep review?"
 
