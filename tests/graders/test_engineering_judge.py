@@ -68,16 +68,15 @@ def _mock_grade(
     side_effect: Exception | None = None,
     context: GraderContext | None = None,
 ) -> tuple[Any, MagicMock]:
+    mock_client = MagicMock()
+    if side_effect:
+        mock_client.messages.create.side_effect = side_effect
+    else:
+        mock_client.messages.create.return_value = api_response
     with (
         patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-        patch("anthropic.Anthropic") as mock_client_cls,
+        patch("gbr_eval.graders.engineering_judge.get_anthropic_client", return_value=mock_client),
     ):
-        mock_client = MagicMock()
-        mock_client_cls.return_value = mock_client
-        if side_effect:
-            mock_client.messages.create.side_effect = side_effect
-        else:
-            mock_client.messages.create.return_value = api_response
         return judge.grade(output, expected, spec, context=context), mock_client
 
 
@@ -418,11 +417,11 @@ class TestRetry:
         exc = _make_rate_limit_error()
         with (
             patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-            patch("anthropic.Anthropic") as mock_cls,
+            patch("gbr_eval.graders.engineering_judge.get_anthropic_client") as mock_get_client,
             patch("gbr_eval.graders.engineering_judge.time.sleep"),
         ):
             mock_client = MagicMock()
-            mock_cls.return_value = mock_client
+            mock_get_client.return_value = mock_client
             mock_client.messages.create.side_effect = [exc, success]
             result = EngineeringJudge().grade(
                 {"content": "x"}, {}, spec
@@ -435,11 +434,11 @@ class TestRetry:
         exc = _make_rate_limit_error()
         with (
             patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-            patch("anthropic.Anthropic") as mock_cls,
+            patch("gbr_eval.graders.engineering_judge.get_anthropic_client") as mock_get_client,
             patch("gbr_eval.graders.engineering_judge.time.sleep"),
         ):
             mock_client = MagicMock()
-            mock_cls.return_value = mock_client
+            mock_get_client.return_value = mock_client
             mock_client.messages.create.side_effect = exc
             result = EngineeringJudge().grade(
                 {"content": "x"}, {}, spec

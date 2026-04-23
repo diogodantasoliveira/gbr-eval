@@ -100,7 +100,8 @@ def run_file_through_funnel(
         # All pass, no LLM graders → done.
         if stats:
             stats.stage1_skipped += 1
-        result.conforming = all(r.passed for r in result.grader_results)
+        req = [r for r in result.grader_results if r.required]
+        result.conforming = all(r.passed for r in req) if req else all(r.passed for r in result.grader_results)
         return result
     elif not any_failed:
         # All deterministic pass → Stage 2 triage.
@@ -126,6 +127,7 @@ def run_file_through_funnel(
                         passed=True,
                         score=1.0,
                         weight=llm_spec.weight,
+                        required=llm_spec.required,
                         details="[funnel:skipped] Haiku triage: no deep review needed",
                         file_path=file_path,
                         status=GraderStatus.SKIPPED,
@@ -134,7 +136,8 @@ def run_file_through_funnel(
 
                 if stats:
                     stats.stage2_skipped += 1
-                result.conforming = all(r.passed for r in result.grader_results)
+                req = [r for r in result.grader_results if r.required]
+                result.conforming = all(r.passed for r in req) if req else all(r.passed for r in result.grader_results)
                 return result
 
             if triage_result.status == GraderStatus.ERROR and stats:
@@ -167,7 +170,8 @@ def run_file_through_funnel(
                 cache.put(cache_key, gr)
             result.grader_results.append(gr)
 
-    result.conforming = all(r.passed for r in result.grader_results)
+    req = [r for r in result.grader_results if r.required]
+    result.conforming = all(r.passed for r in req) if req else all(r.passed for r in result.grader_results)
     return result
 
 

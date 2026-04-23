@@ -100,9 +100,6 @@ def _mock_anthropic_call(spec: GraderSpec, model_roles: dict[str, str] | None = 
     mock_client = MagicMock()
     mock_client.messages.create.return_value = mock_response
 
-    mock_anthropic = MagicMock()
-    mock_anthropic.Anthropic.return_value = mock_client
-
     mock_types = MagicMock()
     mock_types.TextBlock = type(mock_text_block)
 
@@ -111,11 +108,7 @@ def _mock_anthropic_call(spec: GraderSpec, model_roles: dict[str, str] | None = 
     judge = LLMJudge()
     with (
         patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}),
-        # Patch the module-level `anthropic` name in model_judge so that
-        # `anthropic.Anthropic(...)` and `anthropic.APIError` use the mock.
-        patch("gbr_eval.graders.model_judge.anthropic", mock_anthropic),
-        # Patch sys.modules so the `from anthropic.types import TextBlock`
-        # local import inside the try block resolves to the mock type.
+        patch("gbr_eval.graders.model_judge.get_anthropic_client", return_value=mock_client),
         patch.dict(sys.modules, {"anthropic.types": mock_types}),
     ):
         judge.grade({}, {}, spec, context=ctx)

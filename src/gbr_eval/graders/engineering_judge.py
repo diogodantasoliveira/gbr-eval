@@ -13,7 +13,7 @@ from typing import Any
 
 import anthropic
 
-from gbr_eval.graders._shared import _extract_json
+from gbr_eval.graders._shared import _extract_json, get_anthropic_client
 from gbr_eval.graders.base import register_grader
 from gbr_eval.graders.model_judge import _sanitize_pii_str
 from gbr_eval.harness.models import GraderContext, GraderResult, GraderSpec, GraderStatus
@@ -198,7 +198,7 @@ class EngineeringJudge:
         max_retries = min(int(spec.config.get("max_retries", _MAX_RETRIES)), 10)
 
         try:
-            client = anthropic.Anthropic(api_key=api_key)
+            client = get_anthropic_client(api_key)
             api_messages: list[anthropic.types.MessageParam] = [
                 {"role": "user", "content": prompt},
             ]

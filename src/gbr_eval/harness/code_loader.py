@@ -24,7 +24,7 @@ from gbr_eval.harness.models import (
     Tier,
 )
 from gbr_eval.harness.regression import classify_gate
-from gbr_eval.harness.runner import load_tasks_from_dir
+from gbr_eval.harness.runner import _compute_score, load_tasks_from_dir
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -33,6 +33,10 @@ ProgressCallback = Callable[[str, int, int, float, bool], None]
 
 _MAX_FILE_SIZE = 1_000_000  # 1 MB
 _MAX_FILES = 10_000
+_DEFAULT_EXCLUDE_DIRS = frozenset({
+    "node_modules", ".next", "dist", "build", "__pycache__",
+    ".git", ".venv", "venv", ".tox", "coverage", ".nyc_output",
+})
 
 
 @dataclass
@@ -66,6 +70,8 @@ def load_code_files(code_dir: Path, repo: str, scan_target: str) -> list[tuple[s
 
     for file_path in sorted(repo_path.glob(scan_target)):
         if not file_path.is_file():
+            continue
+        if any(part in _DEFAULT_EXCLUDE_DIRS for part in file_path.parts):
             continue
         resolved = file_path.resolve()
         if not resolved.is_relative_to(code_dir_resolved):
@@ -129,7 +135,8 @@ def evaluate_file(
                 cache.put(cache_key, result)
             grader_results.append(result)
 
-    conforming = all(r.passed for r in grader_results)
+    required_results = [r for r in grader_results if r.required]
+    conforming = all(r.passed for r in required_results) if required_results else all(r.passed for r in grader_results)
     return FileResult(file_path=file_path, conforming=conforming, grader_results=grader_results)
 
 
@@ -332,7 +339,7 @@ def run_task_against_code(
                 on_progress(rel_path, idx, total, last_score, is_cached)
 
     duration_ms = (time.monotonic() - start) * 1000
-    score = conforming_count / len(files)
+    score = _compute_score(all_grader_results, task.scoring_mode)
     any_required_failed = any(r.required and not r.passed for r in all_grader_results)
     passed = score >= task.pass_threshold and not any_required_failed
 

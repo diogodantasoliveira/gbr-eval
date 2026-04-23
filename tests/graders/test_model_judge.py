@@ -51,16 +51,15 @@ def _mock_grade(
     api_response: MagicMock | None = None,
     side_effect: Exception | None = None,
 ) -> tuple[Any, MagicMock]:
+    mock_client = MagicMock()
+    if side_effect:
+        mock_client.messages.create.side_effect = side_effect
+    else:
+        mock_client.messages.create.return_value = api_response
     with (
         patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-        patch("anthropic.Anthropic") as mock_client_cls,
+        patch("gbr_eval.graders.model_judge.get_anthropic_client", return_value=mock_client),
     ):
-        mock_client = MagicMock()
-        mock_client_cls.return_value = mock_client
-        if side_effect:
-            mock_client.messages.create.side_effect = side_effect
-        else:
-            mock_client.messages.create.return_value = api_response
         return judge.grade(output, expected, spec), mock_client
 
 
@@ -356,11 +355,11 @@ class TestLLMJudgeRetry:
 
         with (
             patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.get_anthropic_client") as mock_get_client,
             patch("gbr_eval.graders.model_judge.time.sleep") as mock_sleep,
         ):
             mock_client = MagicMock()
-            mock_client_cls.return_value = mock_client
+            mock_get_client.return_value = mock_client
             mock_client.messages.create.side_effect = [rate_limit_exc, success_response]
             result = LLMJudge().grade({}, {}, spec)
 
@@ -376,11 +375,11 @@ class TestLLMJudgeRetry:
 
         with (
             patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.get_anthropic_client") as mock_get_client,
             patch("gbr_eval.graders.model_judge.time.sleep"),
         ):
             mock_client = MagicMock()
-            mock_client_cls.return_value = mock_client
+            mock_get_client.return_value = mock_client
             mock_client.messages.create.side_effect = rate_limit_exc
             result = LLMJudge().grade({}, {}, spec)
 
@@ -397,11 +396,11 @@ class TestLLMJudgeRetry:
 
         with (
             patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.get_anthropic_client") as mock_get_client,
             patch("gbr_eval.graders.model_judge.time.sleep") as mock_sleep,
         ):
             mock_client = MagicMock()
-            mock_client_cls.return_value = mock_client
+            mock_get_client.return_value = mock_client
             mock_client.messages.create.side_effect = bad_req_exc
             result = LLMJudge().grade({}, {}, spec)
 
@@ -417,11 +416,11 @@ class TestLLMJudgeRetry:
 
         with (
             patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-            patch("anthropic.Anthropic") as mock_client_cls,
+            patch("gbr_eval.graders.model_judge.get_anthropic_client") as mock_get_client,
             patch("gbr_eval.graders.model_judge.time.sleep") as mock_sleep,
         ):
             mock_client = MagicMock()
-            mock_client_cls.return_value = mock_client
+            mock_get_client.return_value = mock_client
             mock_client.messages.create.side_effect = rate_limit_exc
             result = LLMJudge().grade({}, {}, spec)
 

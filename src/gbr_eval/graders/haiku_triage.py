@@ -12,6 +12,7 @@ from typing import Any
 
 import anthropic
 
+from gbr_eval.graders._shared import get_anthropic_client
 from gbr_eval.graders.base import register_grader
 from gbr_eval.harness.models import GraderResult, GraderSpec, GraderStatus
 
@@ -82,7 +83,7 @@ class HaikuTriage:
         prompt = f"## Rubric\n{rubric}\n\n## Code\n```\n{code}\n```\n\nDoes this file need deep review?"
 
         try:
-            client = anthropic.Anthropic(api_key=api_key)
+            client = get_anthropic_client(api_key)
             response = client.messages.create(
                 model=model,
                 max_tokens=256,

@@ -55,7 +55,7 @@ class TestHaikuTriage:
         type(mock_text).__name__ = "TextBlock"
 
         with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test"}), \
-             patch("gbr_eval.graders.haiku_triage.anthropic.Anthropic") as mock_cls:
+             patch("gbr_eval.graders.haiku_triage.get_anthropic_client") as mock_cls:
             mock_cls.return_value.messages.create.return_value = mock_response
             with patch("gbr_eval.graders.haiku_triage.isinstance", side_effect=lambda obj, cls: True):
                 result = grader.grade({"content": "eval('danger')"}, {}, spec)
@@ -75,7 +75,7 @@ class TestHaikuTriage:
         mock_response.content = [mock_text]
 
         with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test"}), \
-             patch("gbr_eval.graders.haiku_triage.anthropic.Anthropic") as mock_cls:
+             patch("gbr_eval.graders.haiku_triage.get_anthropic_client") as mock_cls:
             mock_cls.return_value.messages.create.return_value = mock_response
             with patch("gbr_eval.graders.haiku_triage.isinstance", side_effect=lambda obj, cls: True):
                 result = grader.grade({"content": "export default {}"}, {}, spec)
@@ -89,7 +89,7 @@ class TestHaikuTriage:
         spec = _make_spec()
 
         with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test"}), \
-             patch("gbr_eval.graders.haiku_triage.anthropic.Anthropic") as mock_cls:
+             patch("gbr_eval.graders.haiku_triage.get_anthropic_client") as mock_cls:
             mock_cls.return_value.messages.create.side_effect = TimeoutError("timeout")
             result = grader.grade({"content": "code"}, {}, spec)
 

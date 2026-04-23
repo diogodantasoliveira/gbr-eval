@@ -102,7 +102,7 @@ def load_tasks_from_dir(directory: Path, layer: Layer | None = None, tier: Tier 
     return tasks
 
 
-_NON_DETERMINISTIC_GRADERS: frozenset[str] = frozenset({"llm_judge"})
+_NON_DETERMINISTIC_GRADERS: frozenset[str] = frozenset({"llm_judge", "engineering_judge"})
 _LLM_GRADER_TYPES: frozenset[str] = frozenset({"llm_judge", "engineering_judge"})
 
 # Exit code semantics — let CI distinguish gate-fail from runtime crash.
@@ -131,7 +131,7 @@ def _preflight_check(
     )
     if has_llm and not os.environ.get("ANTHROPIC_API_KEY"):
         issues.append(
-            "ANTHROPIC_API_KEY not set — LLM graders will all score 0"
+            "[CRITICAL] ANTHROPIC_API_KEY not set — LLM graders cannot run"
         )
 
     if code_dir:
@@ -801,6 +801,8 @@ def _finalize_and_report(
               help="Disable the 3-stage grading funnel (run all graders on all files)")
 @click.option("--yes", "-y", "auto_confirm", is_flag=True, default=False,
               help="Skip confirmation prompts (e.g. large LLM file count warning)")
+@click.option("--timeout", "run_timeout", type=int, default=None,
+              help="Global timeout in seconds for the entire eval run")
 def run(
     suite: Path | None,
     task_path: Path | None,
@@ -825,8 +827,17 @@ def run(
     base_branch: str,
     no_funnel: bool,
     auto_confirm: bool,
+    run_timeout: int | None,
 ) -> None:
     """Run eval tasks and report results."""
+    import signal
+
+    if run_timeout is not None:
+        def _timeout_handler(signum: int, frame: object) -> None:
+            raise SystemExit(EXIT_RUNTIME_ERROR)
+        signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(run_timeout)
+        click.echo(f"[timeout] Global timeout set to {run_timeout}s", err=True)
     from gbr_eval.harness.cache import GraderCache
 
     model_roles = _parse_model_roles(model_role_pairs)
@@ -942,6 +953,9 @@ def run(
             "hit_rate": stats.hit_rate,
         }
     grader_cache.close()
+
+    from gbr_eval.graders._shared import close_anthropic_client
+    close_anthropic_client()
 
     _finalize_and_report(eval_run, baseline_run, output_format, output_file)
 
