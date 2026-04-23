@@ -1,0 +1,33 @@
+task_id: eng.gbr_billing.no_raw_sql_interpolation
+category: classification
+component: gbr-billing
+layer: engineering
+tier: gate
+description: "Billing não deve usar string interpolation em queries SQL"
+input:
+  payload:
+    repo: services/billing
+    scan_target: "app/**/*.py"
+expected:
+  convention: no_sql_injection
+graders:
+  - type: pattern_forbidden
+    field: no_fstring_sql
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'f["''](?:SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)'
+      file_key: content
+      severity: critical
+  - type: pattern_forbidden
+    field: no_format_sql
+    weight: 1.0
+    required: false
+    config:
+      pattern: '\.format\(.*\).*(?:SELECT|INSERT|UPDATE|DELETE)'
+      file_key: content
+      severity: critical
+scoring_mode: weighted
+pass_threshold: 0.95
+eval_owner: diogo.dantas
+eval_cadence: per-pr

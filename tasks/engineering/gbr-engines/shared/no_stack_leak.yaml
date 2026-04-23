@@ -1,0 +1,25 @@
+task_id: eng.gbr_shared.no_stack_leak
+category: classification
+component: gbr-shared
+layer: engineering
+tier: gate
+description: "Shared library não deve expor stack traces"
+input:
+  payload:
+    repo: shared
+    scan_target: "**/*.py"
+expected:
+  convention: no_stack_leak
+graders:
+  - type: pattern_forbidden
+    field: no_traceback_format
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'traceback\.format_exc|traceback\.print_exc'
+      file_key: content
+      severity: warning
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr
