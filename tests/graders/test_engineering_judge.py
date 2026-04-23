@@ -531,7 +531,10 @@ class TestExtractJson:
 
     def test_extract_json_targeted_score_key(self):
         """When prose contains non-score braces, targeted {"score" search finds the right object."""
-        text = 'The code uses patterns like {color: "red"} for styling.\n\n{"score": 4, "summary": "ok", "findings": []}'
+        text = (
+            'The code uses patterns like {color: "red"} for styling.'
+            '\n\n{"score": 4, "summary": "ok", "findings": []}'
+        )
         result = _extract_json(text)
         parsed = json.loads(result)
         assert parsed["score"] == 4
