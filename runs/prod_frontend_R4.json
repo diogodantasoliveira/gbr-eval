@@ -1,0 +1,187 @@
+{
+  "run_id": "a7adcbbf-64fe-4fc2-8a05-4c2580eb6776",
+  "started_at": "2026-04-23T08:28:08.277747Z",
+  "finished_at": "2026-04-23T08:29:13.328634Z",
+  "layer": "product",
+  "tier": "canary",
+  "tasks_total": 6,
+  "tasks_passed": 5,
+  "tasks_failed": 1,
+  "task_results": [
+    {
+      "task_id": "product.frontend.annotation_studio",
+      "passed": true,
+      "score": 0.75,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "studio_review",
+          "passed": true,
+          "score": 0.75,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=4.0/5 (min=3.0): The annotation studio implements 8 of 9 required features with functional CRUD operations, though form validation could be more robust with consistent Zod schema usage. | Findings: [low] src/app/golden-sets/[id]/page.tsx: Bulk import feature exists as ImportDialog component but implementation details not visible in main page code; [medium] src/app/conventions/new/page.tsx: Form validation relies on client-side toast for error handling rather than integrated Zod schema validation; [low] src/app/layout.tsx: Navigation sidebar not visible in provided layout file",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 18993.37591700896,
+      "pass_threshold": 0.6,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.comparison_and_trends",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "comparison_review",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "[cached] score=5.0/5 (min=2.0): Excellent implementation of all 6 comparison and trend analysis features with comprehensive functionality including side-by-side comparison, regression detection, trend charts with statistical analysis, baseline selection, and visual alerting. | Findings: [low] src/app/runs/compare/page.tsx: Minor accessibility improvement: comparison controls lack proper ARIA labels; [low] src/components/runs/trend-chart.tsx: Chart component could benefit from keyboard navigation support",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 8.358125007362105,
+      "pass_threshold": 0.5,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.dashboard_observability",
+      "passed": true,
+      "score": 0.75,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "dashboard_review",
+          "passed": true,
+          "score": 0.75,
+          "weight": 1.0,
+          "required": true,
+          "details": "[cached] score=4.0/5 (min=3.0): Well-structured dashboard with 7/8 required features implemented, missing only a truly prominent latest run score display and has some error handling gaps. | Findings: [medium] Lines 27-44: Missing error handling for database queries - all DB operations use .all() or .get() without try/catch blocks; [low] Lines 59-103: Latest run score not prominently displayed as a dedicated card - it's buried in the Eval Runs summary card description; [low] Lines 105-172: Engineering Quality section only appears conditionally based on hasEngineering flag, reducing at-a-glance consistency; [low] Lines 213-236: Recent runs list shows run_id in monospace font which may be less readable than a formatted display name",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 0.5192499957047403,
+      "pass_threshold": 0.6,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.import_and_integration",
+      "passed": false,
+      "score": 0.0,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "integration_review",
+          "passed": false,
+          "score": 0.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=1.0/5 (min=2.0): Critical security vulnerabilities in webhook endpoint with no authentication, validation, or data integrity checks - completely unsuitable for production fintech use. | Findings: [critical] src/app/api/runs/webhook/route.ts: Webhook endpoint has no authentication - accepts any POST request without bearer token, HMAC signature, or API key validation; [critical] src/app/api/runs/webhook/route.ts:lines 14-30: No payload validation - directly inserts untrusted JSON into database without schema validation; [high] src/app/api/runs/webhook/route.ts: No duplicate run_id handling - will create duplicate entries for the same run_id; [high] src/app/api/runs/webhook/route.ts: No transaction safety - run and task_results are inserted separately without transaction wrapping; [medium] src/app/api/runs/: No UI import endpoint - users cannot upload/import JSON eval runs except via webhook",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 24578.13624999835,
+      "pass_threshold": 0.7,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.postmortem_workflow",
+      "passed": true,
+      "score": 0.75,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "postmortem_review",
+          "passed": true,
+          "score": 0.75,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=4.0/5 (min=2.0): Postmortem workflow is 80% complete with display, API, linkage, and history features implemented, but lacks a creation form UI. | Findings: [medium] src/app/runs/[id]/page.tsx: No UI form for creating postmortems despite having backend API support",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 21457.783375008148,
+      "pass_threshold": 0.5,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.run_visualization",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "run_features_review",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "[cached] score=5.0/5 (min=3.0): Excellent implementation with all 8 required features present and well-implemented, including run list, detail view, gate matrix, task results, severity grouping, engineering findings, score visualization, and dark mode support. | Findings: [low] src/components/runs/run-detail.tsx:336: Truncated code in GraderDetailsCell function - appears to be cut off mid-expression",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 15.138250004383735,
+      "pass_threshold": 0.6,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    }
+  ],
+  "overall_score": 0.7083333333333334,
+  "metadata": {
+    "code_dir": "Python-Projetos",
+    "funnel_stats": {
+      "total_llm_grader_results": 6,
+      "funnel_skipped": 0,
+      "opus_reviewed": 6
+    },
+    "cache_stats": {
+      "hits": 3,
+      "misses": 3,
+      "puts": 3,
+      "skipped_errors": 0,
+      "total": 6,
+      "hit_rate": 0.5
+    }
+  },
+  "gate_result": "no_go",
+  "baseline_run_id": null
+}

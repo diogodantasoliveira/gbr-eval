@@ -30,6 +30,8 @@ coverage.xml
 .vscode/
 *.iml
 .omc/
+.gbr-eval-cache/
+eval-test-repos/
 
 results/
 *.jsonl

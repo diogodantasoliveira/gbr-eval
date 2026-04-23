@@ -1,0 +1,187 @@
+{
+  "run_id": "10561b8c-7907-4161-a12c-7ee683a9d623",
+  "started_at": "2026-04-23T09:07:01.304500Z",
+  "finished_at": "2026-04-23T09:08:43.257664Z",
+  "layer": "product",
+  "tier": "canary",
+  "tasks_total": 6,
+  "tasks_passed": 5,
+  "tasks_failed": 1,
+  "task_results": [
+    {
+      "task_id": "product.frontend.annotation_studio",
+      "passed": true,
+      "score": 0.75,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "studio_review",
+          "passed": true,
+          "score": 0.75,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=4.0/5 (min=3.0): The annotation studio implements 7-8 of 9 required features with complete CRUD operations for skills, golden sets, tasks, rubrics, contracts, conventions, and calibration sessions, though some validation and navigation details are not fully visible. | Findings: [medium] src/app/golden-sets/[id]/page.tsx: Import feature is implemented but bulk import validation is not visible in the codebase; [low] src/app/conventions/page.tsx: Coverage matrix link exists but the actual coverage page is not in the provided files; [low] src/app/skills/[id]/edit/page.tsx: Edit skill page exists but form validation details not shown in truncated content; [low] src/app/layout.tsx: Navigation sidebar implementation not visible in the truncated layout file",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 13422.880166006507,
+      "pass_threshold": 0.6,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.comparison_and_trends",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "comparison_review",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=5.0/5 (min=2.0): The codebase implements all 6 required comparison and trend analysis features comprehensively with well-structured components and clear visual indicators. | Findings: [low] src/components/runs/trend-chart.tsx: Chart includes basic moving average but lacks more sophisticated statistical indicators like standard deviation bands or confidence intervals; [low] src/components/runs/run-list.tsx:246-251: Visual regression indicators are subtle (small badges) and might benefit from more prominent display",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 9288.500374997966,
+      "pass_threshold": 0.5,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.dashboard_observability",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "dashboard_review",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=5.0/5 (min=3.0): Excellent dashboard implementation with all 8 required features present and well-polished, including responsive grid layout and comprehensive observability metrics. | Findings: [low] lines 50-85: Latest run score calculation could be optimized with a single aggregated query instead of fetching all task results; [low] gateVariant function: no_go and no_go_absolute both return 'outline' variant, losing visual distinction",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 9485.381333011901,
+      "pass_threshold": 0.6,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.import_and_integration",
+      "passed": false,
+      "score": 0.25,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "integration_review",
+          "passed": true,
+          "score": 0.25,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=2.0/5 (min=2.0): Basic webhook endpoint exists but lacks all security, validation, and robustness features required for production CI/CD integration. | Findings: [critical] src/app/api/runs/webhook/route.ts: Webhook endpoint has no authentication - accepts any POST request; [high] src/app/api/runs/webhook/route.ts: No payload validation with Zod schema; [high] src/app/api/runs/webhook/route.ts: No duplicate run_id handling logic; [medium] src/app/api/runs/: No UI import endpoint - only webhook exists; [medium] src/app/api/runs/webhook/route.ts: File appears truncated or incomplete at 33 lines",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 21986.389541008975,
+      "pass_threshold": 0.7,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.postmortem_workflow",
+      "passed": true,
+      "score": 0.5,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "postmortem_review",
+          "passed": true,
+          "score": 0.5,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=3.0/5 (min=2.0): The codebase has backend API support and display functionality for postmortems, but lacks the creation form interface, resulting in an incomplete implementation. | Findings: [high] src/app/api/runs/[id]/postmortem/route.ts: Postmortem API exists but is not imported/referenced in the codebase; [medium] src/app/runs/[id]/page.tsx:lines 71-86: Postmortems are fetched and displayed but no creation form is implemented; [low] src/app/runs/[id]/page.tsx:line 196: Postmortem tab shows count but lacks create functionality",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 20279.42845900543,
+      "pass_threshold": 0.5,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    },
+    {
+      "task_id": "product.frontend.run_visualization",
+      "passed": true,
+      "score": 1.0,
+      "grader_results": [
+        {
+          "grader_type": "engineering_judge",
+          "field": "run_features_review",
+          "passed": true,
+          "score": 1.0,
+          "weight": 1.0,
+          "required": true,
+          "details": "score=5.0/5 (min=3.0): All 8 required features are fully implemented with excellent UI/UX design, comprehensive dark mode support, and additional features beyond requirements.",
+          "error": null,
+          "severity": null,
+          "file_path": "[holistic]",
+          "status": "graded"
+        }
+      ],
+      "duration_ms": 27491.43945799733,
+      "pass_threshold": 0.6,
+      "error": null,
+      "golden_set_tags": null,
+      "reducer_scores": {},
+      "epoch_scores": []
+    }
+  ],
+  "overall_score": 0.75,
+  "metadata": {
+    "code_dir": "Python-Projetos",
+    "funnel_stats": {
+      "total_llm_grader_results": 6,
+      "funnel_skipped": 0,
+      "opus_reviewed": 6
+    },
+    "cache_stats": {
+      "hits": 0,
+      "misses": 6,
+      "puts": 6,
+      "skipped_errors": 0,
+      "total": 6,
+      "hit_rate": 0.0
+    }
+  },
+  "gate_result": "conditional_go",
+  "baseline_run_id": null
+}
