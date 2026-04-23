@@ -1,0 +1,33 @@
+task_id: eng.gbr_nlp_rules.no_stack_leak
+category: classification
+component: gbr-nlp-rules
+layer: engineering
+tier: gate
+description: "NLP Rules não deve expor detalhes de exceções em respostas HTTP"
+input:
+  payload:
+    repo: services/nlp-rules
+    scan_target: "app/**/*.py"
+expected:
+  convention: no_stack_leak
+graders:
+  - type: pattern_forbidden
+    field: no_exc_in_detail
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'detail\s*=\s*f["\x27].*\{.*exc'
+      file_key: content
+      severity: warning
+  - type: pattern_forbidden
+    field: no_traceback_format
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'traceback\.format_exc|traceback\.print_exc'
+      file_key: content
+      severity: warning
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

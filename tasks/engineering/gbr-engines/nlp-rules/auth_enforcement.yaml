@@ -1,0 +1,24 @@
+task_id: eng.gbr_nlp_rules.auth_enforcement
+category: convention
+component: gbr-nlp-rules
+layer: engineering
+tier: gate
+description: "NLP Rules deve usar verify_service_key para proteger endpoints LLM"
+input:
+  payload:
+    repo: services/nlp-rules
+    scan_target: "app/api/routes.py"
+expected:
+  convention: auth_enforced
+graders:
+  - type: pattern_required
+    field: has_service_auth
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'verify_service_key'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr
