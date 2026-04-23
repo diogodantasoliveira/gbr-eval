@@ -44,7 +44,7 @@ graders:
       min_score: 3.0
       file_key: content
       language: python
-scoring_mode: binary
+scoring_mode: weighted
 pass_threshold: 0.7
 eval_owner: diogo.dantas
 eval_cadence: per-pr

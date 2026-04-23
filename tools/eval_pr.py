@@ -173,7 +173,7 @@ def push_to_frontend(
     except urllib.error.HTTPError as e:
         error_body = e.read().decode()
         if e.code == 409:
-            print(f"    (duplicate — already in frontend)")
+            print("    (duplicate — already in frontend)")
             return True
         print(f"    Push failed HTTP {e.code}: {error_body}")
         return False
@@ -207,7 +207,7 @@ def eval_pr_target(
 
     try:
         data = run_eval(
-            target.repo.replace("-", "-"),
+            target.repo,
             repos_dir,
             output_file,
             changed_only=changed_only,
@@ -313,9 +313,11 @@ def main() -> None:
         if r.error:
             print(f"    ERROR: {r.error}")
         else:
-            gate_icon = {"go": "✓", "conditional_go": "~", "no_go": "✗", "no_go_absolute": "✗✗"}.get(r.gate, "?")
+            icons = {"go": "✓", "conditional_go": "~", "no_go": "✗", "no_go_absolute": "✗✗"}
+            gate_icon = icons.get(r.gate, "?")
             push_status = " → frontend ✓" if r.pushed else ""
-            print(f"    {gate_icon} {r.gate.upper()} — {r.score*100:.1f}% ({r.tasks_passed}/{r.tasks_total} passed){push_status}")
+            pct = f"{r.score*100:.1f}%"
+            print(f"    {gate_icon} {r.gate.upper()} — {pct} ({r.tasks_passed}/{r.tasks_total} passed){push_status}")
         print()
 
     print(f"\n{'='*60}")

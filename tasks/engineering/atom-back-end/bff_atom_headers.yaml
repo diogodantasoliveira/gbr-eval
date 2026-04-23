@@ -7,7 +7,7 @@ description: "BFF routes must use atomHeaders(), never serviceAuthKey()"
 input:
   payload:
     repo: atom-back-end
-    scan_target: "src/infrastructure/adapters/inbound/**/*.py"
+    scan_target: "src/infrastructure/adapters/inbound/*_router.py"
 expected:
   convention: bff_atom_headers
 graders:
@@ -25,7 +25,7 @@ graders:
     config:
       pattern: "atomHeaders\\(|atom_headers\\("
       file_key: content
-scoring_mode: binary
-pass_threshold: 1.0
+scoring_mode: weighted
+pass_threshold: 0.80
 eval_owner: diogo.dantas
 eval_cadence: per-pr

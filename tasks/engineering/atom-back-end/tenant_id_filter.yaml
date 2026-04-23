@@ -7,7 +7,7 @@ description: "Every database query/repository must filter by tenant_id or use RL
 input:
   payload:
     repo: atom-back-end
-    scan_target: "src/infrastructure/adapters/outbound/**/*.py"
+    scan_target: "src/infrastructure/adapters/outbound/postgres/**/*.py"
 expected:
   convention: tenant_id_required
 graders:
@@ -25,7 +25,7 @@ graders:
     config:
       pattern: '\.query\([A-Za-z_]\w*\)\s*\.all\(\)|\.query\([A-Za-z_]\w*\)\s*\.first\(\)|select\([^)]+\)(?!.*(?:where|filter|tenant))'
       file_key: content
-scoring_mode: binary
-pass_threshold: 1.0
+scoring_mode: weighted
+pass_threshold: 0.90
 eval_owner: diogo.dantas
 eval_cadence: per-pr

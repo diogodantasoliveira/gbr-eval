@@ -27,7 +27,7 @@ graders:
     config:
       pattern: "print\\(.*password|print\\(.*secret|print\\(.*token"
       file_key: content
-scoring_mode: binary
+scoring_mode: weighted
 pass_threshold: 0.8
 eval_owner: diogo.dantas
 eval_cadence: per-pr

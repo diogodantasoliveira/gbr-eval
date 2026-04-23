@@ -130,9 +130,14 @@ def _preflight_check(
         s.type in _LLM_GRADER_TYPES for t in tasks for s in t.graders
     )
     if has_llm and not os.environ.get("ANTHROPIC_API_KEY"):
-        issues.append(
-            "[CRITICAL] ANTHROPIC_API_KEY not set — LLM graders cannot run"
-        )
+        if code_dir is not None:
+            issues.append(
+                "ANTHROPIC_API_KEY not set — LLM graders will rely on cache"
+            )
+        else:
+            issues.append(
+                "[CRITICAL] ANTHROPIC_API_KEY not set — LLM graders cannot run"
+            )
 
     if code_dir:
         repos: set[str] = {
@@ -831,6 +836,10 @@ def run(
 ) -> None:
     """Run eval tasks and report results."""
     import signal
+
+    # Bug fix: --output-file implies JSON output format
+    if output_file and output_format != "json":
+        output_format = "json"
 
     if run_timeout is not None:
         def _timeout_handler(signum: int, frame: object) -> None:
