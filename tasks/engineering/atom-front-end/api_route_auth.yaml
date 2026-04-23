@@ -1,0 +1,24 @@
+task_id: eng.atom_fe.api_route_auth
+category: tenant_isolation
+component: atom-front-end
+layer: engineering
+tier: gate
+description: "API routes de dados devem delegar ao server module (que usa proxyToBff com auth). Auth routes (/api/auth/*) são excluídas."
+input:
+  payload:
+    repo: atom-front-end
+    scan_target: "app/api/**/route.ts"
+expected:
+  convention: api_routes_authenticated
+graders:
+  - type: pattern_required
+    field: uses_server_or_proxy
+    weight: 1.0
+    required: false
+    config:
+      pattern: 'from\s+["\x27]@/lib/.*server["\x27]|proxyToBff|getAtomUserIdFromCookies|getAuthTokensFromCookies|authenticateUser|cognito'
+      file_key: content
+scoring_mode: weighted
+pass_threshold: 0.70
+eval_owner: diogo.dantas
+eval_cadence: per-pr

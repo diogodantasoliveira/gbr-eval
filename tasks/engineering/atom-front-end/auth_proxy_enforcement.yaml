@@ -1,0 +1,39 @@
+task_id: eng.atom_fe.auth_proxy_enforcement
+category: tenant_isolation
+component: atom-front-end
+layer: engineering
+tier: gate
+description: "proxy.ts deve proteger rotas autenticadas — sem bypass em paths fora de PUBLIC_PATHS e SKIP_PREFIXES"
+input:
+  payload:
+    repo: atom-front-end
+    scan_target: "proxy.ts"
+expected:
+  convention: auth_proxy_enforced
+graders:
+  - type: pattern_required
+    field: has_auth_check
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'isIdTokenValid|idToken|refreshToken'
+      file_key: content
+  - type: pattern_required
+    field: has_redirect_to_login
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'NextResponse\.redirect'
+      file_key: content
+  - type: pattern_forbidden
+    field: no_wildcard_skip
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'SKIP_PREFIXES.*\/api["\x27,]|PUBLIC_PATHS.*\/api'
+      file_key: content
+      severity: critical
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

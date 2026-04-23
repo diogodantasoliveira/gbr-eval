@@ -1,0 +1,46 @@
+task_id: eng.atom_fe.security_deep_review
+category: classification
+component: atom-front-end
+layer: engineering
+tier: gate
+description: "LLM deep review das API routes — auth bypass, info leak, input validation"
+input:
+  payload:
+    repo: atom-front-end
+    scan_target: "app/api/**/route.ts"
+expected:
+  convention: secure_api_routes
+graders:
+  - type: pattern_forbidden
+    field: no_stack_leak
+    weight: 1.0
+    required: false
+    config:
+      pattern: '(?:err|error)\.(?:stack|message)\b(?!.*console)'
+      file_key: content
+      severity: high
+  - type: engineering_judge
+    field: security_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review these Next.js 16 API routes for security in a multi-tenant fintech BFF.
+        Context: routes proxy to atom-back-end via proxyToBff() or handle auth via Cognito.
+        Authentication: cookies (idToken, refreshToken) managed by proxy.ts + lib/auth.
+        Evaluate:
+        1. AUTH: Does every data-access route verify identity (getAtomUserIdFromCookies or proxyToBff which does it internally)?
+        2. INPUT VALIDATION: Are path params, query params, and request bodies validated with Zod before use?
+        3. INFO LEAK: Do error responses avoid exposing internal details (error.message, stack traces, DB errors, upstream URLs)?
+        4. TENANT ISOLATION: Is tenant_id validated from the session, not accepted from user input?
+        5. SSRF: Are upstream URLs only built from env vars, never from user-controlled input?
+        6. ERROR HANDLING: Does every handler have try/catch with appropriate HTTP status codes?
+        Score 5 only if all checks pass with zero findings.
+      min_score: 3.0
+      file_key: content
+      language: typescript
+evaluation_mode: holistic
+scoring_mode: weighted
+pass_threshold: 0.40
+eval_owner: diogo.dantas
+eval_cadence: per-pr

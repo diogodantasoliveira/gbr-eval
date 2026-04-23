@@ -1,0 +1,33 @@
+task_id: eng.atom_fe.bff_proxy_usage
+category: convention
+component: atom-front-end
+layer: engineering
+tier: gate
+description: "API routes devem usar proxyToBff() para chamar o backend, nunca fetch direto ao BFF_UPSTREAM_URL"
+input:
+  payload:
+    repo: atom-front-end
+    scan_target: "app/api/**/route.ts"
+expected:
+  convention: bff_proxy_required
+graders:
+  - type: pattern_forbidden
+    field: no_direct_upstream_fetch
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'fetch\s*\(\s*`?\$\{?\s*(?:process\.env\.BFF_UPSTREAM_URL|upstream|upstreamUrl)'
+      file_key: content
+      severity: high
+  - type: pattern_forbidden
+    field: no_hardcoded_backend_url
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'fetch\s*\(\s*["\x27]https?://.*(?:atom|backend|bff|api/v1)'
+      file_key: content
+      severity: critical
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

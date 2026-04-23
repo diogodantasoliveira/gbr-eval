@@ -1,0 +1,41 @@
+task_id: eng.atom_fe.typescript_quality
+category: code_quality
+component: atom-front-end
+layer: engineering
+tier: gate
+description: "Qualidade TypeScript — sem any explícito, sem ts-ignore, sem as any"
+input:
+  payload:
+    repo: atom-front-end
+    scan_target: "**/*.tsx"
+expected:
+  convention: strict_typescript
+graders:
+  - type: pattern_forbidden
+    field: no_explicit_any
+    weight: 1.0
+    required: false
+    config:
+      pattern: ':\s*any\b'
+      file_key: content
+      severity: high
+  - type: pattern_forbidden
+    field: no_ts_ignore
+    weight: 1.0
+    required: true
+    config:
+      pattern: '@ts-ignore|@ts-nocheck'
+      file_key: content
+      severity: critical
+  - type: pattern_forbidden
+    field: no_as_any
+    weight: 0.5
+    required: false
+    config:
+      pattern: '\bas\s+any\b'
+      file_key: content
+      severity: high
+scoring_mode: weighted
+pass_threshold: 0.70
+eval_owner: diogo.dantas
+eval_cadence: per-pr

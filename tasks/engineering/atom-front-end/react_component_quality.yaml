@@ -1,0 +1,44 @@
+task_id: eng.atom_fe.react_component_quality
+category: code_quality
+component: atom-front-end
+layer: engineering
+tier: regression
+description: "LLM review de qualidade React — separação client/server, hooks, acessibilidade"
+input:
+  payload:
+    repo: atom-front-end
+    scan_target: "components/organisms/**/*.tsx"
+expected:
+  convention: react_best_practices
+graders:
+  - type: pattern_forbidden
+    field: no_dangerously_set_html
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'dangerouslySetInnerHTML'
+      file_key: content
+      severity: critical
+  - type: engineering_judge
+    field: component_review
+    weight: 1.0
+    required: false
+    config:
+      rubric: |
+        Review these React components from atom-front-end (Next.js 16, React 19, Zod v4, TanStack Query).
+        The app follows atomic design: atoms (UI primitives), molecules (composed), organisms (page-level).
+        Evaluate:
+        1. CLIENT/SERVER: If "use client" is present, does it actually need client features? Are server-only imports (next/headers, server-only) avoided?
+        2. HOOKS: useState/useEffect used correctly? No hooks in conditionals? Correct dependency arrays? Derived state not stored in useState?
+        3. FORMS: react-hook-form with Zod resolver used consistently? Validation errors displayed?
+        4. DATA FETCHING: TanStack Query hooks with proper error/loading states? No raw fetch in components?
+        5. ACCESSIBILITY: Interactive elements have ARIA attrs? Buttons have type? Images have alt? Form inputs labeled?
+        Score 5 only if all patterns are followed correctly.
+      min_score: 3.0
+      file_key: content
+      language: typescript
+evaluation_mode: holistic
+scoring_mode: weighted
+pass_threshold: 0.50
+eval_owner: diogo.dantas
+eval_cadence: per-pr

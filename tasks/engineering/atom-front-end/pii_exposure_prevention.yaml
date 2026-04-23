@@ -1,0 +1,33 @@
+task_id: eng.atom_fe.pii_exposure_prevention
+category: convention
+component: atom-front-end
+layer: engineering
+tier: gate
+description: "Dados PII (CPF, CNPJ) não devem ser logados no console nem expostos em URLs"
+input:
+  payload:
+    repo: atom-front-end
+    scan_target: "**/*.ts"
+expected:
+  convention: pii_not_exposed
+graders:
+  - type: pattern_forbidden
+    field: no_pii_in_console
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'console\.(log|info|debug|warn)\s*\([^)]*(?:cpf|cnpj|password|senha|secret)'
+      file_key: content
+      severity: critical
+  - type: pattern_forbidden
+    field: no_pii_in_url
+    weight: 1.0
+    required: true
+    config:
+      pattern: '(?:searchParams|query|pathname).*(?:cpf|cnpj|password|senha)'
+      file_key: content
+      severity: high
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr
