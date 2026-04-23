@@ -1,0 +1,39 @@
+task_id: prod.gbr_extraction.no_hallucination
+category: extraction
+component: ai-engine.extractor
+layer: product
+tier: gate
+description: "Campos ausentes devem ser null, nunca inventados"
+
+input:
+  payload:
+    tipo_documento: identidade_rg
+    campos:
+      nome: "MARIA SILVA"
+      cpf: "12345678900"
+      cnh_numero: null
+      passaporte: null
+
+expected:
+  null_fields: ["cnh_numero", "passaporte"]
+
+graders:
+  - type: exact_match
+    field: cnh_not_hallucinated
+    weight: 0.5
+    required: false
+    config:
+      expected_value: null
+      field_path: "campos.cnh_numero"
+  - type: exact_match
+    field: passaporte_not_hallucinated
+    weight: 0.5
+    required: false
+    config:
+      expected_value: null
+      field_path: "campos.passaporte"
+
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

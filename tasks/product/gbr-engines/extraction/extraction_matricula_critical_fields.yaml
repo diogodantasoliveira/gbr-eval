@@ -1,0 +1,50 @@
+task_id: prod.gbr_extraction.matricula_critical_fields
+category: extraction
+component: ai-engine.extractor
+layer: product
+tier: gate
+description: "Extração de matrícula deve incluir campos patrimoniais críticos"
+
+input:
+  payload:
+    tipo_documento: patrimonial_matricula
+    campos:
+      numero_matricula: "123456"
+      cartorio: "1o Oficio de Registro de Imoveis"
+      area_total: "250.00"
+      proprietarios: [{"nome": "JOAO SILVA", "cpf": "98765432100"}]
+      tem_onus: true
+
+expected:
+  campos:
+    numero_matricula: "123456"
+    tem_onus: true
+
+graders:
+  - type: exact_match
+    field: numero_matricula
+    weight: 0.4
+    required: false
+    config:
+      expected_value: "123456"
+      field_path: "campos.numero_matricula"
+  - type: exact_match
+    field: tem_onus
+    weight: 0.3
+    required: false
+    config:
+      expected_value: true
+      field_path: "campos.tem_onus"
+  - type: numeric_range
+    field: area_total_positive
+    weight: 0.3
+    required: false
+    config:
+      field_path: "campos.area_total"
+      min: 0.01
+      max: 999999999
+
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

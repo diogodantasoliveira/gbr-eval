@@ -1,0 +1,51 @@
+task_id: prod.gbr_extraction.rg_critical_fields
+category: extraction
+component: ai-engine.extractor
+layer: product
+tier: gate
+description: "Extração de RG deve incluir campos críticos (nome, CPF, data_nascimento)"
+
+input:
+  payload:
+    tipo_documento: identidade_rg
+    campos:
+      nome: "MARIA SILVA SANTOS"
+      cpf: "12345678900"
+      data_nascimento: "1980-01-01"
+      rg: "123456789"
+      orgao_emissor: "SSP/SP"
+      filiacao_mae: "ANA MARIA SANTOS"
+
+expected:
+  campos:
+    nome: "MARIA SILVA SANTOS"
+    cpf: "12345678900"
+    data_nascimento: "1980-01-01"
+
+graders:
+  - type: exact_match
+    field: nome
+    weight: 0.4
+    required: false
+    config:
+      expected_value: "MARIA SILVA SANTOS"
+      field_path: "campos.nome"
+  - type: regex_match
+    field: cpf_format
+    weight: 0.3
+    required: false
+    config:
+      pattern: '^\d{11}$'
+      field_path: "campos.cpf"
+  - type: regex_match
+    field: date_format
+    weight: 0.3
+    required: false
+    config:
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+      field_path: "campos.data_nascimento"
+
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

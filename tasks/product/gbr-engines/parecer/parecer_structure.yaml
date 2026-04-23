@@ -1,0 +1,59 @@
+task_id: prod.gbr_parecer.required_sections
+category: decision
+component: parecer.generator
+layer: product
+tier: gate
+description: "Parecer deve conter as 6 seções obrigatórias"
+
+input:
+  payload:
+    secoes:
+      - titulo: "Resumo"
+        conteudo: "Auditoria do imóvel..."
+      - titulo: "Análise Documental"
+        conteudo: "Documentos apresentados..."
+      - titulo: "Conformidade"
+        conteudo: "Requisitos atendidos..."
+      - titulo: "Achados"
+        conteudo: "Foram identificados..."
+      - titulo: "Recomendação"
+        conteudo: "Recomenda-se..."
+      - titulo: "Conclusão"
+        conteudo: "Com base na análise..."
+    resultado: "CONFORME"
+    grau_risco: "BAIXO"
+
+expected:
+  required_sections: ["Resumo", "Análise Documental", "Conformidade", "Achados", "Recomendação", "Conclusão"]
+  resultado: "CONFORME"
+  valid_resultados: ["CONFORME", "INCONFORME", "COM_RESSALVAS"]
+  valid_riscos: ["BAIXO", "MEDIO", "ALTO", "CRITICO"]
+
+graders:
+  - type: exact_match
+    field: resultado_valid
+    weight: 0.3
+    required: false
+    config:
+      expected_value: "CONFORME"
+      field_path: resultado
+  - type: set_membership
+    field: risco_valid
+    weight: 0.2
+    required: false
+    config:
+      expected_set: ["BAIXO", "MEDIO", "ALTO", "CRITICO"]
+      field_path: grau_risco
+  - type: numeric_range
+    field: section_count
+    weight: 0.5
+    required: false
+    config:
+      field_path: "secoes.__len__"
+      min: 6
+      max: 10
+
+scoring_mode: weighted
+pass_threshold: 0.90
+eval_owner: diogo.dantas
+eval_cadence: per-pr

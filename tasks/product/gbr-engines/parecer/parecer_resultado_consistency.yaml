@@ -1,0 +1,36 @@
+task_id: prod.gbr_parecer.resultado_risco_consistency
+category: decision
+component: parecer.generator
+layer: product
+tier: gate
+description: "CONFORME deve ter risco BAIXO/MEDIO; INCONFORME deve ter risco ALTO/CRITICO"
+
+input:
+  payload:
+    resultado: "CONFORME"
+    grau_risco: "BAIXO"
+
+expected:
+  resultado: "CONFORME"
+  grau_risco: "BAIXO"
+
+graders:
+  - type: exact_match
+    field: resultado
+    weight: 0.5
+    required: false
+    config:
+      expected_value: "CONFORME"
+      field_path: resultado
+  - type: set_membership
+    field: risco_consistent
+    weight: 0.5
+    required: false
+    config:
+      expected_set: ["BAIXO", "MEDIO"]
+      field_path: grau_risco
+
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

@@ -1,0 +1,34 @@
+task_id: prod.gbr_nlp_rules.monetary_format
+category: classification
+component: nlp-rules.translator
+layer: product
+tier: gate
+description: "Valores monetários devem ser numéricos (3000), não formatados (R$ 3.000,00)"
+
+input:
+  payload:
+    texto: "Renda mensal mínima de 3000 reais"
+    dominio: "credito"
+    condition:
+      ">=":
+        - var: "renda_mensal"
+        - 3000
+    confianca: 0.90
+    vars_referenciados: ["renda_mensal"]
+
+expected:
+  monetary_value: 3000
+
+graders:
+  - type: exact_match
+    field: monetary_numeric
+    weight: 1.0
+    required: false
+    config:
+      expected_value: 3000
+      field_path: "condition.>=.1"
+
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

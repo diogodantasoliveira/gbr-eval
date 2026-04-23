@@ -1,0 +1,27 @@
+task_id: prod.gbr_classification.type_coverage
+category: classification
+component: ai-engine.classifier
+layer: product
+tier: gate
+description: "Classificador deve suportar os 5 tipos P0 de documentos"
+
+input:
+  payload:
+    supported_types: ["identidade_rg", "identidade_cnh", "financeiro_contracheque", "patrimonial_matricula", "contrato_social"]
+
+expected:
+  required_types: ["identidade_rg", "identidade_cnh", "financeiro_contracheque", "patrimonial_matricula", "contrato_social"]
+
+graders:
+  - type: set_membership
+    field: p0_types_supported
+    weight: 1.0
+    required: false
+    config:
+      expected_set: ["identidade_rg", "identidade_cnh", "financeiro_contracheque", "patrimonial_matricula", "contrato_social"]
+      field_path: supported_types
+
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr

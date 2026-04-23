@@ -1,0 +1,37 @@
+task_id: prod.gbr_classification.confidence_gate
+category: classification
+component: ai-engine.classifier
+layer: product
+tier: gate
+description: "Classificação de documentos deve ter confiança >= 0.85 para auto-aprovação"
+
+input:
+  payload:
+    tipo_documento: identidade_rg
+    confianca: 0.92
+    alternativas: ["identidade_cnh", "outro"]
+
+expected:
+  tipo_documento: identidade_rg
+  min_confianca: 0.85
+
+graders:
+  - type: exact_match
+    field: tipo_documento
+    weight: 0.5
+    required: false
+    config:
+      expected_value: identidade_rg
+  - type: numeric_range
+    field: confianca_threshold
+    weight: 0.5
+    required: false
+    config:
+      field_path: confianca
+      min: 0.85
+      max: 1.0
+
+scoring_mode: weighted
+pass_threshold: 1.00
+eval_owner: diogo.dantas
+eval_cadence: per-pr
