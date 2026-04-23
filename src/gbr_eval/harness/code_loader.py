@@ -24,7 +24,7 @@ from gbr_eval.harness.models import (
     Tier,
 )
 from gbr_eval.harness.regression import classify_gate
-from gbr_eval.harness.runner import _compute_score, load_tasks_from_dir
+from gbr_eval.harness.runner import _compute_score, _resolve_git_sha, load_tasks_from_dir
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -140,12 +140,40 @@ def evaluate_file(
     return FileResult(file_path=file_path, conforming=conforming, grader_results=grader_results)
 
 
+def _resolve_changed_files(
+    code_dir: Path,
+    repo: str,
+    *,
+    changed_files: set[str] | None = None,
+    base_branch: str | None = None,
+) -> set[str] | None:
+    """Resolve changed files for a specific repo.
+
+    If *changed_files* is already provided, returns it directly.
+    If *base_branch* is set, runs ``git diff`` inside ``code_dir/repo``.
+    """
+    if changed_files is not None:
+        return changed_files
+    if base_branch is None:
+        return None
+    from gbr_eval.harness.git_diff import get_changed_files
+
+    repo_path = (code_dir / repo).resolve()
+    if not repo_path.is_dir():
+        return None
+    try:
+        return get_changed_files(repo_path, base_branch)
+    except (RuntimeError, ValueError):
+        return None
+
+
 def run_task_holistic(
     task: Task,
     code_dir: Path,
     *,
     cache: GraderCache | None = None,
     changed_files: set[str] | None = None,
+    base_branch: str | None = None,
 ) -> TaskResult:
     """Run a holistic task — aggregate files, grade once with LLM.
 
@@ -169,9 +197,12 @@ def run_task_holistic(
 
     start = time.monotonic()
     files = load_code_files(code_dir, repo, scan_target)
-    if changed_files is not None:
+    resolved_changed = _resolve_changed_files(
+        code_dir, repo, changed_files=changed_files, base_branch=base_branch,
+    )
+    if resolved_changed is not None:
         from gbr_eval.harness.git_diff import filter_changed_files
-        files = filter_changed_files(files, changed_files)
+        files = filter_changed_files(files, resolved_changed)
 
     if not files:
         return TaskResult(
@@ -261,6 +292,7 @@ def run_task_against_code(
     *,
     cache: GraderCache | None = None,
     changed_files: set[str] | None = None,
+    base_branch: str | None = None,
     use_funnel: bool = False,
     on_progress: ProgressCallback | None = None,
 ) -> TaskResult:
@@ -273,7 +305,7 @@ def run_task_against_code(
     *on_progress* is called after each file: ``(file_path, idx, total, score, cached)``.
     """
     if task.evaluation_mode == EvaluationMode.HOLISTIC:
-        return run_task_holistic(task, code_dir, cache=cache, changed_files=changed_files)
+        return run_task_holistic(task, code_dir, cache=cache, changed_files=changed_files, base_branch=base_branch)
 
     repo = task.input.payload.get("repo", "")
     scan_target = task.input.payload.get("scan_target", "**/*.py")
@@ -291,9 +323,12 @@ def run_task_against_code(
 
     start = time.monotonic()
     files = load_code_files(code_dir, repo, scan_target)
-    if changed_files is not None:
+    resolved_changed = _resolve_changed_files(
+        code_dir, repo, changed_files=changed_files, base_branch=base_branch,
+    )
+    if resolved_changed is not None:
         from gbr_eval.harness.git_diff import filter_changed_files
-        files = filter_changed_files(files, changed_files)
+        files = filter_changed_files(files, resolved_changed)
 
     if not files:
         return TaskResult(
@@ -364,6 +399,7 @@ def run_engineering_suite(
     *,
     cache: GraderCache | None = None,
     changed_files: set[str] | None = None,
+    base_branch: str | None = None,
     use_funnel: bool = False,
     on_progress: ProgressCallback | None = None,
 ) -> EvalRun:
@@ -374,18 +410,26 @@ def run_engineering_suite(
     effective_layer = layer or Layer.ENGINEERING
     tasks = load_tasks_from_dir(tasks_dir, layer=effective_layer, tier=tier)
 
+    repos: set[str] = {
+        str(r) for t in tasks
+        if (r := t.input.payload.get("repo")) and isinstance(r, str)
+    }
+    first_repo = sorted(repos)[0] if repos else None
+    git_sha = _resolve_git_sha(code_dir, first_repo)
+
     run = EvalRun(
         run_id=str(uuid.uuid4()),
         layer=effective_layer,
         tier=tier,
         tasks_total=len(tasks),
         metadata={"code_dir": code_dir.name},
+        git_sha=git_sha,
     )
 
     for task in tasks:
         result = run_task_against_code(
             task, code_dir, cache=cache, changed_files=changed_files,
-            use_funnel=use_funnel, on_progress=on_progress,
+            base_branch=base_branch, use_funnel=use_funnel, on_progress=on_progress,
         )
         run.task_results.append(result)
         if result.passed:

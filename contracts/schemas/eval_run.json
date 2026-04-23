@@ -316,6 +316,18 @@
       ],
       "default": null,
       "title": "Baseline Run Id"
+    },
+    "git_sha": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Git Sha"
     }
   },
   "required": [

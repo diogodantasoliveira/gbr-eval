@@ -23,11 +23,24 @@
       "title": "EvaluationMode",
       "type": "string"
     },
+    "GraderKind": {
+      "enum": [
+        "deterministic",
+        "llm_triage",
+        "llm_deep"
+      ],
+      "title": "GraderKind",
+      "type": "string"
+    },
     "GraderSpec": {
       "properties": {
         "type": {
           "title": "Type",
           "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/GraderKind",
+          "default": "deterministic"
         },
         "field": {
           "anyOf": [

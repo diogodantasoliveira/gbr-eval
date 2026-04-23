@@ -6,6 +6,7 @@ import contextlib
 import copy
 import json as json_mod
 import os
+import subprocess
 import time
 import uuid
 import warnings
@@ -28,6 +29,7 @@ from gbr_eval.harness.models import (
     EvaluationMode,
     GateResult,
     GraderContext,
+    GraderKind,
     GraderResult,
     GraderSpec,
     Layer,
@@ -51,7 +53,19 @@ def load_task(path: Path) -> Task:
     for g in raw_graders:
         if "config" in g and isinstance(g["config"], dict):
             g["config"] = {k: v for k, v in g["config"].items() if not k.startswith("_")}
+        if "kind" not in g:
+            if g.get("type") in _LLM_GRADER_TYPES:
+                g["kind"] = GraderKind.LLM_DEEP if g.get("type") == "engineering_judge" else GraderKind.LLM_TRIAGE
+            else:
+                g["kind"] = GraderKind.DETERMINISTIC
     graders = [GraderSpec(**g) for g in raw_graders]
+    for g in graders:
+        if g.kind != GraderKind.DETERMINISTIC and g.required:
+            warnings.warn(
+                f"Task {raw.get('task_id', '?')}: LLM grader '{g.type}' is required=true — "
+                f"non-deterministic graders should not block deploys alone",
+                stacklevel=1,
+            )
     task_input = TaskInput(**raw.get("input", {}))
 
     task = Task(
@@ -514,6 +528,8 @@ def run_suite_with_golden(
         tier=tier,
         tasks_total=len(tasks),
     )
+    if self_eval:
+        run.metadata["mode"] = "self_eval"
     if model_roles:
         run.metadata["model_roles"] = model_roles
 
@@ -622,6 +638,18 @@ def _make_progress_callback() -> Any:
     return _on_progress
 
 
+def _resolve_git_sha(code_dir: Path, repo: str | None = None) -> str | None:
+    target = code_dir / repo if repo else code_dir
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True, cwd=target,
+        )
+        return result.stdout.strip() if result.returncode == 0 else None
+    except OSError:
+        return None
+
+
 def _run_code_eval(
     suite: Path | None,
     task_path: Path | None,
@@ -631,6 +659,7 @@ def _run_code_eval(
     *,
     cache: Any | None = None,
     changed_files: set[str] | None = None,
+    base_branch: str | None = None,
     use_funnel: bool = False,
     progress: bool = True,
 ) -> EvalRun:
@@ -638,12 +667,15 @@ def _run_code_eval(
     from gbr_eval.harness.code_loader import run_engineering_suite, run_task_against_code
 
     on_progress = _make_progress_callback() if progress else None
+    repo_name: str | None = None
 
     if task_path:
         task = load_task(task_path)
+        repo_name = task.input.payload.get("repo")
         click.echo(f"[eval] {task.task_id}", err=True)
         result = run_task_against_code(
             task, code_dir, cache=cache, changed_files=changed_files,
+            base_branch=base_branch,
             use_funnel=use_funnel, on_progress=on_progress,
         )
         return EvalRun(
@@ -656,12 +688,13 @@ def _run_code_eval(
             task_results=[result],
             overall_score=result.score,
             finished_at=datetime.now(UTC),
+            git_sha=_resolve_git_sha(code_dir, repo_name),
         )
     assert suite is not None
     return run_engineering_suite(
         suite, code_dir, layer=layer_enum, tier=tier_enum,
-        cache=cache, changed_files=changed_files, use_funnel=use_funnel,
-        on_progress=on_progress,
+        cache=cache, changed_files=changed_files, base_branch=base_branch,
+        use_funnel=use_funnel, on_progress=on_progress,
     )
 
 
@@ -900,22 +933,15 @@ def run(
         click.echo(f"[preflight] Warning: preflight check failed: {exc}", err=True)
 
     # --- Resolve changed files ---
-    changed: set[str] | None = None
-    if changed_only and code_dir:
-        from gbr_eval.harness.git_diff import get_changed_files
-        try:
-            changed = get_changed_files(code_dir, base_branch)
-            click.echo(f"[git-diff] {len(changed)} files changed vs {base_branch}", err=True)
-        except (RuntimeError, ValueError) as exc:
-            click.echo(f"[git-diff] Failed: {exc}", err=True)
-            raise SystemExit(EXIT_RUNTIME_ERROR) from exc
+    effective_base_branch: str | None = base_branch if changed_only else None
 
     # --- Run evaluation ---
     try:
         if code_dir:
             eval_run = _run_code_eval(
                 suite, task_path, code_dir, layer_enum, tier_enum,
-                cache=grader_cache, changed_files=changed, use_funnel=not no_funnel,
+                cache=grader_cache, base_branch=effective_base_branch,
+                use_funnel=not no_funnel,
             )
         elif task_path:
             eval_run = _run_single_task_eval(task_path, golden_dir, self_eval, client, recorder, model_roles)

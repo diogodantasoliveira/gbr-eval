@@ -60,6 +60,12 @@ class Severity(StrEnum):
     LOW = "low"
 
 
+class GraderKind(StrEnum):
+    DETERMINISTIC = "deterministic"
+    LLM_TRIAGE = "llm_triage"
+    LLM_DEEP = "llm_deep"
+
+
 class GraderStatus(StrEnum):
     GRADED = "graded"
     ERROR = "error"
@@ -76,6 +82,7 @@ class GateResult(StrEnum):
 
 class GraderSpec(BaseModel):
     type: str
+    kind: GraderKind = GraderKind.DETERMINISTIC
     field: str | None = None
     weight: float = 1.0
     required: bool = False
@@ -172,6 +179,7 @@ class EvalRun(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
     gate_result: GateResult | None = None
     baseline_run_id: str | None = None
+    git_sha: str | None = None
 
 
 class PostMortem(BaseModel):
