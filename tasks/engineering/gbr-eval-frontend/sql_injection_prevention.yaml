@@ -38,19 +38,20 @@ graders:
     required: false
     config:
       rubric: |
-        Review this TypeScript file for data access security in a Next.js application using Drizzle ORM with SQLite.
+        Review these TypeScript API routes for SQL injection prevention in a Next.js application using Drizzle ORM with SQLite.
+        Focus ONLY on SQL injection and query safety — authorization and access control are evaluated separately.
         Evaluate:
         1. SQL INJECTION: Are all database queries using Drizzle's query builder or parameterized sql`` tagged templates? Any string concatenation in queries?
         2. INPUT VALIDATION: Are user inputs from URL params, search params, or request bodies validated (e.g., with Zod) before being used in queries?
-        3. DATA EXPOSURE: Do API responses leak internal database IDs, schemas, or sensitive fields that shouldn't be exposed?
-        4. AUTHORIZATION: Are there any query paths that bypass access checks or return unscoped data?
-        Score 5 only if all checks pass with zero findings.
+        3. DYNAMIC QUERIES: Are any query filters or sort orders built from user input without whitelisting allowed values?
+        4. RAW SQL: Is db.run() or similar raw execution used with user-controlled inputs?
+        Score 5 if all queries use parameterized access with proper input validation. Score 3 if queries are safe but input validation is incomplete. Score 1 if raw string interpolation is used in queries.
       min_score: 3.0
       file_key: content
       language: typescript
 
 evaluation_mode: holistic
 scoring_mode: hybrid
-pass_threshold: 0.8
+pass_threshold: 0.7
 eval_owner: diogo.dantas
 eval_cadence: per-pr

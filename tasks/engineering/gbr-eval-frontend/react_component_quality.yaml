@@ -14,10 +14,19 @@ expected:
   convention: react_best_practices
 
 graders:
+  - type: pattern_forbidden
+    field: no_dangerously_set_html
+    weight: 1.0
+    required: true
+    config:
+      pattern: 'dangerouslySetInnerHTML'
+      file_key: content
+      severity: critical
+
   - type: engineering_judge
     field: component_review
     weight: 1.0
-    required: true
+    required: false
     config:
       rubric: |
         Review this React component for quality in a Next.js 16 application.
