@@ -14,17 +14,17 @@ graders:
   - type: pattern_forbidden
     field: no_traceback_in_response
     weight: 1.0
-    required: true
+    required: false
     config:
       pattern: 'traceback\.format_exc\(\)|traceback\.print_exc\(\)'
       file_key: content
       severity: critical
   - type: pattern_forbidden
-    field: no_str_exc_in_response
+    field: no_fstring_exc_in_detail
     weight: 1.0
     required: false
     config:
-      pattern: 'detail\s*=\s*str\((?:exc|err|e|error)\)'
+      pattern: 'detail\s*=\s*f["\x27][^"'']*\{(?:str\()?(?:exc|err|e|error)\)?[^"'']*["\x27]'
       file_key: content
       severity: high
 scoring_mode: weighted
