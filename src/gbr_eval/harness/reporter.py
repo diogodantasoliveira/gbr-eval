@@ -18,26 +18,35 @@ if TYPE_CHECKING:
 
 def console_report(run: EvalRun, delta: RegressionDelta | None = None) -> str:
     # Build header — include gate result when present
+    project_line = f"  Project: {run.project}\n" if run.project != "default" else ""
     if run.gate_result is not None:
         gate_label = run.gate_result.value.upper().replace("_", " ")
         header_tier = run.tier.value if run.tier else "all"
         lines = [
             f"{'='*60}",
             f"  Eval Run: {run.run_id[:8]}",
+        ]
+        if project_line:
+            lines.append(project_line.rstrip())
+        lines.extend([
             f"  Layer: {run.layer.value}  |  Tier: {header_tier}  |  Gate: {gate_label}",
             f"  Started: {run.started_at.isoformat()}",
             f"{'='*60}",
             "",
-        ]
+        ])
     else:
         lines = [
             f"{'='*60}",
             f"  Eval Run: {run.run_id[:8]}",
+        ]
+        if project_line:
+            lines.append(project_line.rstrip())
+        lines.extend([
             f"  Layer: {run.layer.value}  |  Tier: {run.tier.value if run.tier else 'all'}",
             f"  Started: {run.started_at.isoformat()}",
             f"{'='*60}",
             "",
-        ]
+        ])
 
     for result in run.task_results:
         status = "PASS" if result.passed else "FAIL"
@@ -185,17 +194,18 @@ def junit_xml_report(run: EvalRun, output_path: Path | None = None) -> str:
 def ci_summary(run: EvalRun) -> str:
     """One-line summary for CI output."""
     failed_tasks = [r.task_id for r in run.task_results if not r.passed]
+    prefix = f"gbr-eval[{run.project}]" if run.project != "default" else "gbr-eval"
 
     if run.gate_result is not None:
         gate_label = run.gate_result.value.upper().replace("_", " ")
         tier_label = run.tier.value if run.tier else "all"
         summary = (
-            f"gbr-eval | {run.layer.value} {tier_label} | {gate_label} | "
+            f"{prefix} | {run.layer.value} {tier_label} | {gate_label} | "
             f"{run.tasks_passed}/{run.tasks_total} passed | {run.overall_score:.1%}"
         )
     else:
         status = "PASSED" if run.tasks_failed == 0 else "FAILED"
-        summary = f"gbr-eval {status}: {run.tasks_passed}/{run.tasks_total} tasks passed ({run.overall_score:.1%})"
+        summary = f"{prefix} {status}: {run.tasks_passed}/{run.tasks_total} tasks passed ({run.overall_score:.1%})"
 
     if failed_tasks:
         summary += f" | Failed: {', '.join(failed_tasks)}"

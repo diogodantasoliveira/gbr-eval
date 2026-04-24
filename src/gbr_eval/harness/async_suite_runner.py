@@ -71,6 +71,7 @@ async def run_eval_run_async(
     layer: Layer | None = None,
     model_roles: dict[str, str] | None = None,
     max_concurrency: int = 5,
+    project: str = "default",
 ) -> EvalRun:
     """Run tasks in parallel and return a fully populated EvalRun.
 
@@ -90,6 +91,7 @@ async def run_eval_run_async(
     """
     run = EvalRun(
         run_id=str(uuid.uuid4()),
+        project=project,
         layer=layer or Layer.PRODUCT,
         tasks_total=len(tasks),
     )

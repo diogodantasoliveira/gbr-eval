@@ -70,6 +70,7 @@ def load_task(path: Path) -> Task:
 
     task = Task(
         task_id=raw["task_id"],
+        project=raw.get("project", "default"),
         category=Category(raw["category"]),
         component=raw.get("component", "unknown"),
         layer=Layer(raw["layer"]),
@@ -104,13 +105,20 @@ def load_task(path: Path) -> Task:
     return task
 
 
-def load_tasks_from_dir(directory: Path, layer: Layer | None = None, tier: Tier | None = None) -> list[Task]:
+def load_tasks_from_dir(
+    directory: Path,
+    layer: Layer | None = None,
+    tier: Tier | None = None,
+    project: str | None = None,
+) -> list[Task]:
     tasks: list[Task] = []
     for yaml_file in sorted(directory.rglob("*.yaml")):
         task = load_task(yaml_file)
         if layer and task.layer != layer:
             continue
         if tier and task.tier != tier:
+            continue
+        if project and task.project != project:
             continue
         tasks.append(task)
     return tasks
@@ -481,10 +489,12 @@ def run_suite(
     layer: Layer | None = None,
     tier: Tier | None = None,
     model_roles: dict[str, str] | None = None,
+    project: str = "default",
 ) -> EvalRun:
     tasks = load_tasks_from_dir(tasks_dir, layer=layer, tier=tier)
     run = EvalRun(
         run_id=str(uuid.uuid4()),
+        project=project,
         layer=layer or Layer.PRODUCT,
         tier=tier,
         tasks_total=len(tasks),
@@ -519,11 +529,13 @@ def run_suite_with_golden(
     client: EvalClient | None = None,
     recorder: OutputRecorder | None = None,
     model_roles: dict[str, str] | None = None,
+    project: str = "default",
 ) -> EvalRun:
     """Run all tasks using golden set cases as reference data."""
     tasks = load_tasks_from_dir(tasks_dir, layer=layer, tier=tier)
     run = EvalRun(
         run_id=str(uuid.uuid4()),
+        project=project,
         layer=layer or Layer.PRODUCT,
         tier=tier,
         tasks_total=len(tasks),
@@ -583,6 +595,9 @@ def _warn_unused_model_roles(tasks: list[Task], model_roles: dict[str, str]) -> 
 @click.version_option(version="0.1.0", prog_name="gbr-eval")
 def cli() -> None:
     """gbr-eval — eval-first quality framework for GarantiaBR."""
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
 
 def _parse_model_roles(model_role: tuple[str, ...]) -> dict[str, str] | None:
@@ -746,6 +761,7 @@ def _run_single_task_eval(
         result = run_task(task, {}, model_roles=model_roles)
     return EvalRun(
         run_id=str(uuid.uuid4()),
+        project=task.project,
         layer=task.layer,
         tier=task.tier,
         tasks_total=1,
@@ -766,13 +782,14 @@ def _run_golden_suite_eval(
     client: Any,
     recorder: Any,
     model_roles: dict[str, str] | None,
+    project: str = "default",
 ) -> EvalRun:
     """Handle --suite + --golden-dir branch."""
     if model_roles:
         _warn_unused_model_roles(load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum), model_roles)
     return run_suite_with_golden(
         suite, golden_dir, self_eval=self_eval, layer=layer_enum, tier=tier_enum,
-        client=client, recorder=recorder, model_roles=model_roles,
+        client=client, recorder=recorder, model_roles=model_roles, project=project,
     )
 
 
@@ -781,11 +798,12 @@ def _run_plain_suite_eval(
     layer_enum: Layer | None,
     tier_enum: Tier | None,
     model_roles: dict[str, str] | None,
+    project: str = "default",
 ) -> EvalRun:
     """Handle plain --suite branch (no golden dir, no code dir)."""
     if model_roles:
         _warn_unused_model_roles(load_tasks_from_dir(suite, layer=layer_enum, tier=tier_enum), model_roles)
-    return run_suite(suite, {}, layer=layer_enum, tier=tier_enum, model_roles=model_roles)
+    return run_suite(suite, {}, layer=layer_enum, tier=tier_enum, model_roles=model_roles, project=project)
 
 
 def _finalize_and_report(
@@ -861,6 +879,8 @@ def _finalize_and_report(
               help="Skip confirmation prompts (e.g. large LLM file count warning)")
 @click.option("--timeout", "run_timeout", type=int, default=None,
               help="Global timeout in seconds for the entire eval run")
+@click.option("--project", default="default",
+              help="Project identifier (resolves paths under projects/<project>/ when they exist)")
 def run(
     suite: Path | None,
     task_path: Path | None,
@@ -886,6 +906,7 @@ def run(
     no_funnel: bool,
     auto_confirm: bool,
     run_timeout: int | None,
+    project: str,
 ) -> None:
     """Run eval tasks and report results."""
     import signal
@@ -923,6 +944,16 @@ def run(
         raise click.UsageError("--parallel only applies to --suite without --golden-dir or --code-dir")
     if changed_only and not code_dir:
         raise click.UsageError("--changed-only requires --code-dir")
+
+    # --- Auto-resolve project paths ---
+    if project != "default" and not task_path:
+        project_dir = Path(f"projects/{project}")
+        if suite is None and (project_dir / "tasks").is_dir():
+            suite = project_dir / "tasks"
+            click.echo(f"[project] Auto-resolved --suite to {suite}", err=True)
+        if golden_dir is None and (project_dir / "golden").is_dir():
+            golden_dir = project_dir / "golden"
+            click.echo(f"[project] Auto-resolved --golden-dir to {golden_dir}", err=True)
 
     client, recorder = _setup_client_recorder(endpoint, allow_internal, tenant, record_dir, replay_dir)
 
@@ -968,7 +999,8 @@ def run(
         elif golden_dir:
             assert suite is not None
             eval_run = _run_golden_suite_eval(
-                suite, golden_dir, self_eval, layer_enum, tier_enum, client, recorder, model_roles
+                suite, golden_dir, self_eval, layer_enum, tier_enum, client, recorder, model_roles,
+                project=project,
             )
         elif parallel:
             import asyncio
@@ -980,11 +1012,11 @@ def run(
             if model_roles:
                 _warn_unused_model_roles(tasks, model_roles)
             eval_run = asyncio.run(
-                run_eval_run_async(tasks, {}, layer=layer_enum, model_roles=model_roles)
+                run_eval_run_async(tasks, {}, layer=layer_enum, model_roles=model_roles, project=project)
             )
         else:
             assert suite is not None
-            eval_run = _run_plain_suite_eval(suite, layer_enum, tier_enum, model_roles)
+            eval_run = _run_plain_suite_eval(suite, layer_enum, tier_enum, model_roles, project=project)
     except SystemExit:
         raise
     except Exception as exc:
@@ -1016,13 +1048,23 @@ def run(
 
 
 @cli.command()
-@click.option("--runs-dir", type=click.Path(exists=True, path_type=Path), required=True,
+@click.option("--runs-dir", type=click.Path(exists=True, path_type=Path), default=None,
               help="Directory containing run JSON files")
 @click.option("--min-consecutive", type=int, default=3, help="Minimum consecutive runs for trend detection")
 @click.option("--output-format", type=click.Choice(["console", "json"]), default="console", help="Output format")
-def trends(runs_dir: Path, min_consecutive: int, output_format: str) -> None:
+@click.option("--project", default="default",
+              help="Project identifier (auto-resolves runs dir under projects/<project>/runs)")
+def trends(runs_dir: Path | None, min_consecutive: int, output_format: str, project: str) -> None:
     """Detect score trends across historical runs."""
     import json as json_mod
+
+    if runs_dir is None:
+        if project != "default":
+            runs_dir = Path(f"projects/{project}/runs")
+        else:
+            runs_dir = Path("runs")
+        if not runs_dir.is_dir():
+            raise click.UsageError(f"Runs directory not found: {runs_dir}")
 
     runs = load_runs_from_dir(runs_dir)
     alerts = detect_trends(runs, min_consecutive=min_consecutive)
@@ -1060,15 +1102,25 @@ def trends(runs_dir: Path, min_consecutive: int, output_format: str) -> None:
 
 
 @cli.command()
-@click.option("--runs-dir", type=click.Path(exists=True, path_type=Path), required=True,
+@click.option("--runs-dir", type=click.Path(exists=True, path_type=Path), default=None,
               help="Directory containing run JSON files")
 @click.option("--top", type=int, default=10, help="Number of top results to show")
 @click.option("--output-format", type=click.Choice(["console", "json"]), default="console", help="Output format")
-def analyze(runs_dir: Path, top: int, output_format: str) -> None:
+@click.option("--project", default="default",
+              help="Project identifier (auto-resolves runs dir under projects/<project>/runs)")
+def analyze(runs_dir: Path | None, top: int, output_format: str, project: str) -> None:
     """Analyze eval runs — find weak tasks, failing fields, patterns."""
     import json as json_mod
 
     from gbr_eval.harness.analyzer import analysis_to_dict, analyze_runs, format_analysis
+
+    if runs_dir is None:
+        if project != "default":
+            runs_dir = Path(f"projects/{project}/runs")
+        else:
+            runs_dir = Path("runs")
+        if not runs_dir.is_dir():
+            raise click.UsageError(f"Runs directory not found: {runs_dir}")
 
     runs = load_runs_from_dir(runs_dir)
     if not runs:

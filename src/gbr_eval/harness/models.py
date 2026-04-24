@@ -103,6 +103,7 @@ class TaskInput(BaseModel):
 
 class Task(BaseModel):
     task_id: str
+    project: str = "default"
     category: Category
     component: str
     layer: Layer
@@ -167,6 +168,7 @@ class TaskResult(BaseModel):
 
 class EvalRun(BaseModel):
     run_id: str
+    project: str = "default"
     started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     finished_at: datetime | None = None
     layer: Layer

@@ -168,6 +168,11 @@
       "title": "Task Id",
       "type": "string"
     },
+    "project": {
+      "default": "default",
+      "title": "Project",
+      "type": "string"
+    },
     "category": {
       "$ref": "#/$defs/Category"
     },

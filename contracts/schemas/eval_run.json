@@ -230,6 +230,11 @@
       "title": "Run Id",
       "type": "string"
     },
+    "project": {
+      "default": "default",
+      "title": "Project",
+      "type": "string"
+    },
     "started_at": {
       "format": "date-time",
       "title": "Started At",
