@@ -21,9 +21,24 @@ except ImportError:
 BASE_URL = "http://localhost:3002"
 ADMIN_TOKEN: str | None = None
 ROOT = Path(__file__).resolve().parent.parent
+PROJECT: str = "default"
 GOLDEN_DIR = ROOT / "golden"
 TASKS_DIR = ROOT / "tasks" / "product"
 ENGINEERING_TASKS_DIR = ROOT / "tasks" / "engineering"
+
+
+def _resolve_project_dirs() -> None:
+    """Override GOLDEN_DIR / TASKS_DIR / ENGINEERING_TASKS_DIR when --project is set."""
+    global GOLDEN_DIR, TASKS_DIR, ENGINEERING_TASKS_DIR
+    if PROJECT == "default":
+        return
+    project_root = ROOT / "projects" / PROJECT
+    if (project_root / "golden").is_dir():
+        GOLDEN_DIR = project_root / "golden"
+    if (project_root / "tasks" / "product").is_dir():
+        TASKS_DIR = project_root / "tasks" / "product"
+    if (project_root / "tasks" / "engineering").is_dir():
+        ENGINEERING_TASKS_DIR = project_root / "tasks" / "engineering"
 
 
 def api(method: str, path: str, data: dict | list | None = None) -> dict | list:
@@ -301,7 +316,7 @@ def run_self_eval_and_import() -> None:
 
 
 def main() -> None:
-    global BASE_URL, ADMIN_TOKEN
+    global BASE_URL, ADMIN_TOKEN, PROJECT
     if "--base-url" in sys.argv:
         idx = sys.argv.index("--base-url")
         BASE_URL = sys.argv[idx + 1]
@@ -310,6 +325,10 @@ def main() -> None:
         ADMIN_TOKEN = sys.argv[idx + 1]
     elif os.environ.get("ADMIN_API_TOKEN"):
         ADMIN_TOKEN = os.environ["ADMIN_API_TOKEN"]
+    if "--project" in sys.argv:
+        idx = sys.argv.index("--project")
+        PROJECT = sys.argv[idx + 1]
+        _resolve_project_dirs()
 
     engineering_only = "--engineering-only" in sys.argv
 

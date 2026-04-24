@@ -98,9 +98,17 @@ def _count_existing(golden_dir: Path) -> dict[str, int]:
 @click.option("--apply", is_flag=True, default=False, help="Generate and write (dry-run by default)")
 @click.option("--model", default=None, help="Override Claude model (default: env or claude-sonnet-4-5-20250929)")
 @click.option("--sync/--no-sync", default=True, help="Sync to frontend after generation (default: yes)")
-@click.option("--golden-dir", type=click.Path(path_type=Path), default=ROOT / "golden")
-def main(apply: bool, model: str | None, sync: bool, golden_dir: Path) -> None:
+@click.option("--golden-dir", type=click.Path(path_type=Path), default=None)
+@click.option("--project", default="default",
+              help="Project identifier (auto-resolves golden dir under projects/<project>/golden)")
+def main(apply: bool, model: str | None, sync: bool, golden_dir: Path | None, project: str) -> None:
     """Generate all synthetic golden set cases and sync to frontend."""
+
+    if golden_dir is None:
+        if project != "default":
+            golden_dir = ROOT / "projects" / project / "golden"
+        else:
+            golden_dir = ROOT / "golden"
 
     click.echo("=" * 60)
     click.echo("  gbr-eval — Synthetic Golden Set Generator")

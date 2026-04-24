@@ -1,0 +1,46 @@
+id: caixa
+name: "BPO Caixa Econômica Federal"
+description: "Eval suite para os 7 serviços do BPO Caixa — tratamento, classificação, extração, validação, consulta, regras e jornadas"
+owner: diogo.dantas
+created_at: "2026-04-24"
+services:
+  - tratamento_arquivo_digital
+  - classificacao_documental
+  - extracao_dados
+  - validacao_autenticidade
+  - consulta_bases_externas
+  - regras_negociais
+  - jornadas_automatizadas
+document_types:
+  - matricula
+  - contrato_social
+  - certidao_negativa
+  - procuracao
+  - certidao_trabalhista
+  - balanco_patrimonial
+  - iptu
+  - ccir
+  - itr
+  - car
+  - cnpj
+  - rg
+  - cnh
+  - comprovante_renda
+  - escritura
+  - averbacao
+  - certidao_casamento
+  - certidao_nascimento
+  - certidao_obito
+  - declaracao_ir
+  - extrato_bancario
+  - contrato_compra_venda
+  - laudo_avaliacao
+  - habite_se
+  - alvara
+  - memorial_descritivo
+  - planta_imovel
+  - ata_assembleia
+  - demonstracao_financeira
+  - nota_fiscal
+  - certidao_protesto
+  - guia_recolhimento
