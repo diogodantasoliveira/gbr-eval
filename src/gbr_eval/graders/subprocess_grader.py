@@ -109,6 +109,13 @@ class SubprocessGrader:
 
         env = {**os.environ, **{k: _expand_env(str(v)) for k, v in extra_env.items()}} if extra_env else None
 
+        repo_root = output.get("repo_root")
+        if repo_root:
+            if env is None:
+                env = dict(os.environ)
+            existing = env.get("PYTHONPATH", "")
+            env["PYTHONPATH"] = f"{repo_root}:{existing}" if existing else str(repo_root)
+
         try:
             proc = sp.run(
                 cmd,

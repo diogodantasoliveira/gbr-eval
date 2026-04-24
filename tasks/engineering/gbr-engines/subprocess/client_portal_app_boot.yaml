@@ -1,0 +1,26 @@
+task_id: eng.subprocess.client-portal.app-boot
+category: code_quality
+component: client-portal
+layer: engineering
+tier: gate
+description: "FastAPI app must import and boot without errors for client-portal"
+eval_owner: diogo.dantas
+eval_cadence: per-pr
+
+input:
+  payload:
+    repo: services/client-portal
+
+expected: {}
+
+graders:
+  - type: subprocess
+    weight: 1.0
+    required: true
+    config:
+      command: ["uv", "run", "python", "-c", "from app.main import app; print(f'routes: {len(app.routes)}')"]
+      timeout_seconds: 30
+      pass_pattern: "routes: \\d+"
+
+scoring_mode: binary
+pass_threshold: 1.0

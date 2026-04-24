@@ -299,7 +299,7 @@ def _run_subprocess_task(task: Task, code_dir: Path) -> TaskResult:
     repo = task.input.payload.get("repo", "")
     cwd = str((code_dir / repo).resolve()) if repo else str(code_dir.resolve())
 
-    output: dict[str, Any] = {"cwd": cwd}
+    output: dict[str, Any] = {"cwd": cwd, "repo_root": str(code_dir.resolve())}
     grader_results: list[GraderResult] = []
     ctx = GraderContext(metadata={"task_id": task.task_id})
 
