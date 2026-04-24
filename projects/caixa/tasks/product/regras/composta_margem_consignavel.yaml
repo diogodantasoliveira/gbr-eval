@@ -1,0 +1,29 @@
+task_id: caixa.regra_composta.margem_consignavel
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica cálculo correto da margem consignável disponível"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: margem_consignavel
+
+expected:
+  margem_calculada: 0
+
+graders:
+  - type: numeric_tolerance
+    field: margem_calculada
+    weight: 1.0
+    required: true
+    config:
+      tolerance: 0.01
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

@@ -1,0 +1,27 @@
+task_id: caixa.tratamento.multipaginas
+project: caixa
+category: extraction
+component: tratamento-arquivo
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica tratamento correto de documento multipaginado"
+
+input:
+  endpoint: /api/v1/tratamento
+  payload:
+    operation: multipaginas
+
+expected:
+  formato_saida: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: exact_match
+    field: formato_saida
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95

@@ -1,0 +1,28 @@
+task_id: caixa.autenticidade.threshold_verde
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que documento com score alto é classificado como verde"
+
+input:
+  endpoint: /api/v1/autenticidade/classificar
+  payload:
+    document_type: generic
+
+expected:
+  classificacao: verde
+
+graders:
+  - type: exact_match
+    field: classificacao
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

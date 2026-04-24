@@ -1,0 +1,36 @@
+task_id: caixa.regra_composta.somatorio_holerite
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que o somatório de proventos e descontos do holerite está correto"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: somatorio_holerite
+
+expected:
+  salario_liquido_calculado: 0
+  descontos_corretos: true
+
+graders:
+  - type: numeric_tolerance
+    field: salario_liquido_calculado
+    weight: 1.0
+    required: true
+    config:
+      tolerance: 0.01
+      severity: critical
+  - type: exact_match
+    field: descontos_corretos
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

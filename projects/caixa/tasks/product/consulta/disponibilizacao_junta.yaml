@@ -1,0 +1,28 @@
+task_id: caixa.consulta.disponibilizacao_junta
+project: caixa
+category: extraction
+component: consulta-bases
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica disponibilização de dados da Junta Comercial incluindo sócios e capital social"
+
+input:
+  endpoint: /api/v1/consulta/junta
+  payload:
+    document_type: junta_comercial
+
+expected:
+  socios: "PLACEHOLDER — substituir por golden set real"
+  capital_social: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

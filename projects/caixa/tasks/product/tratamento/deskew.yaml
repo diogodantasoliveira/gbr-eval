@@ -1,0 +1,29 @@
+task_id: caixa.tratamento.deskew
+project: caixa
+category: extraction
+component: tratamento-arquivo
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica correção de inclinação em documento digitalizado"
+
+input:
+  endpoint: /api/v1/tratamento
+  payload:
+    operation: deskew
+
+expected:
+  angulo_residual: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: numeric_range
+    field: angulo_residual
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      min: 0.0
+      max: 0.5
+
+scoring_mode: weighted
+pass_threshold: 0.95

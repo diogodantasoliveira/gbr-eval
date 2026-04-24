@@ -1,0 +1,33 @@
+task_id: caixa.autenticidade.score_composicao
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica composição correta do score final de autenticidade ponderando sub-scores"
+
+input:
+  endpoint: /api/v1/autenticidade/score
+  payload:
+    document_type: generic
+
+expected:
+  score_final: 0.92
+  suporte: 0.90
+  conteudo: 0.95
+  biometria: 0.88
+  cruzamento: 0.95
+
+graders:
+  - type: numeric_tolerance
+    field: score_final
+    weight: 3
+    required: true
+    config:
+      tolerance: 0.01
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

@@ -1,0 +1,49 @@
+task_id: caixa.extracao.cnh
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de documento CNH"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: cnh
+    skill: cnh_v1
+
+expected:
+  nome: "PLACEHOLDER — substituir por golden set real"
+  cpf: "PLACEHOLDER"
+  cnh_numero: "PLACEHOLDER"
+  categoria: "PLACEHOLDER — substituir por golden set real"
+  validade: "PLACEHOLDER — substituir por golden set real"
+  data_nascimento: "PLACEHOLDER — substituir por golden set real"
+  filiacao: "PLACEHOLDER — substituir por golden set real"
+  orgao_emissor: "PLACEHOLDER — substituir por golden set real"
+  foto: "PLACEHOLDER — substituir por golden set real"
+  qr_code: "PLACEHOLDER — substituir por golden set real"
+  observacoes: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: cpf
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: cnh_numero
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

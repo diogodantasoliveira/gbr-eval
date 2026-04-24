@@ -1,0 +1,40 @@
+task_id: caixa.extracao.residencia
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de Comprovante de Residência"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: residencia
+    skill: residencia_v1
+
+expected:
+  nome: "PLACEHOLDER — substituir por golden set real"
+  endereco: "PLACEHOLDER — substituir por golden set real"
+  cep: "PLACEHOLDER"
+  cidade: "PLACEHOLDER — substituir por golden set real"
+  estado: "PLACEHOLDER — substituir por golden set real"
+  data_emissao: "PLACEHOLDER — substituir por golden set real"
+  concessionaria: "PLACEHOLDER — substituir por golden set real"
+  tipo_servico: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: cep
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

@@ -1,0 +1,50 @@
+task_id: caixa.extracao.rg
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de documento RG"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: rg
+    skill: rg_v1
+
+expected:
+  nome: "PLACEHOLDER — substituir por golden set real"
+  cpf: "PLACEHOLDER"
+  rg: "PLACEHOLDER"
+  filiacao_mae: "PLACEHOLDER — substituir por golden set real"
+  filiacao_pai: "PLACEHOLDER — substituir por golden set real"
+  data_nascimento: "PLACEHOLDER — substituir por golden set real"
+  naturalidade: "PLACEHOLDER — substituir por golden set real"
+  orgao_emissor: "PLACEHOLDER — substituir por golden set real"
+  data_emissao: "PLACEHOLDER — substituir por golden set real"
+  foto_3x4: "PLACEHOLDER — substituir por golden set real"
+  assinatura: "PLACEHOLDER — substituir por golden set real"
+  sexo: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: cpf
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: rg
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

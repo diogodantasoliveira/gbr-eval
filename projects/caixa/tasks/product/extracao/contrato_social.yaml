@@ -1,0 +1,42 @@
+task_id: caixa.extracao.contrato_social
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de Contrato Social"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: contrato_social
+    skill: contrato_social_v1
+
+expected:
+  razao_social: "PLACEHOLDER — substituir por golden set real"
+  cnpj: "PLACEHOLDER"
+  socios: "PLACEHOLDER — array de objetos"
+  capital_social: "PLACEHOLDER — substituir por golden set real"
+  objeto_social: "PLACEHOLDER — substituir por golden set real"
+  poderes_administracao: "PLACEHOLDER — substituir por golden set real"
+  nire: "PLACEHOLDER — substituir por golden set real"
+  data_registro: "PLACEHOLDER — substituir por golden set real"
+  clausulas_decisao: "PLACEHOLDER — substituir por golden set real"
+  endereco_sede: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: cnpj
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

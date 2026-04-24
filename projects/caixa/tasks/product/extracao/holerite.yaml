@@ -1,0 +1,49 @@
+task_id: caixa.extracao.holerite
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de Holerite/Contracheque"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: holerite
+    skill: holerite_v1
+
+expected:
+  empresa: "PLACEHOLDER — substituir por golden set real"
+  cnpj: "PLACEHOLDER"
+  competencia: "PLACEHOLDER — substituir por golden set real"
+  salario_bruto: "PLACEHOLDER — substituir por golden set real"
+  descontos: "PLACEHOLDER — array de objetos"
+  salario_liquido: "PLACEHOLDER — substituir por golden set real"
+  cargo: "PLACEHOLDER — substituir por golden set real"
+  admissao: "PLACEHOLDER — substituir por golden set real"
+  inss: "PLACEHOLDER — substituir por golden set real"
+  irrf: "PLACEHOLDER — substituir por golden set real"
+  fgts: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: cnpj
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: numeric_tolerance
+    field: salario_liquido
+    weight: 2
+    config:
+      tolerance: 0.01
+      severity: high
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

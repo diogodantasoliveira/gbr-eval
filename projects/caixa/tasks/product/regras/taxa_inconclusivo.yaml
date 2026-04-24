@@ -1,0 +1,29 @@
+task_id: caixa.regras.taxa_inconclusivo
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que taxa de resultados inconclusivos permanece abaixo de 5%"
+
+input:
+  endpoint: /api/v1/regras/consolidar
+  payload: {}
+
+expected:
+  taxa_inconclusivo: 0.02
+
+graders:
+  - type: numeric_range
+    field: taxa_inconclusivo
+    weight: 1.0
+    required: true
+    config:
+      min: 0.0
+      max: 0.05
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

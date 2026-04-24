@@ -1,0 +1,40 @@
+task_id: caixa.consulta.dnf_impossibilidade
+project: caixa
+category: extraction
+component: consulta-bases
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que impossibilidade de consulta é registrada com motivo válido e rastreável"
+
+input:
+  endpoint: /api/v1/consulta/status
+  payload:
+    document_type: generic
+
+expected:
+  motivo: "base_indisponivel"
+  tentativas: 3
+
+graders:
+  - type: field_not_empty
+    field: motivo
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+  - type: set_membership
+    field: motivo
+    weight: 1.0
+    required: true
+    config:
+      values:
+        - base_indisponivel
+        - registro_inexistente
+        - timeout
+        - dados_insuficientes
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

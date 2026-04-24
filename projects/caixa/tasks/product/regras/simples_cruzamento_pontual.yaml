@@ -1,0 +1,28 @@
+task_id: caixa.regra_simples.cruzamento_pontual
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica cruzamento pontual entre dois campos de documentos distintos"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: cruzamento_pontual
+
+expected:
+  cruzamento_ok: true
+
+graders:
+  - type: exact_match
+    field: cruzamento_ok
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

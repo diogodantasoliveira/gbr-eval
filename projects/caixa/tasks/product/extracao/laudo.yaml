@@ -1,0 +1,50 @@
+task_id: caixa.extracao.laudo
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de Laudo de Avaliação de Imóvel"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: laudo
+    skill: laudo_v1
+
+expected:
+  avaliador: "PLACEHOLDER — substituir por golden set real"
+  crea: "PLACEHOLDER"
+  valor_avaliacao: "PLACEHOLDER — substituir por golden set real"
+  endereco_imovel: "PLACEHOLDER — substituir por golden set real"
+  area_terreno: "PLACEHOLDER — substituir por golden set real"
+  area_construida: "PLACEHOLDER — substituir por golden set real"
+  coordenadas_geo: "PLACEHOLDER — substituir por golden set real"
+  fotos_count: "PLACEHOLDER — substituir por golden set real"
+  metodologia: "PLACEHOLDER — substituir por golden set real"
+  data_vistoria: "PLACEHOLDER — substituir por golden set real"
+  estado_conservacao: "PLACEHOLDER — substituir por golden set real"
+  parecer_final: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: numeric_tolerance
+    field: valor_avaliacao
+    weight: 2
+    config:
+      tolerance: 0.01
+      severity: high
+  - type: field_not_empty
+    field: crea
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

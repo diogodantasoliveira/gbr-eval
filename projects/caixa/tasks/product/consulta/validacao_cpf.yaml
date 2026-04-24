@@ -1,0 +1,35 @@
+task_id: caixa.consulta.validacao_cpf
+project: caixa
+category: extraction
+component: consulta-bases
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica consulta à Receita Federal para validação de situação cadastral de CPF"
+
+input:
+  endpoint: /api/v1/consulta/cpf
+  payload:
+    document_type: cpf
+
+expected:
+  situacao_cadastral: "REGULAR"
+  nome_match: true
+
+graders:
+  - type: exact_match
+    field: situacao_cadastral
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: nome_match
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

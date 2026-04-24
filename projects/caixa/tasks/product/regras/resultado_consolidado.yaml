@@ -1,0 +1,31 @@
+task_id: caixa.regras.resultado_consolidado
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que o resultado consolidado das regras é um dos valores válidos"
+
+input:
+  endpoint: /api/v1/regras/consolidar
+  payload: {}
+
+expected:
+  resultado: "CONFORME"
+
+graders:
+  - type: set_membership
+    field: resultado
+    weight: 1.0
+    required: true
+    config:
+      values:
+        - CONFORME
+        - NAO_CONFORME
+        - INCONCLUSIVO
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

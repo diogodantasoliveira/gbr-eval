@@ -1,0 +1,30 @@
+task_id: caixa.jornada.sla_24h
+project: caixa
+category: latency
+component: jornadas
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que jornadas com HITL completam dentro do SLA de 24 horas"
+
+input:
+  endpoint: /api/v1/jornada/metrics
+  payload:
+    sla_target: 24h
+
+expected:
+  tempo_processamento_s: 43200
+
+graders:
+  - type: numeric_range
+    field: tempo_processamento_s
+    weight: 1.0
+    required: true
+    config:
+      min: 0
+      max: 86400
+      severity: high
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["seed"]

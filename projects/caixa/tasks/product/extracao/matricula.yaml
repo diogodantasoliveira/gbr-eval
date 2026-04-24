@@ -1,0 +1,56 @@
+task_id: caixa.extracao.matricula
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de Matrícula de Imóvel"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: matricula
+    skill: matricula_v1
+
+expected:
+  numero_matricula: "PLACEHOLDER"
+  proprietario_nome: "PLACEHOLDER — substituir por golden set real"
+  proprietario_cpf: "PLACEHOLDER"
+  endereco_imovel: "PLACEHOLDER — substituir por golden set real"
+  area_total: "PLACEHOLDER — substituir por golden set real"
+  onus: "PLACEHOLDER — substituir por golden set real"
+  averbacoes: "PLACEHOLDER — substituir por golden set real"
+  alienacao_fiduciaria: "PLACEHOLDER — substituir por golden set real"
+  cadeia_dominial: "PLACEHOLDER — substituir por golden set real"
+  data_registro: "PLACEHOLDER — substituir por golden set real"
+  cartorio: "PLACEHOLDER — substituir por golden set real"
+  comarca: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: proprietario_cpf
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: numero_matricula
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: numeric_tolerance
+    field: area_total
+    weight: 2
+    config:
+      tolerance: 0.01
+      severity: high
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

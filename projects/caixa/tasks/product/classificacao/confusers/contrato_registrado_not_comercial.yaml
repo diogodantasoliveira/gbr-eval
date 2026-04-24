@@ -1,0 +1,28 @@
+task_id: caixa.classificacao.confuser.contrato_registrado_not_comercial
+project: caixa
+category: classification
+component: classificacao-documental
+layer: product
+tier: gate
+tenant_profile: global
+description: "Contrato comercial registrado nao deve ser classificado como contrato comercial simples (confuser negativo)"
+
+input:
+  endpoint: /api/v1/classify
+  payload:
+    document_type_actual: contrato_comercial_registrado
+
+expected:
+  document_type: contrato_comercial_registrado
+
+graders:
+  - type: exact_match
+    field: document_type
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["confuser"]

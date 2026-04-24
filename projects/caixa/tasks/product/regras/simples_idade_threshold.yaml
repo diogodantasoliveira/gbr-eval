@@ -1,0 +1,31 @@
+task_id: caixa.regra_simples.idade_threshold
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que a regra de idade mínima (18 anos) é aplicada corretamente"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: idade_threshold
+
+expected:
+  resultado: "CONFORME"
+  idade: 25
+
+graders:
+  - type: numeric_range
+    field: idade
+    weight: 1.0
+    required: true
+    config:
+      min: 18
+      max: 150
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

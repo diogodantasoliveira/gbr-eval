@@ -1,0 +1,35 @@
+task_id: caixa.regra_composta.conformidade_agro
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica conformidade de documentação para operações de agronegócio"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: conformidade_agro
+
+expected:
+  checklist_resultado: "CONFORME"
+  todas_etapas_completas: true
+
+graders:
+  - type: field_not_empty
+    field: checklist_resultado
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+  - type: exact_match
+    field: todas_etapas_completas
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

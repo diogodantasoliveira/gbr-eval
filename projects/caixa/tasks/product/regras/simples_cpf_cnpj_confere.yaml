@@ -1,0 +1,28 @@
+task_id: caixa.regra_simples.cpf_cnpj_confere
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que o CPF/CNPJ no documento confere com o cadastro"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: cpf_cnpj_confere
+
+expected:
+  cpf_match: true
+
+graders:
+  - type: exact_match
+    field: cpf_match
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

@@ -1,0 +1,28 @@
+task_id: caixa.autenticidade.biometria_liveness
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que a prova de vida (liveness) é detectada corretamente"
+
+input:
+  endpoint: /api/v1/autenticidade/biometria
+  payload:
+    document_type: generic
+
+expected:
+  liveness: true
+
+graders:
+  - type: exact_match
+    field: liveness
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

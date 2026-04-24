@@ -1,0 +1,28 @@
+task_id: caixa.consulta.validacao_nfe
+project: caixa
+category: extraction
+component: consulta-bases
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica consulta à SEFAZ para validação de status de Nota Fiscal Eletrônica"
+
+input:
+  endpoint: /api/v1/consulta/nfe
+  payload:
+    document_type: nfe
+
+expected:
+  status_nfe: "AUTORIZADA"
+
+graders:
+  - type: exact_match
+    field: status_nfe
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

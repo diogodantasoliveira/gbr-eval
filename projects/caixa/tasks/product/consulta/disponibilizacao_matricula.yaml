@@ -1,0 +1,28 @@
+task_id: caixa.consulta.disponibilizacao_matricula
+project: caixa
+category: extraction
+component: consulta-bases
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica disponibilização de matrícula de imóvel via consulta ao cartório"
+
+input:
+  endpoint: /api/v1/consulta/matricula
+  payload:
+    document_type: matricula
+
+expected:
+  arquivo_id: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_not_empty
+    field: arquivo_id
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

@@ -1,0 +1,27 @@
+task_id: caixa.regras.checklist_completo
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que 100% dos itens do checklist de regras foram avaliados"
+
+input:
+  endpoint: /api/v1/regras/consolidar
+  payload: {}
+
+expected:
+  checklist_100_pct: true
+
+graders:
+  - type: exact_match
+    field: checklist_100_pct
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

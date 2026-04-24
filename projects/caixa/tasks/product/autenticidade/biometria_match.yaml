@@ -1,0 +1,30 @@
+task_id: caixa.autenticidade.biometria_match
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que a similaridade facial entre selfie e foto do documento está no range esperado"
+
+input:
+  endpoint: /api/v1/autenticidade/biometria
+  payload:
+    document_type: generic
+
+expected:
+  face_similarity: 0.995
+
+graders:
+  - type: numeric_range
+    field: face_similarity
+    weight: 1.0
+    required: true
+    config:
+      min: 0.99
+      max: 1.0
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

@@ -1,0 +1,38 @@
+task_id: caixa.tratamento.recusa
+project: caixa
+category: extraction
+component: tratamento-arquivo
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica recusa de documento com motivo válido e classificado"
+
+input:
+  endpoint: /api/v1/tratamento
+  payload:
+    operation: recusa
+
+expected:
+  motivo: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_not_empty
+    field: motivo
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: set_membership
+    field: motivo
+    weight: 2
+    required: true
+    config:
+      severity: critical
+      values:
+        - ilegivel
+        - corrompido
+        - formato_invalido
+        - resolucao_insuficiente
+
+scoring_mode: weighted
+pass_threshold: 0.95

@@ -1,0 +1,38 @@
+task_id: caixa.jornada.pe_de_meia
+project: caixa
+category: decision
+component: jornadas
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica execução completa da jornada Pé-de-Meia com resultado e SLA"
+
+input:
+  endpoint: /api/v1/jornada/executar
+  payload:
+    jornada: pe_de_meia
+
+expected:
+  resultado_final: "APROVADO"
+  etapas_executadas: "PLACEHOLDER — substituir por golden set real"
+  tempo_total_s: 120
+
+graders:
+  - type: exact_match
+    field: resultado_final
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: numeric_range
+    field: tempo_total_s
+    weight: 1.0
+    required: true
+    config:
+      min: 0
+      max: 3600
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

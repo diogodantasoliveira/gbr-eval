@@ -1,0 +1,35 @@
+task_id: caixa.autenticidade.cruzamento_dossie
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica cruzamento entre dados do documento e dados do dossie do cliente"
+
+input:
+  endpoint: /api/v1/autenticidade/cruzamento
+  payload:
+    document_type: generic
+
+expected:
+  nome_match: true
+  cpf_match: true
+
+graders:
+  - type: exact_match
+    field: nome_match
+    weight: 3
+    required: true
+    config:
+      severity: critical
+  - type: exact_match
+    field: cpf_match
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

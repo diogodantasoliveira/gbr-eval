@@ -1,0 +1,28 @@
+task_id: caixa.regra_simples.tipo_confere
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que o tipo de documento confere com o esperado pela jornada"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: tipo_confere
+
+expected:
+  tipo_confere: true
+
+graders:
+  - type: exact_match
+    field: tipo_confere
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

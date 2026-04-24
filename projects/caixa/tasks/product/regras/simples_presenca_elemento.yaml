@@ -1,0 +1,28 @@
+task_id: caixa.regra_simples.presenca_elemento
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica presença de elemento obrigatório (assinatura) no documento"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: presenca_elemento
+
+expected:
+  assinatura_presente: true
+
+graders:
+  - type: field_not_empty
+    field: assinatura_presente
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

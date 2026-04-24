@@ -1,0 +1,30 @@
+task_id: caixa.jornada.sla_18h
+project: caixa
+category: latency
+component: jornadas
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que jornadas complexas completam dentro do SLA de 18 horas"
+
+input:
+  endpoint: /api/v1/jornada/metrics
+  payload:
+    sla_target: 18h
+
+expected:
+  tempo_processamento_s: 36000
+
+graders:
+  - type: numeric_range
+    field: tempo_processamento_s
+    weight: 1.0
+    required: true
+    config:
+      min: 0
+      max: 64800
+      severity: high
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["seed"]

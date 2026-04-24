@@ -1,0 +1,45 @@
+task_id: caixa.extracao.irpf
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de Declaração IRPF"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: irpf
+    skill: irpf_v1
+
+expected:
+  cpf: "PLACEHOLDER"
+  nome: "PLACEHOLDER — substituir por golden set real"
+  ano_exercicio: "PLACEHOLDER — substituir por golden set real"
+  rendimentos_tributaveis: "PLACEHOLDER — substituir por golden set real"
+  rendimentos_isentos: "PLACEHOLDER — substituir por golden set real"
+  bens_direitos: "PLACEHOLDER — array de objetos"
+  dividas_onus: "PLACEHOLDER — array de objetos"
+  dependentes: "PLACEHOLDER — array de objetos"
+  imposto_devido: "PLACEHOLDER — substituir por golden set real"
+  imposto_pago: "PLACEHOLDER — substituir por golden set real"
+  restituicao: "PLACEHOLDER — substituir por golden set real"
+  ocupacao: "PLACEHOLDER — substituir por golden set real"
+  natureza_ocupacao: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: cpf
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

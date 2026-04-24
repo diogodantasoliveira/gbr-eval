@@ -1,0 +1,28 @@
+task_id: caixa.autenticidade.suporte_edicao
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica detecção de edição no suporte físico/digital do documento"
+
+input:
+  endpoint: /api/v1/autenticidade/suporte
+  payload:
+    document_type: generic
+
+expected:
+  tampering_detected: true
+
+graders:
+  - type: exact_match
+    field: tampering_detected
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

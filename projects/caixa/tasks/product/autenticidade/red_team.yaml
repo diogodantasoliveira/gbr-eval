@@ -1,0 +1,30 @@
+task_id: caixa.autenticidade.red_team
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica taxa de detecção de documentos falsificados ou adulterados (red team)"
+
+input:
+  endpoint: /api/v1/autenticidade/score
+  payload:
+    document_type: generic
+
+expected:
+  detection_rate: 0.85
+
+graders:
+  - type: numeric_range
+    field: detection_rate
+    weight: 1.0
+    required: true
+    config:
+      min: 0.80
+      max: 1.0
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["red_team"]

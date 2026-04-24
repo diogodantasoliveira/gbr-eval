@@ -1,0 +1,30 @@
+task_id: caixa.autenticidade.redistribuicao_pesos
+project: caixa
+category: decision
+component: validacao-autenticidade
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica redistribuição correta de pesos quando biometria não está disponível"
+
+input:
+  endpoint: /api/v1/autenticidade/score
+  payload:
+    document_type: generic
+    biometria_disponivel: false
+
+expected:
+  score_sem_biometria: 0.93
+
+graders:
+  - type: numeric_tolerance
+    field: score_sem_biometria
+    weight: 1.0
+    required: true
+    config:
+      tolerance: 0.02
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

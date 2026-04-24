@@ -1,0 +1,42 @@
+task_id: caixa.extracao.nota_fiscal
+project: caixa
+category: extraction
+component: extracao-dados
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica extração de campos estruturados de Nota Fiscal Eletrônica"
+
+input:
+  endpoint: /api/v1/extract
+  payload:
+    document_type: nota_fiscal
+    skill: nota_fiscal_v1
+
+expected:
+  emitente: "PLACEHOLDER — substituir por golden set real"
+  cnpj_emitente: "PLACEHOLDER — substituir por golden set real"
+  chave_acesso_44: "PLACEHOLDER"
+  itens: "PLACEHOLDER — array de objetos"
+  valor_total: "PLACEHOLDER — substituir por golden set real"
+  data_emissao: "PLACEHOLDER — substituir por golden set real"
+  destinatario: "PLACEHOLDER — substituir por golden set real"
+  cnpj_destinatario: "PLACEHOLDER — substituir por golden set real"
+  natureza_operacao: "PLACEHOLDER — substituir por golden set real"
+  cfop: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: field_f1
+    weight: 2
+    config:
+      severity: high
+  - type: exact_match
+    field: chave_acesso_44
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: hybrid
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

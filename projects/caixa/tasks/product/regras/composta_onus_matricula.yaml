@@ -1,0 +1,29 @@
+task_id: caixa.regra_composta.onus_matricula
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica detecção de ônus ou impedimentos na matrícula do imóvel"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: onus_matricula
+
+expected:
+  impedimento_detectado: false
+  onus_lista: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: exact_match
+    field: impedimento_detectado
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

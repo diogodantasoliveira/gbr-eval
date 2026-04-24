@@ -1,0 +1,28 @@
+task_id: caixa.classificacao.modelo_padrao_caixa
+project: caixa
+category: classification
+component: classificacao-documental
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica classificação correta de documento tipo modelo padrão Caixa"
+
+input:
+  endpoint: /api/v1/classify
+  payload:
+    document_type: modelo_padrao_caixa
+
+expected:
+  document_type: modelo_padrao_caixa
+
+graders:
+  - type: exact_match
+    field: document_type
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: binary
+pass_threshold: 1.0
+golden_set_tags: ["seed"]

@@ -1,0 +1,35 @@
+task_id: caixa.jornada.abertura_conta
+project: caixa
+category: decision
+component: jornadas
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica execução completa da jornada de abertura de conta"
+
+input:
+  endpoint: /api/v1/jornada/executar
+  payload:
+    jornada: abertura_conta
+
+expected:
+  resultado_final: "APROVADO"
+  checklist_resultado: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: exact_match
+    field: resultado_final
+    weight: 1.0
+    required: true
+    config:
+      severity: critical
+  - type: field_not_empty
+    field: checklist_resultado
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

@@ -1,0 +1,28 @@
+task_id: caixa.regra_simples.validade_documento
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que documento dentro do prazo de validade é aceito"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: validade_documento
+
+expected:
+  documento_valido: true
+
+graders:
+  - type: exact_match
+    field: documento_valido
+    weight: 1.0
+    required: true
+    config:
+      severity: high
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]

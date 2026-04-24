@@ -1,0 +1,29 @@
+task_id: caixa.tratamento.preservacao
+project: caixa
+category: extraction
+component: tratamento-arquivo
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que a resolução pós-tratamento preserva >= 95% da resolução original"
+
+input:
+  endpoint: /api/v1/tratamento
+  payload:
+    operation: preservacao
+
+expected:
+  resolucao_ratio: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: numeric_range
+    field: resolucao_ratio
+    weight: 3
+    required: true
+    config:
+      severity: critical
+      min: 0.95
+      max: 1.0
+
+scoring_mode: weighted
+pass_threshold: 0.95

@@ -1,0 +1,29 @@
+task_id: caixa.regra_composta.poderes_contrato
+project: caixa
+category: decision
+component: regras-negociais
+layer: product
+tier: gate
+tenant_profile: global
+description: "Verifica que os poderes declarados no contrato social são suficientes para a operação"
+
+input:
+  endpoint: /api/v1/regras/avaliar
+  payload:
+    regra: poderes_contrato
+
+expected:
+  poderes_suficientes: true
+  justificativa: "PLACEHOLDER — substituir por golden set real"
+
+graders:
+  - type: exact_match
+    field: poderes_suficientes
+    weight: 3
+    required: true
+    config:
+      severity: critical
+
+scoring_mode: weighted
+pass_threshold: 0.95
+golden_set_tags: ["seed"]
