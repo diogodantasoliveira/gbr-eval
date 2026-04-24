@@ -31,6 +31,8 @@ if TYPE_CHECKING:
 
 ProgressCallback = Callable[[str, int, int, float, bool], None]
 
+_SUBPROCESS_GRADER_TYPES = frozenset({"subprocess"})
+
 _MAX_FILE_SIZE = 1_000_000  # 1 MB
 _MAX_FILES = 10_000
 _DEFAULT_EXCLUDE_DIRS = frozenset({
@@ -287,6 +289,40 @@ def run_task_holistic(
     )
 
 
+def _run_subprocess_task(task: Task, code_dir: Path) -> TaskResult:
+    """Run a task whose graders are all subprocess type.
+
+    Resolves cwd from ``code_dir / repo`` and delegates to each grader.
+    No file loading needed — subprocess graders execute external tools directly.
+    """
+    start = time.monotonic()
+    repo = task.input.payload.get("repo", "")
+    cwd = str((code_dir / repo).resolve()) if repo else str(code_dir.resolve())
+
+    output: dict[str, Any] = {"cwd": cwd}
+    grader_results: list[GraderResult] = []
+    ctx = GraderContext(metadata={"task_id": task.task_id})
+
+    for spec in task.graders:
+        result = grade(spec.type, output, task.expected, spec, context=ctx)
+        grader_results.append(result)
+        ctx = ctx.model_copy(update={"previous_results": [*ctx.previous_results, result]})
+
+    duration_ms = (time.monotonic() - start) * 1000
+    score = _compute_score(grader_results, task.scoring_mode)
+    any_required_failed = any(r.required and not r.passed for r in grader_results)
+    passed = score >= task.pass_threshold and not any_required_failed
+
+    return TaskResult(
+        task_id=task.task_id,
+        passed=passed,
+        score=score,
+        grader_results=grader_results,
+        duration_ms=duration_ms,
+        pass_threshold=task.pass_threshold,
+    )
+
+
 def run_task_against_code(
     task: Task,
     code_dir: Path,
@@ -305,6 +341,9 @@ def run_task_against_code(
     grading funnel (deterministic → Haiku triage → Opus deep review).
     *on_progress* is called after each file: ``(file_path, idx, total, score, cached)``.
     """
+    if all(s.type in _SUBPROCESS_GRADER_TYPES for s in task.graders):
+        return _run_subprocess_task(task, code_dir)
+
     if task.evaluation_mode == EvaluationMode.HOLISTIC:
         return run_task_holistic(task, code_dir, cache=cache, changed_files=changed_files, base_branch=base_branch)
 

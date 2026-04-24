@@ -1,0 +1,27 @@
+task_id: eng.subprocess.athena.go-test
+category: code_quality
+component: athena
+layer: engineering
+tier: gate
+description: "go test must pass for the Athena rules engine"
+eval_owner: diogo.dantas
+eval_cadence: per-pr
+
+input:
+  payload:
+    repo: services/athena
+
+expected: {}
+
+graders:
+  - type: subprocess
+    weight: 1.0
+    required: true
+    config:
+      command: ["go", "test", "./..."]
+      timeout_seconds: 120
+      pass_pattern: "^ok"
+      fail_pattern: "FAIL"
+
+scoring_mode: binary
+pass_threshold: 1.0

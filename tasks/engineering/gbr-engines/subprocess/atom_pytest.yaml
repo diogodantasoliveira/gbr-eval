@@ -1,0 +1,27 @@
+task_id: eng.subprocess.atom.pytest
+category: code_quality
+component: atom
+layer: engineering
+tier: gate
+description: "All pytest tests must pass for the atom service"
+eval_owner: diogo.dantas
+eval_cadence: per-pr
+
+input:
+  payload:
+    repo: services/atom
+
+expected: {}
+
+graders:
+  - type: subprocess
+    weight: 1.0
+    required: true
+    config:
+      command: ["uv", "run", "pytest", "--tb=short", "-q"]
+      timeout_seconds: 300
+      pass_pattern: "\\d+ passed"
+      fail_pattern: "ERRORS|ERROR collecting"
+
+scoring_mode: binary
+pass_threshold: 1.0

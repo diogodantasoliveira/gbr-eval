@@ -1,0 +1,25 @@
+task_id: eng.subprocess.atom.ruff
+category: convention
+component: atom
+layer: engineering
+tier: gate
+description: "ruff check must pass with zero lint errors for atom"
+eval_owner: diogo.dantas
+eval_cadence: per-pr
+
+input:
+  payload:
+    repo: services/atom
+
+expected: {}
+
+graders:
+  - type: subprocess
+    weight: 1.0
+    required: true
+    config:
+      command: ["uv", "run", "ruff", "check", "."]
+      timeout_seconds: 60
+
+scoring_mode: binary
+pass_threshold: 1.0

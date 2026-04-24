@@ -1,0 +1,26 @@
+task_id: eng.subprocess.admin-panel.typecheck
+category: code_quality
+component: admin-panel
+layer: engineering
+tier: gate
+description: "pnpm type-check must pass for the admin panel"
+eval_owner: diogo.dantas
+eval_cadence: per-pr
+
+input:
+  payload:
+    repo: services/admin-panel
+
+expected: {}
+
+graders:
+  - type: subprocess
+    weight: 1.0
+    required: true
+    config:
+      command: ["pnpm", "type-check"]
+      timeout_seconds: 120
+      fail_pattern: "error TS|Type error"
+
+scoring_mode: binary
+pass_threshold: 1.0
